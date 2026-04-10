@@ -1,0 +1,125 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "40e8a8f596361b91e1f318dfefc69ec84bbe03d84e": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "createRequisitionWithItems",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "createRequisitionWithItems",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0016d3cf7b06d8ba9fca40a102d15926c277da8c5a": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getVendorsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getVendorsAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00f2a4807dfd03bbe854e17bc42de9ee54a0f4dfd7": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getUserBranchAndDepartmentAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getUserBranchAndDepartmentAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "000c6532ed3867ed4abeede9b524f9ea180aa0f446": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getExpenseAccountsAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "40f63b9d2a7c789f85ddafe526696ac9551e57313f": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "createExpenseAccountAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    }
+  },
+  "edge": {}
+}

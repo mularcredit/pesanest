@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/dashboard/layout,_N_T_/dashboard/roles/layout,_N_T_/dashboard/roles/new/layout,_N_T_/dashboard/roles/new/page,_N_T_/dashboard/roles/new"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/dashboard/roles/new/__PAGE__",
+    "/dashboard/roles/new",
+    "/dashboard/roles",
+    "/dashboard",
+    "/_index",
+    "/_head"
+  ]
+}

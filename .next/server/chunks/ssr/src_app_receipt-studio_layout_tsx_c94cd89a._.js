@@ -1,0 +1,3 @@
+module.exports=[856345,a=>{"use strict";var b=a.i(907997);function c({children:a}){return(0,b.jsx)("div",{style:{fontFamily:'var(--font-lexend), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif'},children:a})}a.s(["default",()=>c,"metadata",0,{title:"Voucher Studio | Capital Pay",description:"Create & issue official disbursement vouchers"}])}];
+
+//# sourceMappingURL=src_app_receipt-studio_layout_tsx_c94cd89a._.js.map

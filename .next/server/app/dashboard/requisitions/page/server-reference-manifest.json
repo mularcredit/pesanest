@@ -1,0 +1,140 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "40e5a915ffde34cd104f26cb6be66c5129354d531b": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "fulfillRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "fulfillRequisition",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    },
+    "40cc3c86346a86d92cf0a79da6d6df49b29cad889a": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "updateRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "updateRequisition",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    },
+    "40bcc2650efa53f25c74601a0f41d5c15cc6289868": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "deleteVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "deleteVendor",
+      "filename": "src/app/actions/vendors.ts"
+    },
+    "4007b40d6a00f861e186e3ee52521619d64c97812f": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "deleteCustomer",
+          "filename": "src/app/actions/customers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "deleteCustomer",
+      "filename": "src/app/actions/customers.ts"
+    },
+    "40194ec4d9eb41beba9a073b5e444675b4089de4a0": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "deleteRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "deleteRequisition",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    },
+    "60efe64e5ee24a16fdbca79ba9f4f081dcf88a9fc6": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "updateMonthlyBudget",
+          "filename": "src/app/dashboard/requisitions/budget-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "updateMonthlyBudget",
+      "filename": "src/app/dashboard/requisitions/budget-actions.ts"
+    }
+  },
+  "edge": {}
+}

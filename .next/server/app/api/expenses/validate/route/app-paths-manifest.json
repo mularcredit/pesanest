@@ -1,0 +1,3 @@
+{
+  "/api/expenses/validate/route": "app/api/expenses/validate/route.js"
+}

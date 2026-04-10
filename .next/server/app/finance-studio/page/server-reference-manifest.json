@@ -1,0 +1,50 @@
+{
+  "node": {
+    "40421fb57a829df51b122ada5ad822bcba62473c0f": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": 15743,
+          "async": false,
+          "exportedName": "checkCreditNoteNumberUniqueness",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "exportedName": "checkCreditNoteNumberUniqueness",
+      "filename": "src/app/actions/finance-studio.ts"
+    },
+    "0098bd620327e0d7d00b6b38aa1871bd609bd9ef8e": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": 15743,
+          "async": false,
+          "exportedName": "getCustomersForStudio",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "exportedName": "getCustomersForStudio",
+      "filename": "src/app/actions/finance-studio.ts"
+    },
+    "70f48c3bf9e6f33e2663507c2e5a3a194ef9c80d2c": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": 15743,
+          "async": false,
+          "exportedName": "getStatementData",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "exportedName": "getStatementData",
+      "filename": "src/app/actions/finance-studio.ts"
+    }
+  },
+  "edge": {}
+}

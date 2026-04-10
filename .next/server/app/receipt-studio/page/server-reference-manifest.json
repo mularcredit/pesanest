@@ -1,0 +1,80 @@
+{
+  "node": {
+    "40d0a8da98663fcac8718043fb88e8cf5174e038d5": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getPaymentDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "exportedName": "getPaymentDetailsForReceipt",
+      "filename": "src/app/actions/receipt-studio.ts"
+    },
+    "4020e4191b171e7f49df0b23d61c800af88d01d53d": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getRequisitionDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "exportedName": "getRequisitionDetailsForReceipt",
+      "filename": "src/app/actions/receipt-studio.ts"
+    },
+    "40a353c83424ad8045fa3cca8572532faca7974d3f": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getInvoiceDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "exportedName": "getInvoiceDetailsForReceipt",
+      "filename": "src/app/actions/receipt-studio.ts"
+    },
+    "40c6ed5a509f7693ea697d0128158ac9ff44d2a932": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getExpenseDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "exportedName": "getExpenseDetailsForReceipt",
+      "filename": "src/app/actions/receipt-studio.ts"
+    },
+    "402cb8e23df55d9112bc199db320e2eed712bda77f": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getRequisitionItemDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "exportedName": "getRequisitionItemDetailsForReceipt",
+      "filename": "src/app/actions/receipt-studio.ts"
+    }
+  },
+  "edge": {}
+}

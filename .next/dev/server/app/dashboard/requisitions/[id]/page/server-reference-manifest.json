@@ -1,0 +1,80 @@
+{
+  "node": {
+    "00da2e63c392810a63b6438f5c38c682a140091ef0": {
+      "workers": {
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/[id]/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7": {
+      "workers": {
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/[id]/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0091a92555f278240af27907405115155c98dadd58": {
+      "workers": {
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/[id]/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "4094f3159f2cf1efe2e56822be3dd6fa18f60658f2": {
+      "workers": {
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "default",
+          "filename": "src/app/dashboard/requisitions/[id]/page.tsx"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/[id]/page": "rsc"
+      },
+      "exportedName": "default",
+      "filename": "src/app/dashboard/requisitions/[id]/page.tsx"
+    },
+    "40bc8ef0fcbe24f24edd0b3945be4e23836c92ecc3": {
+      "workers": {
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/[id]/page.tsx [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createItemPaymentBatch",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/[id]/page": "action-browser"
+      },
+      "exportedName": "createItemPaymentBatch",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    }
+  },
+  "edge": {}
+}

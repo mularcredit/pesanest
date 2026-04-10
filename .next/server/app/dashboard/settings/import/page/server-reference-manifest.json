@@ -1,0 +1,80 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/import/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/import/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/import/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "40e94330fb1ebd2f0733d83b628ea1b3dd108a8397": {
+      "workers": {
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "importCustomers",
+          "filename": "src/app/actions/bulk-import.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/import/page": "action-browser"
+      },
+      "exportedName": "importCustomers",
+      "filename": "src/app/actions/bulk-import.ts"
+    },
+    "40dea10a3bb28d9aeaa8ac46fbeec6808437f1d45e": {
+      "workers": {
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "importSales",
+          "filename": "src/app/actions/bulk-import.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/import/page": "action-browser"
+      },
+      "exportedName": "importSales",
+      "filename": "src/app/actions/bulk-import.ts"
+    }
+  },
+  "edge": {}
+}

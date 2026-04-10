@@ -1,0 +1,95 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "4063f3bae3ea615e2479232f7d83a5c15e25683fd2": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "createTaxRate",
+          "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "exportedName": "createTaxRate",
+      "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+    },
+    "40d624bf3ce7264a610cd61ac8da99de8618ec6cc2": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "updateTaxRate",
+          "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "exportedName": "updateTaxRate",
+      "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+    },
+    "605f868737ee6fb87b8a2fb3ee32210d5563af1cb6": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "toggleTaxRateStatus",
+          "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "exportedName": "toggleTaxRateStatus",
+      "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+    }
+  },
+  "edge": {}
+}

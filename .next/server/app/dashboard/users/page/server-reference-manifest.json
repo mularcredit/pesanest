@@ -1,0 +1,95 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0032d26e6dd48db08438292e40d93d7c97924e3362": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "getPendingUsers",
+          "filename": "src/app/actions/admin.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "exportedName": "getPendingUsers",
+      "filename": "src/app/actions/admin.ts"
+    },
+    "408ec1dc9398e7992d2e33872c0e825a1ad0deb344": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "approveUser",
+          "filename": "src/app/actions/admin.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "exportedName": "approveUser",
+      "filename": "src/app/actions/admin.ts"
+    },
+    "40ebe01e07f5c5f204cfbef1f62f584858e5c2be88": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "rejectUser",
+          "filename": "src/app/actions/admin.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "exportedName": "rejectUser",
+      "filename": "src/app/actions/admin.ts"
+    }
+  },
+  "edge": {}
+}

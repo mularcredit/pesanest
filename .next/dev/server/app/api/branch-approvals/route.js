@@ -1,0 +1,10 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/branch-approvals/route.js")
+R.c("server/chunks/node_modules_next_55548540._.js")
+R.c("server/chunks/node_modules_@auth_core_36df0127._.js")
+R.c("server/chunks/node_modules_jose_dist_webapi_868b124b._.js")
+R.c("server/chunks/node_modules_zod_v4_da12b5b3._.js")
+R.c("server/chunks/[root-of-the-server]__307a9db8._.js")
+R.c("server/chunks/[root-of-the-server]__b65f475d._.js")
+R.c("server/chunks/_next-internal_server_app_api_branch-approvals_route_actions_0fbdb5e9.js")
+R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/branch-approvals/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/branch-approvals/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

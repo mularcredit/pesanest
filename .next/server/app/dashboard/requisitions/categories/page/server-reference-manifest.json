@@ -1,0 +1,95 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "40fea340c869728a8980e35c6697c83092225000f5": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "createCustomCategory",
+          "filename": "src/app/dashboard/requisitions/category-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "exportedName": "createCustomCategory",
+      "filename": "src/app/dashboard/requisitions/category-actions.ts"
+    },
+    "406f76cd353f8532919a68724bd3145a1433e0508b": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "deleteCustomCategory",
+          "filename": "src/app/dashboard/requisitions/category-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "exportedName": "deleteCustomCategory",
+      "filename": "src/app/dashboard/requisitions/category-actions.ts"
+    },
+    "00d930b401f04e943e349d52ddd9ccdbf1fbdd8bff": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "getCustomCategories",
+          "filename": "src/app/dashboard/requisitions/category-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "exportedName": "getCustomCategories",
+      "filename": "src/app/dashboard/requisitions/category-actions.ts"
+    }
+  },
+  "edge": {}
+}

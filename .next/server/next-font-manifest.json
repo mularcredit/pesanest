@@ -1,0 +1,312 @@
+{
+  "app": {
+    "[project]/src/app/_not-found/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/chart-of-accounts/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/customers/[id]/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/customers/[id]/statement/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/customers/new/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/customers/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/ledger/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/payables/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/periods/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/reconciliation/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/reports/balance-sheet/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/reports/cash-flow/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/reports/income-statement/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/reports/trial-balance/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/sales/[id]/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/sales/new/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/sales/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/tax-rates/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/approvals/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/assets/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/audit/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/branch-approvals/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/branches/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/budgets/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/contracts/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/expenses/new/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/expenses/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/forecasting/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/invoices/[id]/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/invoices/new/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/invoices/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/payments/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/policies/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/regions/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/reports/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/[id]/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/categories/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/monthly/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/new/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/roles/[id]/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/roles/new/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/roles/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/salaries/[id]/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/salaries/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/schedules/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/settings/import/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/settings/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/team/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/users/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/vendors/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/wallet/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/workflow-analytics/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/finance-studio/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/forgot-password/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/login/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/receipt-studio/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/reset-password/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/signup/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}

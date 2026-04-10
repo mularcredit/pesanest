@@ -1,0 +1,140 @@
+{
+  "node": {
+    "00da2e63c392810a63b6438f5c38c682a140091ef0": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0091a92555f278240af27907405115155c98dadd58": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "4056bc53f0d80d8629f0dd5dfc17637703ec641596": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "fulfillRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "fulfillRequisition",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    },
+    "40e1e69edab14277e88444f56cefc0388179236fe3": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "updateRequisition",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    },
+    "40a4f25cab38431ee6c3e60b097dcb851512c82b59": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "deleteVendor",
+      "filename": "src/app/actions/vendors.ts"
+    },
+    "40ca75e3957829e48693d042037e04f87f11b16372": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteCustomer",
+          "filename": "src/app/actions/customers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "deleteCustomer",
+      "filename": "src/app/actions/customers.ts"
+    },
+    "40e14673047f6f15b55678ea0a5e7d0350fa0bce6c": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "deleteRequisition",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    },
+    "605caea99e2d4dad4cdb908fb6ff993d5fe5bb080a": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE4 => \"[project]/src/app/dashboard/requisitions/budget-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateMonthlyBudget",
+          "filename": "src/app/dashboard/requisitions/budget-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "exportedName": "updateMonthlyBudget",
+      "filename": "src/app/dashboard/requisitions/budget-actions.ts"
+    }
+  },
+  "edge": {}
+}

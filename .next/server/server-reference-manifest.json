@@ -1,0 +1,2290 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/accounting/chart-of-accounts/page": {
+          "moduleId": 144336,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/[id]/page": {
+          "moduleId": 106914,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/[id]/statement/page": {
+          "moduleId": 105232,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/new/page": {
+          "moduleId": 98631,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": 668012,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/ledger/page": {
+          "moduleId": 649675,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/payables/page": {
+          "moduleId": 244051,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reconciliation/page": {
+          "moduleId": 935008,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/balance-sheet/page": {
+          "moduleId": 68048,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/cash-flow/page": {
+          "moduleId": 382909,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/income-statement/page": {
+          "moduleId": 433711,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/trial-balance/page": {
+          "moduleId": 816320,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/[id]/page": {
+          "moduleId": 484240,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/new/page": {
+          "moduleId": 354220,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/page": {
+          "moduleId": 779801,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/approvals/page": {
+          "moduleId": 596386,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/audit/page": {
+          "moduleId": 972111,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/branch-approvals/page": {
+          "moduleId": 196032,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/branches/page": {
+          "moduleId": 372742,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/budgets/page": {
+          "moduleId": 285513,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/contracts/page": {
+          "moduleId": 367541,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/forecasting/page": {
+          "moduleId": 12701,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/[id]/page": {
+          "moduleId": 186734,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/new/page": {
+          "moduleId": 736433,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/page": {
+          "moduleId": 921701,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/payments/page": {
+          "moduleId": 137203,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/regions/page": {
+          "moduleId": 687606,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 590353,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": 468792,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/monthly/page": {
+          "moduleId": 317309,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/[id]/page": {
+          "moduleId": 683246,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/new/page": {
+          "moduleId": 530223,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/page": {
+          "moduleId": 135606,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/salaries/[id]/page": {
+          "moduleId": 227033,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/salaries/page": {
+          "moduleId": 930573,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/schedules/page": {
+          "moduleId": 130687,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 40723,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/workflow-analytics/page": {
+          "moduleId": 554933,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/chart-of-accounts/page": "action-browser",
+        "app/dashboard/accounting/customers/[id]/page": "action-browser",
+        "app/dashboard/accounting/customers/[id]/statement/page": "action-browser",
+        "app/dashboard/accounting/customers/new/page": "action-browser",
+        "app/dashboard/accounting/customers/page": "action-browser",
+        "app/dashboard/accounting/ledger/page": "action-browser",
+        "app/dashboard/accounting/payables/page": "action-browser",
+        "app/dashboard/accounting/periods/page": "action-browser",
+        "app/dashboard/accounting/reconciliation/page": "action-browser",
+        "app/dashboard/accounting/reports/balance-sheet/page": "action-browser",
+        "app/dashboard/accounting/reports/cash-flow/page": "action-browser",
+        "app/dashboard/accounting/reports/income-statement/page": "action-browser",
+        "app/dashboard/accounting/reports/trial-balance/page": "action-browser",
+        "app/dashboard/accounting/sales/[id]/page": "action-browser",
+        "app/dashboard/accounting/sales/new/page": "action-browser",
+        "app/dashboard/accounting/sales/page": "action-browser",
+        "app/dashboard/accounting/tax-rates/page": "action-browser",
+        "app/dashboard/approvals/page": "action-browser",
+        "app/dashboard/assets/page": "action-browser",
+        "app/dashboard/audit/page": "action-browser",
+        "app/dashboard/branch-approvals/page": "action-browser",
+        "app/dashboard/branches/page": "action-browser",
+        "app/dashboard/budgets/page": "action-browser",
+        "app/dashboard/contracts/page": "action-browser",
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/forecasting/page": "action-browser",
+        "app/dashboard/invoices/[id]/page": "action-browser",
+        "app/dashboard/invoices/new/page": "action-browser",
+        "app/dashboard/invoices/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/payments/page": "action-browser",
+        "app/dashboard/policies/page": "action-browser",
+        "app/dashboard/regions/page": "action-browser",
+        "app/dashboard/reports/page": "action-browser",
+        "app/dashboard/requisitions/[id]/page": "action-browser",
+        "app/dashboard/requisitions/categories/page": "action-browser",
+        "app/dashboard/requisitions/monthly/page": "action-browser",
+        "app/dashboard/requisitions/new/page": "action-browser",
+        "app/dashboard/requisitions/page": "action-browser",
+        "app/dashboard/roles/[id]/page": "action-browser",
+        "app/dashboard/roles/new/page": "action-browser",
+        "app/dashboard/roles/page": "action-browser",
+        "app/dashboard/salaries/[id]/page": "action-browser",
+        "app/dashboard/salaries/page": "action-browser",
+        "app/dashboard/schedules/page": "action-browser",
+        "app/dashboard/settings/import/page": "action-browser",
+        "app/dashboard/settings/page": "action-browser",
+        "app/dashboard/team/page": "action-browser",
+        "app/dashboard/users/page": "action-browser",
+        "app/dashboard/vendors/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser",
+        "app/dashboard/workflow-analytics/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "addItemToRequisition"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/accounting/chart-of-accounts/page": {
+          "moduleId": 144336,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/[id]/page": {
+          "moduleId": 106914,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/[id]/statement/page": {
+          "moduleId": 105232,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/new/page": {
+          "moduleId": 98631,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": 668012,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/ledger/page": {
+          "moduleId": 649675,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/payables/page": {
+          "moduleId": 244051,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reconciliation/page": {
+          "moduleId": 935008,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/balance-sheet/page": {
+          "moduleId": 68048,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/cash-flow/page": {
+          "moduleId": 382909,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/income-statement/page": {
+          "moduleId": 433711,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/trial-balance/page": {
+          "moduleId": 816320,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/[id]/page": {
+          "moduleId": 484240,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/new/page": {
+          "moduleId": 354220,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/page": {
+          "moduleId": 779801,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/approvals/page": {
+          "moduleId": 596386,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/audit/page": {
+          "moduleId": 972111,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/branch-approvals/page": {
+          "moduleId": 196032,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/branches/page": {
+          "moduleId": 372742,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/budgets/page": {
+          "moduleId": 285513,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/contracts/page": {
+          "moduleId": 367541,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/forecasting/page": {
+          "moduleId": 12701,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/[id]/page": {
+          "moduleId": 186734,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/new/page": {
+          "moduleId": 736433,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/page": {
+          "moduleId": 921701,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/payments/page": {
+          "moduleId": 137203,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/regions/page": {
+          "moduleId": 687606,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 590353,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": 468792,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/monthly/page": {
+          "moduleId": 317309,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/[id]/page": {
+          "moduleId": 683246,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/new/page": {
+          "moduleId": 530223,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/page": {
+          "moduleId": 135606,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/salaries/[id]/page": {
+          "moduleId": 227033,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/salaries/page": {
+          "moduleId": 930573,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/schedules/page": {
+          "moduleId": 130687,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 40723,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/workflow-analytics/page": {
+          "moduleId": 554933,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/chart-of-accounts/page": "action-browser",
+        "app/dashboard/accounting/customers/[id]/page": "action-browser",
+        "app/dashboard/accounting/customers/[id]/statement/page": "action-browser",
+        "app/dashboard/accounting/customers/new/page": "action-browser",
+        "app/dashboard/accounting/customers/page": "action-browser",
+        "app/dashboard/accounting/ledger/page": "action-browser",
+        "app/dashboard/accounting/payables/page": "action-browser",
+        "app/dashboard/accounting/periods/page": "action-browser",
+        "app/dashboard/accounting/reconciliation/page": "action-browser",
+        "app/dashboard/accounting/reports/balance-sheet/page": "action-browser",
+        "app/dashboard/accounting/reports/cash-flow/page": "action-browser",
+        "app/dashboard/accounting/reports/income-statement/page": "action-browser",
+        "app/dashboard/accounting/reports/trial-balance/page": "action-browser",
+        "app/dashboard/accounting/sales/[id]/page": "action-browser",
+        "app/dashboard/accounting/sales/new/page": "action-browser",
+        "app/dashboard/accounting/sales/page": "action-browser",
+        "app/dashboard/accounting/tax-rates/page": "action-browser",
+        "app/dashboard/approvals/page": "action-browser",
+        "app/dashboard/assets/page": "action-browser",
+        "app/dashboard/audit/page": "action-browser",
+        "app/dashboard/branch-approvals/page": "action-browser",
+        "app/dashboard/branches/page": "action-browser",
+        "app/dashboard/budgets/page": "action-browser",
+        "app/dashboard/contracts/page": "action-browser",
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/forecasting/page": "action-browser",
+        "app/dashboard/invoices/[id]/page": "action-browser",
+        "app/dashboard/invoices/new/page": "action-browser",
+        "app/dashboard/invoices/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/payments/page": "action-browser",
+        "app/dashboard/policies/page": "action-browser",
+        "app/dashboard/regions/page": "action-browser",
+        "app/dashboard/reports/page": "action-browser",
+        "app/dashboard/requisitions/[id]/page": "action-browser",
+        "app/dashboard/requisitions/categories/page": "action-browser",
+        "app/dashboard/requisitions/monthly/page": "action-browser",
+        "app/dashboard/requisitions/new/page": "action-browser",
+        "app/dashboard/requisitions/page": "action-browser",
+        "app/dashboard/roles/[id]/page": "action-browser",
+        "app/dashboard/roles/new/page": "action-browser",
+        "app/dashboard/roles/page": "action-browser",
+        "app/dashboard/salaries/[id]/page": "action-browser",
+        "app/dashboard/salaries/page": "action-browser",
+        "app/dashboard/schedules/page": "action-browser",
+        "app/dashboard/settings/import/page": "action-browser",
+        "app/dashboard/settings/page": "action-browser",
+        "app/dashboard/team/page": "action-browser",
+        "app/dashboard/users/page": "action-browser",
+        "app/dashboard/vendors/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser",
+        "app/dashboard/workflow-analytics/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "getCategoriesAction"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/accounting/chart-of-accounts/page": {
+          "moduleId": 144336,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/[id]/page": {
+          "moduleId": 106914,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/[id]/statement/page": {
+          "moduleId": 105232,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/new/page": {
+          "moduleId": 98631,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": 668012,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/ledger/page": {
+          "moduleId": 649675,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/payables/page": {
+          "moduleId": 244051,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reconciliation/page": {
+          "moduleId": 935008,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/balance-sheet/page": {
+          "moduleId": 68048,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/cash-flow/page": {
+          "moduleId": 382909,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/income-statement/page": {
+          "moduleId": 433711,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/reports/trial-balance/page": {
+          "moduleId": 816320,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/[id]/page": {
+          "moduleId": 484240,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/new/page": {
+          "moduleId": 354220,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/sales/page": {
+          "moduleId": 779801,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/approvals/page": {
+          "moduleId": 596386,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/audit/page": {
+          "moduleId": 972111,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/branch-approvals/page": {
+          "moduleId": 196032,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/branches/page": {
+          "moduleId": 372742,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/budgets/page": {
+          "moduleId": 285513,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/contracts/page": {
+          "moduleId": 367541,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/forecasting/page": {
+          "moduleId": 12701,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/[id]/page": {
+          "moduleId": 186734,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/new/page": {
+          "moduleId": 736433,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/invoices/page": {
+          "moduleId": 921701,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/payments/page": {
+          "moduleId": 137203,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/regions/page": {
+          "moduleId": 687606,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 590353,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": 468792,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/monthly/page": {
+          "moduleId": 317309,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/[id]/page": {
+          "moduleId": 683246,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/new/page": {
+          "moduleId": 530223,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/roles/page": {
+          "moduleId": 135606,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/salaries/[id]/page": {
+          "moduleId": 227033,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/salaries/page": {
+          "moduleId": 930573,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/schedules/page": {
+          "moduleId": 130687,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 40723,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/workflow-analytics/page": {
+          "moduleId": 554933,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/chart-of-accounts/page": "action-browser",
+        "app/dashboard/accounting/customers/[id]/page": "action-browser",
+        "app/dashboard/accounting/customers/[id]/statement/page": "action-browser",
+        "app/dashboard/accounting/customers/new/page": "action-browser",
+        "app/dashboard/accounting/customers/page": "action-browser",
+        "app/dashboard/accounting/ledger/page": "action-browser",
+        "app/dashboard/accounting/payables/page": "action-browser",
+        "app/dashboard/accounting/periods/page": "action-browser",
+        "app/dashboard/accounting/reconciliation/page": "action-browser",
+        "app/dashboard/accounting/reports/balance-sheet/page": "action-browser",
+        "app/dashboard/accounting/reports/cash-flow/page": "action-browser",
+        "app/dashboard/accounting/reports/income-statement/page": "action-browser",
+        "app/dashboard/accounting/reports/trial-balance/page": "action-browser",
+        "app/dashboard/accounting/sales/[id]/page": "action-browser",
+        "app/dashboard/accounting/sales/new/page": "action-browser",
+        "app/dashboard/accounting/sales/page": "action-browser",
+        "app/dashboard/accounting/tax-rates/page": "action-browser",
+        "app/dashboard/approvals/page": "action-browser",
+        "app/dashboard/assets/page": "action-browser",
+        "app/dashboard/audit/page": "action-browser",
+        "app/dashboard/branch-approvals/page": "action-browser",
+        "app/dashboard/branches/page": "action-browser",
+        "app/dashboard/budgets/page": "action-browser",
+        "app/dashboard/contracts/page": "action-browser",
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/forecasting/page": "action-browser",
+        "app/dashboard/invoices/[id]/page": "action-browser",
+        "app/dashboard/invoices/new/page": "action-browser",
+        "app/dashboard/invoices/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/payments/page": "action-browser",
+        "app/dashboard/policies/page": "action-browser",
+        "app/dashboard/regions/page": "action-browser",
+        "app/dashboard/reports/page": "action-browser",
+        "app/dashboard/requisitions/[id]/page": "action-browser",
+        "app/dashboard/requisitions/categories/page": "action-browser",
+        "app/dashboard/requisitions/monthly/page": "action-browser",
+        "app/dashboard/requisitions/new/page": "action-browser",
+        "app/dashboard/requisitions/page": "action-browser",
+        "app/dashboard/roles/[id]/page": "action-browser",
+        "app/dashboard/roles/new/page": "action-browser",
+        "app/dashboard/roles/page": "action-browser",
+        "app/dashboard/salaries/[id]/page": "action-browser",
+        "app/dashboard/salaries/page": "action-browser",
+        "app/dashboard/schedules/page": "action-browser",
+        "app/dashboard/settings/import/page": "action-browser",
+        "app/dashboard/settings/page": "action-browser",
+        "app/dashboard/team/page": "action-browser",
+        "app/dashboard/users/page": "action-browser",
+        "app/dashboard/vendors/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser",
+        "app/dashboard/workflow-analytics/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "getEligibleRequisitions"
+    },
+    "40e44a6614272ac57d60fd9f0795b7c690399724b5": {
+      "workers": {
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "createExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "createExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "createExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "createExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/new/actions.ts",
+      "exportedName": "createExpense"
+    },
+    "60adc523e16523a1fe8a4bdb5d09524d614212f9c1": {
+      "workers": {
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "updateExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "updateExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "updateExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "updateExpense",
+          "filename": "src/app/dashboard/expenses/new/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/new/actions.ts",
+      "exportedName": "updateExpense"
+    },
+    "60fabd2e0a5df4ecad7ff0ee8604ffe5abfc0a7a21": {
+      "workers": {
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "checkBudget",
+          "filename": "src/app/dashboard/expenses/new/budget-actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "checkBudget",
+          "filename": "src/app/dashboard/expenses/new/budget-actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "checkBudget",
+          "filename": "src/app/dashboard/expenses/new/budget-actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "checkBudget",
+          "filename": "src/app/dashboard/expenses/new/budget-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/new/budget-actions.ts",
+      "exportedName": "checkBudget"
+    },
+    "00d565a1ee3a1559ad50f374e9d8b28c8c941c490a": {
+      "workers": {
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "getVendors",
+          "filename": "src/app/dashboard/vendors/actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "getVendors",
+          "filename": "src/app/dashboard/vendors/actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "getVendors",
+          "filename": "src/app/dashboard/vendors/actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "getVendors",
+          "filename": "src/app/dashboard/vendors/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/vendors/actions.ts",
+      "exportedName": "getVendors"
+    },
+    "000c6532ed3867ed4abeede9b524f9ea180aa0f446": {
+      "workers": {
+        "app/dashboard/budgets/page": {
+          "moduleId": 285513,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/monthly/page": {
+          "moduleId": 317309,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/budgets/page": "action-browser",
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/requisitions/monthly/page": "action-browser",
+        "app/dashboard/requisitions/new/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "getExpenseAccountsAction"
+    },
+    "40f63b9d2a7c789f85ddafe526696ac9551e57313f": {
+      "workers": {
+        "app/dashboard/expenses/new/page": {
+          "moduleId": 379261,
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/monthly/page": {
+          "moduleId": 317309,
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        },
+        "app/dashboard/wallet/page": {
+          "moduleId": 989472,
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/new/page": "action-browser",
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/requisitions/monthly/page": "action-browser",
+        "app/dashboard/requisitions/new/page": "action-browser",
+        "app/dashboard/wallet/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "createExpenseAccountAction"
+    },
+    "609641164fa0ed2afdd5c0bb6f5b09b36d216c7e22": {
+      "workers": {
+        "app/dashboard/invoices/page": {
+          "moduleId": 921701,
+          "async": false,
+          "exportedName": "uploadQuickInvoice",
+          "filename": "src/app/dashboard/invoices/actions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 979312,
+          "async": false,
+          "exportedName": "uploadQuickInvoice",
+          "filename": "src/app/dashboard/invoices/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/invoices/page": "action-browser",
+        "app/dashboard/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/invoices/actions.ts",
+      "exportedName": "uploadQuickInvoice"
+    },
+    "40bcc2650efa53f25c74601a0f41d5c15cc6289868": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": 668012,
+          "async": false,
+          "exportedName": "deleteVendor",
+          "filename": "src/app/actions/vendors.ts"
+        },
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "deleteVendor",
+          "filename": "src/app/actions/vendors.ts"
+        },
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "deleteVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser",
+        "app/dashboard/requisitions/page": "action-browser",
+        "app/dashboard/vendors/page": "action-browser"
+      },
+      "filename": "src/app/actions/vendors.ts",
+      "exportedName": "deleteVendor"
+    },
+    "4007b40d6a00f861e186e3ee52521619d64c97812f": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": 668012,
+          "async": false,
+          "exportedName": "deleteCustomer",
+          "filename": "src/app/actions/customers.ts"
+        },
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "deleteCustomer",
+          "filename": "src/app/actions/customers.ts"
+        },
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "deleteCustomer",
+          "filename": "src/app/actions/customers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser",
+        "app/dashboard/requisitions/page": "action-browser",
+        "app/dashboard/vendors/page": "action-browser"
+      },
+      "filename": "src/app/actions/customers.ts",
+      "exportedName": "deleteCustomer"
+    },
+    "40194ec4d9eb41beba9a073b5e444675b4089de4a0": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": 668012,
+          "async": false,
+          "exportedName": "deleteRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        },
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "deleteRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        },
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "deleteRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser",
+        "app/dashboard/requisitions/page": "action-browser",
+        "app/dashboard/vendors/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/actions.ts",
+      "exportedName": "deleteRequisition"
+    },
+    "4004183ede112aa14908289bb1a8dcd0c42d5eb63c": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "createFiscalYear",
+          "filename": "src/app/dashboard/accounting/periods/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/accounting/periods/actions.ts",
+      "exportedName": "createFiscalYear"
+    },
+    "4035a6630512c2ca7c66ba1e35638f05cbfc60a9af": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "closePeriod",
+          "filename": "src/app/dashboard/accounting/periods/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/accounting/periods/actions.ts",
+      "exportedName": "closePeriod"
+    },
+    "4056072c3506070ec439682f150f09835c85649c7f": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "closeFiscalYear",
+          "filename": "src/app/dashboard/accounting/periods/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/accounting/periods/actions.ts",
+      "exportedName": "closeFiscalYear"
+    },
+    "4063f3bae3ea615e2479232f7d83a5c15e25683fd2": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "createTaxRate",
+          "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/accounting/tax-rates/actions.ts",
+      "exportedName": "createTaxRate"
+    },
+    "40d624bf3ce7264a610cd61ac8da99de8618ec6cc2": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "updateTaxRate",
+          "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/accounting/tax-rates/actions.ts",
+      "exportedName": "updateTaxRate"
+    },
+    "605f868737ee6fb87b8a2fb3ee32210d5563af1cb6": {
+      "workers": {
+        "app/dashboard/accounting/tax-rates/page": {
+          "moduleId": 638700,
+          "async": false,
+          "exportedName": "toggleTaxRateStatus",
+          "filename": "src/app/dashboard/accounting/tax-rates/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/tax-rates/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/accounting/tax-rates/actions.ts",
+      "exportedName": "toggleTaxRateStatus"
+    },
+    "002dec93e728fef43042cecb8085080133d535bc6a": {
+      "workers": {
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "getAssetStats",
+          "filename": "src/app/dashboard/assets/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/assets/page": "rsc"
+      },
+      "filename": "src/app/dashboard/assets/actions.ts",
+      "exportedName": "getAssetStats"
+    },
+    "007f61a4db223424de0cdde3899973c9f2d303b17c": {
+      "workers": {
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "runDepreciation",
+          "filename": "src/app/dashboard/assets/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/assets/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/assets/actions.ts",
+      "exportedName": "runDepreciation"
+    },
+    "40025ac87f3fd4bf0e521f6698bc7ef8ed42716654": {
+      "workers": {
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "getAssets",
+          "filename": "src/app/dashboard/assets/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/assets/page": "rsc"
+      },
+      "filename": "src/app/dashboard/assets/actions.ts",
+      "exportedName": "getAssets"
+    },
+    "404f038f3c58eee11d3055e4c86e3ba08927354fa0": {
+      "workers": {
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "deleteAsset",
+          "filename": "src/app/dashboard/assets/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/assets/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/assets/actions.ts",
+      "exportedName": "deleteAsset"
+    },
+    "40ca76100a5d1c4b998cff9a23821ed62c6980a60d": {
+      "workers": {
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "createAsset",
+          "filename": "src/app/dashboard/assets/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/assets/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/assets/actions.ts",
+      "exportedName": "createAsset"
+    },
+    "40123e8058f8005ca3ffeeaf380c1e7bc691acef55": {
+      "workers": {
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "processSalaryFile",
+          "filename": "src/app/dashboard/expenses/salary-upload-action.ts"
+        },
+        "app/dashboard/salaries/page": {
+          "moduleId": 930573,
+          "async": false,
+          "exportedName": "processSalaryFile",
+          "filename": "src/app/dashboard/expenses/salary-upload-action.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/page": "action-browser",
+        "app/dashboard/salaries/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/salary-upload-action.ts",
+      "exportedName": "processSalaryFile"
+    },
+    "00761e591a92c0e408a8b2baf70908f4419181df70": {
+      "workers": {
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "submitAllDrafts",
+          "filename": "src/app/dashboard/expenses/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/actions.ts",
+      "exportedName": "submitAllDrafts"
+    },
+    "407eae5af6da3cf5c59bd3c3116387210b2c51bb8c": {
+      "workers": {
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "deleteExpense",
+          "filename": "src/app/dashboard/expenses/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/actions.ts",
+      "exportedName": "deleteExpense"
+    },
+    "40cf0ada8cd9439d5092e2591194ba176d2198b7f5": {
+      "workers": {
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "rejectExpense",
+          "filename": "src/app/dashboard/expenses/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/actions.ts",
+      "exportedName": "rejectExpense"
+    },
+    "40b1ccbb7d2e6083cd75c7841379def23e2b728bb0": {
+      "workers": {
+        "app/dashboard/expenses/page": {
+          "moduleId": 642961,
+          "async": false,
+          "exportedName": "submitSelectedExpenses",
+          "filename": "src/app/dashboard/expenses/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/expenses/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/expenses/actions.ts",
+      "exportedName": "submitSelectedExpenses"
+    },
+    "605843176a9ef537dea7491e7167752edb74f3b774": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "togglePolicy",
+          "filename": "src/app/dashboard/policies/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/policies/actions.ts",
+      "exportedName": "togglePolicy"
+    },
+    "40e421ff8b86bb0856216091c6492edc3d2bc481ab": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "deletePolicy",
+          "filename": "src/app/dashboard/policies/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/policies/actions.ts",
+      "exportedName": "deletePolicy"
+    },
+    "400750a14ce1a59de0f99d063569833ab126c97907": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "createPolicy",
+          "filename": "src/app/dashboard/policies/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/policies/actions.ts",
+      "exportedName": "createPolicy"
+    },
+    "40e5a915ffde34cd104f26cb6be66c5129354d531b": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "fulfillRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/actions.ts",
+      "exportedName": "fulfillRequisition"
+    },
+    "40cc3c86346a86d92cf0a79da6d6df49b29cad889a": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "updateRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/actions.ts",
+      "exportedName": "updateRequisition"
+    },
+    "60efe64e5ee24a16fdbca79ba9f4f081dcf88a9fc6": {
+      "workers": {
+        "app/dashboard/requisitions/page": {
+          "moduleId": 835242,
+          "async": false,
+          "exportedName": "updateMonthlyBudget",
+          "filename": "src/app/dashboard/requisitions/budget-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/budget-actions.ts",
+      "exportedName": "updateMonthlyBudget"
+    },
+    "40187dffe501889c792702f2b0238902eca2917733": {
+      "workers": {
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": 468792,
+          "async": false,
+          "exportedName": "default",
+          "filename": "src/app/dashboard/requisitions/[id]/page.tsx"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/[id]/page": "rsc"
+      },
+      "filename": "src/app/dashboard/requisitions/[id]/page.tsx",
+      "exportedName": "default"
+    },
+    "4060f58e1cfd10196aaa5af69bf2a5f108db6f2159": {
+      "workers": {
+        "app/dashboard/requisitions/[id]/page": {
+          "moduleId": 468792,
+          "async": false,
+          "exportedName": "createItemPaymentBatch",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/[id]/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/actions.ts",
+      "exportedName": "createItemPaymentBatch"
+    },
+    "40fea340c869728a8980e35c6697c83092225000f5": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "createCustomCategory",
+          "filename": "src/app/dashboard/requisitions/category-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/category-actions.ts",
+      "exportedName": "createCustomCategory"
+    },
+    "406f76cd353f8532919a68724bd3145a1433e0508b": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "deleteCustomCategory",
+          "filename": "src/app/dashboard/requisitions/category-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/category-actions.ts",
+      "exportedName": "deleteCustomCategory"
+    },
+    "00d930b401f04e943e349d52ddd9ccdbf1fbdd8bff": {
+      "workers": {
+        "app/dashboard/requisitions/categories/page": {
+          "moduleId": 100220,
+          "async": false,
+          "exportedName": "getCustomCategories",
+          "filename": "src/app/dashboard/requisitions/category-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/categories/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/category-actions.ts",
+      "exportedName": "getCustomCategories"
+    },
+    "40535d42f7f728aedb694d4d2b12a39bdaa59c57eb": {
+      "workers": {
+        "app/dashboard/requisitions/monthly/page": {
+          "moduleId": 317309,
+          "async": false,
+          "exportedName": "createMonthlyBudget",
+          "filename": "src/app/dashboard/requisitions/budget-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/monthly/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/budget-actions.ts",
+      "exportedName": "createMonthlyBudget"
+    },
+    "40e8a8f596361b91e1f318dfefc69ec84bbe03d84e": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "createRequisitionWithItems",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "createRequisitionWithItems"
+    },
+    "0016d3cf7b06d8ba9fca40a102d15926c277da8c5a": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getVendorsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "getVendorsAction"
+    },
+    "00f2a4807dfd03bbe854e17bc42de9ee54a0f4dfd7": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": 360154,
+          "async": false,
+          "exportedName": "getUserBranchAndDepartmentAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts",
+      "exportedName": "getUserBranchAndDepartmentAction"
+    },
+    "406614ad7faf433a1d4266f0332fb4427e2a5e42f0": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": 40723,
+          "async": false,
+          "exportedName": "updateSettings",
+          "filename": "src/app/dashboard/settings/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/settings/actions.ts",
+      "exportedName": "updateSettings"
+    },
+    "40e94330fb1ebd2f0733d83b628ea1b3dd108a8397": {
+      "workers": {
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "importCustomers",
+          "filename": "src/app/actions/bulk-import.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/import/page": "action-browser"
+      },
+      "filename": "src/app/actions/bulk-import.ts",
+      "exportedName": "importCustomers"
+    },
+    "40dea10a3bb28d9aeaa8ac46fbeec6808437f1d45e": {
+      "workers": {
+        "app/dashboard/settings/import/page": {
+          "moduleId": 700899,
+          "async": false,
+          "exportedName": "importSales",
+          "filename": "src/app/actions/bulk-import.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/import/page": "action-browser"
+      },
+      "filename": "src/app/actions/bulk-import.ts",
+      "exportedName": "importSales"
+    },
+    "00376e9a3235b6bbf95f4199129a579be109c3ba44": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "getUsers",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "rsc"
+      },
+      "filename": "src/app/dashboard/team/actions.ts",
+      "exportedName": "getUsers"
+    },
+    "40880b2d23faab0576afe9be62cfe02b4160edd09b": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "createUser",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/team/actions.ts",
+      "exportedName": "createUser"
+    },
+    "409f7ae9c3bce6758a48cbc78095dee8e50d11d534": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "deleteUser",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/team/actions.ts",
+      "exportedName": "deleteUser"
+    },
+    "6054694c96742bd56cef4dbcafa22c382c34095c85": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "updateUser",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/team/actions.ts",
+      "exportedName": "updateUser"
+    },
+    "60a59a0e572fbc554892c6b0600e9d78ac1175e7b6": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "toggleUserStatus",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "filename": "src/app/dashboard/team/actions.ts",
+      "exportedName": "toggleUserStatus"
+    },
+    "0032d26e6dd48db08438292e40d93d7c97924e3362": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "getPendingUsers",
+          "filename": "src/app/actions/admin.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "filename": "src/app/actions/admin.ts",
+      "exportedName": "getPendingUsers"
+    },
+    "408ec1dc9398e7992d2e33872c0e825a1ad0deb344": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "approveUser",
+          "filename": "src/app/actions/admin.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "filename": "src/app/actions/admin.ts",
+      "exportedName": "approveUser"
+    },
+    "40ebe01e07f5c5f204cfbef1f62f584858e5c2be88": {
+      "workers": {
+        "app/dashboard/users/page": {
+          "moduleId": 374977,
+          "async": false,
+          "exportedName": "rejectUser",
+          "filename": "src/app/actions/admin.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/users/page": "action-browser"
+      },
+      "filename": "src/app/actions/admin.ts",
+      "exportedName": "rejectUser"
+    },
+    "60469a1a09647c423b5c09b235d0f69155cf8fd9e2": {
+      "workers": {
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "createVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/vendors/page": "action-browser"
+      },
+      "filename": "src/app/actions/vendors.ts",
+      "exportedName": "createVendor"
+    },
+    "60c6a1d55045d8dc31a6783431576df077b470fb93": {
+      "workers": {
+        "app/dashboard/vendors/page": {
+          "moduleId": 63304,
+          "async": false,
+          "exportedName": "updateVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/vendors/page": "action-browser"
+      },
+      "filename": "src/app/actions/vendors.ts",
+      "exportedName": "updateVendor"
+    },
+    "40421fb57a829df51b122ada5ad822bcba62473c0f": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": 15743,
+          "async": false,
+          "exportedName": "checkCreditNoteNumberUniqueness",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/finance-studio.ts",
+      "exportedName": "checkCreditNoteNumberUniqueness"
+    },
+    "0098bd620327e0d7d00b6b38aa1871bd609bd9ef8e": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": 15743,
+          "async": false,
+          "exportedName": "getCustomersForStudio",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/finance-studio.ts",
+      "exportedName": "getCustomersForStudio"
+    },
+    "70f48c3bf9e6f33e2663507c2e5a3a194ef9c80d2c": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": 15743,
+          "async": false,
+          "exportedName": "getStatementData",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/finance-studio.ts",
+      "exportedName": "getStatementData"
+    },
+    "40d0a8da98663fcac8718043fb88e8cf5174e038d5": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getPaymentDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/receipt-studio.ts",
+      "exportedName": "getPaymentDetailsForReceipt"
+    },
+    "4020e4191b171e7f49df0b23d61c800af88d01d53d": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getRequisitionDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/receipt-studio.ts",
+      "exportedName": "getRequisitionDetailsForReceipt"
+    },
+    "40a353c83424ad8045fa3cca8572532faca7974d3f": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getInvoiceDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/receipt-studio.ts",
+      "exportedName": "getInvoiceDetailsForReceipt"
+    },
+    "40c6ed5a509f7693ea697d0128158ac9ff44d2a932": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getExpenseDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/receipt-studio.ts",
+      "exportedName": "getExpenseDetailsForReceipt"
+    },
+    "402cb8e23df55d9112bc199db320e2eed712bda77f": {
+      "workers": {
+        "app/receipt-studio/page": {
+          "moduleId": 582380,
+          "async": false,
+          "exportedName": "getRequisitionItemDetailsForReceipt",
+          "filename": "src/app/actions/receipt-studio.ts"
+        }
+      },
+      "layer": {
+        "app/receipt-studio/page": "action-browser"
+      },
+      "filename": "src/app/actions/receipt-studio.ts",
+      "exportedName": "getRequisitionItemDetailsForReceipt"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "8N7cZmPoicZU67l7z3S7tkaMnKCYbFVM8VqwGVOndr0="
+}

@@ -1,0 +1,95 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "4004183ede112aa14908289bb1a8dcd0c42d5eb63c": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "createFiscalYear",
+          "filename": "src/app/dashboard/accounting/periods/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "exportedName": "createFiscalYear",
+      "filename": "src/app/dashboard/accounting/periods/actions.ts"
+    },
+    "4035a6630512c2ca7c66ba1e35638f05cbfc60a9af": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "closePeriod",
+          "filename": "src/app/dashboard/accounting/periods/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "exportedName": "closePeriod",
+      "filename": "src/app/dashboard/accounting/periods/actions.ts"
+    },
+    "4056072c3506070ec439682f150f09835c85649c7f": {
+      "workers": {
+        "app/dashboard/accounting/periods/page": {
+          "moduleId": 271231,
+          "async": false,
+          "exportedName": "closeFiscalYear",
+          "filename": "src/app/dashboard/accounting/periods/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/periods/page": "action-browser"
+      },
+      "exportedName": "closeFiscalYear",
+      "filename": "src/app/dashboard/accounting/periods/actions.ts"
+    }
+  },
+  "edge": {}
+}

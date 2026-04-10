@@ -1,0 +1,72 @@
+{
+  "app": {
+    "[project]/src/app/_not-found/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/accounting/ledger/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/expenses/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/reports/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/[id]/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/new/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/requisitions/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/salaries/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/dashboard/workflow-analytics/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/login/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ],
+    "[project]/src/app/signup/page": [
+      "static/media/ca31d6821328a4e9-s.p.8036670a.woff2",
+      "static/media/e8f2fbee2754df70-s.p.9b7a96b4.woff2",
+      "static/media/Geist_Variable-s.p.f19e4721.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}

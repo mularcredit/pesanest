@@ -1,0 +1,95 @@
+{
+  "node": {
+    "00da2e63c392810a63b6438f5c38c682a140091ef0": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0091a92555f278240af27907405115155c98dadd58": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "40a4f25cab38431ee6c3e60b097dcb851512c82b59": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "deleteVendor",
+      "filename": "src/app/actions/vendors.ts"
+    },
+    "40ca75e3957829e48693d042037e04f87f11b16372": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteCustomer",
+          "filename": "src/app/actions/customers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "deleteCustomer",
+      "filename": "src/app/actions/customers.ts"
+    },
+    "40e14673047f6f15b55678ea0a5e7d0350fa0bce6c": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteRequisition",
+          "filename": "src/app/dashboard/requisitions/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "deleteRequisition",
+      "filename": "src/app/dashboard/requisitions/actions.ts"
+    }
+  },
+  "edge": {}
+}

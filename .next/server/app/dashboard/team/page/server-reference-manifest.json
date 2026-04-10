@@ -1,0 +1,125 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00376e9a3235b6bbf95f4199129a579be109c3ba44": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "getUsers",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "rsc"
+      },
+      "exportedName": "getUsers",
+      "filename": "src/app/dashboard/team/actions.ts"
+    },
+    "40880b2d23faab0576afe9be62cfe02b4160edd09b": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "createUser",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "exportedName": "createUser",
+      "filename": "src/app/dashboard/team/actions.ts"
+    },
+    "409f7ae9c3bce6758a48cbc78095dee8e50d11d534": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "deleteUser",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "exportedName": "deleteUser",
+      "filename": "src/app/dashboard/team/actions.ts"
+    },
+    "6054694c96742bd56cef4dbcafa22c382c34095c85": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "updateUser",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "exportedName": "updateUser",
+      "filename": "src/app/dashboard/team/actions.ts"
+    },
+    "60a59a0e572fbc554892c6b0600e9d78ac1175e7b6": {
+      "workers": {
+        "app/dashboard/team/page": {
+          "moduleId": 19396,
+          "async": false,
+          "exportedName": "toggleUserStatus",
+          "filename": "src/app/dashboard/team/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/team/page": "action-browser"
+      },
+      "exportedName": "toggleUserStatus",
+      "filename": "src/app/dashboard/team/actions.ts"
+    }
+  },
+  "edge": {}
+}

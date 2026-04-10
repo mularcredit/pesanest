@@ -1,0 +1,125 @@
+{
+  "node": {
+    "00da2e63c392810a63b6438f5c38c682a140091ef0": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0091a92555f278240af27907405115155c98dadd58": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "4097090b14f3694beb8d26a31e2b39646a909d56a7": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createRequisitionWithItems",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "createRequisitionWithItems",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00eb32d07ce872f4d06f644c06492316c1f91587f3": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getVendorsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getVendorsAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00759d09b12d20c3d57c9ac1915c9f6e67486cd37d": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUserBranchAndDepartmentAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getUserBranchAndDepartmentAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0055ad71838ff70d1e9df2e7fb7df6728aa730ac9a": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getExpenseAccountsAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "getExpenseAccountsAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "40ce350df0d7e11b23077af3a50f4fd58849efd1f4": {
+      "workers": {
+        "app/dashboard/requisitions/new/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/requisitions/new/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createExpenseAccountAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/requisitions/new/page": "action-browser"
+      },
+      "exportedName": "createExpenseAccountAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    }
+  },
+  "edge": {}
+}

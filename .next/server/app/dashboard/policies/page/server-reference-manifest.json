@@ -1,0 +1,95 @@
+{
+  "node": {
+    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "addItemToRequisition",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "exportedName": "addItemToRequisition",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "getCategoriesAction",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "exportedName": "getCategoriesAction",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "getEligibleRequisitions",
+          "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "exportedName": "getEligibleRequisitions",
+      "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
+    },
+    "605843176a9ef537dea7491e7167752edb74f3b774": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "togglePolicy",
+          "filename": "src/app/dashboard/policies/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "exportedName": "togglePolicy",
+      "filename": "src/app/dashboard/policies/actions.ts"
+    },
+    "40e421ff8b86bb0856216091c6492edc3d2bc481ab": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "deletePolicy",
+          "filename": "src/app/dashboard/policies/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "exportedName": "deletePolicy",
+      "filename": "src/app/dashboard/policies/actions.ts"
+    },
+    "400750a14ce1a59de0f99d063569833ab126c97907": {
+      "workers": {
+        "app/dashboard/policies/page": {
+          "moduleId": 621923,
+          "async": false,
+          "exportedName": "createPolicy",
+          "filename": "src/app/dashboard/policies/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/policies/page": "action-browser"
+      },
+      "exportedName": "createPolicy",
+      "filename": "src/app/dashboard/policies/actions.ts"
+    }
+  },
+  "edge": {}
+}
