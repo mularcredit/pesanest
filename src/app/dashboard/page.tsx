@@ -114,13 +114,13 @@ export default async function DashboardPage() {
         acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
         return acc;
     }, {});
-    const topCategories = Object.entries(categorySpending).sort(([, a]: any, [, b]: any) => b - a).slice(0, 8);
+    const topCategories = Object.entries(categorySpending).sort(([, a]: any, [, b]: any) => b - a).slice(0, 8) as [string, number][];
 
     const requisitionCategorySpending = allRequisitions.reduce((acc: any, req: any) => {
         acc[req.category] = (acc[req.category] || 0) + req.amount;
         return acc;
     }, {});
-    const topReqCategories = Object.entries(requisitionCategorySpending).sort(([, a]: any, [, b]: any) => b - a).slice(0, 8);
+    const topReqCategories = Object.entries(requisitionCategorySpending).sort(([, a]: any, [, b]: any) => b - a).slice(0, 8) as [string, number][];
 
     const avgDailySpend = allExpenses.length > 0 ? allExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0) / 30 : 0;
     const recentLargeExpenses = allExpenses.filter((exp: any) => exp.amount > avgDailySpend * 3).slice(0, 3);
