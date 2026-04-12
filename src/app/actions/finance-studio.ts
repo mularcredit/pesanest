@@ -207,3 +207,64 @@ export async function checkCreditNoteNumberUniqueness(cnNumber: string) {
         return { error: "Failed to verify uniqueness" };
     }
 }
+
+export async function getSSCAAStatementData(fromDate?: string, toDate?: string) {
+    try {
+        const whereClause: any = {
+            OR: [
+                { type: 'SOUTH_SUDAN' },
+                { type: 'SOUTH_SUDAN_STRICT' },
+                { branch: 'SSCAA' },
+                { category: { contains: 'SSCAA', mode: 'insensitive' } }
+            ]
+        };
+
+        if (fromDate && toDate) {
+            const startDate = new Date(fromDate);
+            const endDateInclusive = new Date(toDate);
+            endDateInclusive.setHours(23, 59, 59, 999);
+            whereClause.createdAt = {
+                gte: startDate,
+                lte: endDateInclusive
+            };
+        }
+
+        const requisitions = await prisma.requisition.findMany({
+            where: whereClause,
+            orderBy: { createdAt: 'asc' }
+        });
+
+        let runningBalance = 0;
+        const formattedTransactions = requisitions.map((req, idx) => {
+            runningBalance += req.amount;
+            return {
+                id: req.id,
+                operator: req.description || req.title,
+                invoiceRef: `REQ-${req.id.substring(0, 8)}`,
+                period: req.createdAt.toLocaleDateString('en-GB'),
+                amount: req.amount,
+                balance: runningBalance
+            };
+        });
+
+        return {
+            customer: {
+                name: 'South Sudanese Civil Aviation Authority',
+                group: 'Government Agency',
+                country: 'South Sudan',
+                accountType: 'Treasury Beneficiary'
+            },
+            summary: {
+                openingBalance: 0,
+                totalCharges: runningBalance, // Total allocations
+                totalPayments: runningBalance, // Requisition payouts
+                outstandingBalance: runningBalance
+            },
+            transactions: formattedTransactions
+        };
+
+    } catch (error) {
+        console.error("Error generating SSCAA statement data:", error);
+        return null;
+    }
+}

@@ -369,11 +369,12 @@ export function EditBudgetModal({ isOpen, onClose, budget }: EditBudgetModalProp
                                                     )}
                                                 </div>
                                                 <div className="w-full md:w-28 flex items-center gap-1 border-b border-gray-100">
-                                                    <span className="text-gray-400 text-xs">$</span>
+                                                    <span className="text-gray-400 text-xs font-semibold">$</span>
                                                     <input
                                                         type="number"
-                                                        className="w-full bg-transparent text-sm font-mono text-right focus:outline-none px-1 text-gray-900 placeholder:text-gray-300"
-                                                        placeholder="0.00"
+                                                        step="1"
+                                                        className="w-full bg-transparent text-sm font-mono font-bold text-right focus:outline-none px-1 text-gray-900 placeholder:text-gray-300"
+                                                        placeholder="0"
                                                         value={item.amount || ""}
                                                         onChange={e => updateItem(index, 'amount', e.target.value)}
                                                         onFocus={(e) => e.target.select()}
@@ -398,8 +399,8 @@ export function EditBudgetModal({ isOpen, onClose, budget }: EditBudgetModalProp
                     <div className="h-[88px] px-6 bg-white border-t border-gray-100 flex items-center justify-between shrink-0 rounded-b-2xl">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">New Estimated Total</span>
-                            <span className="text-xl font-mono font-bold text-[#29258D]">
-                                ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            <span className="text-2xl font-mono font-bold text-[#29258D]">
+                                ${totalAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                             </span>
                         </div>
 

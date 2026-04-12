@@ -6,14 +6,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CreditNoteTemplate } from '@/components/finance-studio/CreditNoteTemplate';
 import { PaymentReceiptTemplate } from '@/components/finance-studio/PaymentReceiptTemplate';
 import { CustomerStatementTemplate, Transaction } from '@/components/finance-studio/CustomerStatementTemplate';
+import { SSCAAStatementTemplate, SSCAATransaction } from '@/components/finance-studio/SSCAAStatementTemplate';
 import { StudioDatePicker } from '@/components/finance-studio/StudioDatePicker';
 import { StudioDateRangePicker } from '@/components/finance-studio/StudioDateRangePicker';
 import { read, utils, writeFile } from 'xlsx';
 import { pdf } from '@react-pdf/renderer';
-import { ReceiptPDF, CreditNotePDF, StatementPDF } from '@/components/finance-studio/VectorTemplates';
-import { checkCreditNoteNumberUniqueness, getCustomersForStudio, getStatementData } from '@/app/actions/finance-studio';
+import { ReceiptPDF, CreditNotePDF, StatementPDF, SSCAAReportPDF } from '@/components/finance-studio/VectorTemplates';
+import { checkCreditNoteNumberUniqueness, getCustomersForStudio, getStatementData, getSSCAAStatementData } from '@/app/actions/finance-studio';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, setMonth, setYear } from "date-fns";
-import { PiTrash, PiPlus, PiFloppyDisk, PiFileText, PiReceipt, PiListBullets, PiArrowLeft, PiUpload, PiCaretDown, PiInfo, PiGear, PiCalendar, PiCaretLeft, PiCaretRight, PiWarningCircle, PiSortAscending } from 'react-icons/pi';
+import { PiTrash, PiPlus, PiFloppyDisk, PiFileText, PiReceipt, PiListBullets, PiArrowLeft, PiUpload, PiCaretDown, PiInfo, PiGear, PiCalendar, PiCaretLeft, PiCaretRight, PiWarningCircle, PiSortAscending, PiBuildings } from 'react-icons/pi';
 
 // Known airlines for quick fallback
 const KNOWN_AIRLINES = [
@@ -58,8 +59,9 @@ import { Suspense } from 'react';
 function FinanceStudioContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'CREDIT_NOTE' | 'RECEIPT' | 'STATEMENT'>('CREDIT_NOTE');
+    const [activeTab, setActiveTab] = useState<'CREDIT_NOTE' | 'RECEIPT' | 'STATEMENT' | 'SSCAA_REPORT'>('CREDIT_NOTE');
     const [settings, setSettings] = useState<Record<string, string>>({});
+    const [draftSaved, setDraftSaved] = useState(false);
 
     // Customer Selection State
     const [availableCustomers, setAvailableCustomers] = useState<any[]>([]);
@@ -99,19 +101,43 @@ function FinanceStudioContent() {
         // Fetch settings required for PDFs so they can match the HTML previews
         const fetchSettings = async () => {
             try {
-                // Fetch the keys that are used in VectorTemplates.tsx
                 const keys = [
                     'pesanest_statement_logo', 'nra_statement_logo_left', 'caa_statement_logo_right',
                     'statement_footer_logo_left', 'statement_footer_logo_center', 'statement_footer_logo_right',
                     'pesanest_receipt_logo', 'nra_receipt_logo_left', 'caa_receipt_logo_right',
                     'receipt_footer_logo_left', 'receipt_footer_logo_center', 'receipt_footer_logo_right',
-                    'watermark_logo'
+                    'watermark_logo',
+                    // Draft keys
+                    'studio_draft_credit_note', 'studio_draft_receipt', 'studio_draft_statement'
                 ].join(',');
                 
                 const res = await fetch(`/api/settings?keys=${keys}`);
                 if (res.ok) {
                     const data = await res.json();
                     setSettings(data);
+
+                    // Restore drafts from DB
+                    try {
+                        if (data.studio_draft_credit_note) {
+                            const cn = JSON.parse(data.studio_draft_credit_note);
+                            setCreditNoteData(prev => ({ ...prev, ...cn, date: new Date(cn.date) }));
+                        }
+                        if (data.studio_draft_receipt) {
+                            const r = JSON.parse(data.studio_draft_receipt);
+                            setReceiptData(prev => ({ ...prev, ...r, receiptDate: new Date(r.receiptDate), paymentDate: new Date(r.paymentDate) }));
+                        }
+                        if (data.studio_draft_statement) {
+                            const s = JSON.parse(data.studio_draft_statement);
+                            setStatementData(prev => ({
+                                ...prev, ...s,
+                                date: new Date(s.date),
+                                periodStart: s.periodStart ? new Date(s.periodStart) : null,
+                                periodEnd: s.periodEnd ? new Date(s.periodEnd) : null
+                            }));
+                        }
+                    } catch (e) {
+                        console.warn('Could not restore studio drafts:', e);
+                    }
                 }
             } catch (err) {
                 console.error("Failed to fetch settings:", err);
@@ -239,6 +265,33 @@ function FinanceStudioContent() {
             'This statement provides a detailed summary of your account activity for the specified period.',
             'Please review all transactions and contact our finance department for any discrepancies.',
             'Outstanding balances are due upon receipt of this statement.'
+        ]
+    });
+
+    // --- STATE FOR SSCAA REPORT ---
+    const [sscaaData, setSscaaData] = useState({
+        statementNo: `SSCAA-${format(new Date(), 'yyyyMMdd')}-001`,
+        date: new Date(),
+        periodStart: null as Date | null,
+        periodEnd: null as Date | null,
+        isLoading: false,
+        customer: {
+            name: 'South Sudanese Civil Aviation Authority',
+            group: 'Government Agency',
+            country: 'South Sudan',
+            accountType: 'Treasury Beneficiary'
+        },
+        summary: {
+            openingBalance: 0,
+            totalCharges: 0,
+            totalPayments: 0,
+            outstandingBalance: 0
+        },
+        transactions: [] as SSCAATransaction[],
+        notes: [
+            'This report reflects all requisition payouts disbursed to SSCAA by eService.',
+            'Debit: eService column reflects amounts debited from eService accounts.',
+            'Credit: SSCAA column reflects amounts credited to SSCAA.'
         ]
     });
 
@@ -625,6 +678,31 @@ function FinanceStudioContent() {
                         >
                             <PiListBullets className="text-lg" /> Statement
                         </button>
+                        <button
+                            onClick={async () => {
+                                setActiveTab('SSCAA_REPORT');
+                                setSscaaData(prev => ({ ...prev, isLoading: true }));
+                                const data = await getSSCAAStatementData(
+                                    sscaaData.periodStart ? sscaaData.periodStart.toISOString() : undefined,
+                                    sscaaData.periodEnd ? sscaaData.periodEnd.toISOString() : undefined
+                                );
+                                if (data) {
+                                    setSscaaData(prev => ({
+                                        ...prev,
+                                        isLoading: false,
+                                        customer: data.customer,
+                                        summary: data.summary,
+                                        transactions: data.transactions as SSCAATransaction[]
+                                    }));
+                                } else {
+                                    setSscaaData(prev => ({ ...prev, isLoading: false }));
+                                }
+                            }}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold rounded-lg transition-all duration-200 
+                            ${activeTab === 'SSCAA_REPORT' ? 'bg-red-700 text-white shadow-md shadow-red-900/20' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'}`}
+                        >
+                            <PiBuildings className="text-lg" /> SSCAA
+                        </button>
                     </div>
                 </div>
 
@@ -997,35 +1075,120 @@ function FinanceStudioContent() {
                             </div>
                         </div>
                     )}
+
+                    {/* --- SSCAA REPORT EDITOR --- */}
+                    {activeTab === 'SSCAA_REPORT' && (
+                        <div className="space-y-8 animate-in slide-in-from-left-4 duration-500 fade-in">
+                            <div>
+                                <div className="flex items-center gap-2 mb-4">
+                                    <h3 className="text-xs font-bold text-slate-300">SSCAA Report Info</h3>
+                                </div>
+                                <div className="space-y-5">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <InputLabel>Report No.</InputLabel>
+                                            <TextInput value={sscaaData.statementNo} onChange={(e: any) => setSscaaData({ ...sscaaData, statementNo: e.target.value })} />
+                                        </div>
+                                        <div>
+                                            <InputLabel>Report Date</InputLabel>
+                                            <StudioDatePicker value={sscaaData.date} onChange={(date) => setSscaaData({ ...sscaaData, date })} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <InputLabel>Date Range (Filter)</InputLabel>
+                                        <StudioDateRangePicker
+                                            startDate={sscaaData.periodStart}
+                                            endDate={sscaaData.periodEnd}
+                                            onSelect={(start, end) => setSscaaData({ ...sscaaData, periodStart: start, periodEnd: end })}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={async () => {
+                                            setSscaaData(prev => ({ ...prev, isLoading: true }));
+                                            const data = await getSSCAAStatementData(
+                                                sscaaData.periodStart ? sscaaData.periodStart.toISOString() : undefined,
+                                                sscaaData.periodEnd ? sscaaData.periodEnd.toISOString() : undefined
+                                            );
+                                            if (data) {
+                                                setSscaaData(prev => ({
+                                                    ...prev,
+                                                    isLoading: false,
+                                                    customer: data.customer,
+                                                    summary: data.summary,
+                                                    transactions: data.transactions as SSCAATransaction[]
+                                                }));
+                                            } else {
+                                                setSscaaData(prev => ({ ...prev, isLoading: false }));
+                                            }
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 bg-red-700 text-white font-bold py-2.5 rounded-lg border border-red-600 hover:bg-red-600 transition-all text-xs"
+                                    >
+                                        {sscaaData.isLoading ? 'Loading from Database...' : '↻  Refresh from Database'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <h3 className="text-xs font-bold text-slate-300">Transactions ({sscaaData.transactions.length})</h3>
+                                </div>
+                                <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700 text-[10px] text-slate-400">
+                                    {sscaaData.transactions.length === 0 ? (
+                                        <p>No SSCAA transactions found. Click "Refresh from Database" to load.</p>
+                                    ) : (
+                                        <p className="text-emerald-400 font-bold">✓ {sscaaData.transactions.length} transactions loaded from database.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* BOTTOM ACTIONS */}
                 <div className="p-5 border-t border-slate-800 bg-slate-900 shrink-0 grid grid-cols-2 gap-3 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.2)] print:hidden">
                     <button
-                        onClick={() => {
-                            // Save as Excel Draft
-                            const wb = utils.book_new();
-                            let data: any[] = [];
-                            let filename = "draft.xlsx";
-
-                            if (activeTab === 'STATEMENT') {
-                                data = statementData.transactions;
-                                filename = `Draftv1_${statementData.statementNo}.xlsx`;
-                            } else if (activeTab === 'CREDIT_NOTE') {
-                                data = [{ ...creditNoteData }];
-                                filename = `Draftv1_${creditNoteData.cnNumber}.xlsx`;
-                            } else {
-                                data = [{ ...receiptData }];
-                                filename = `Draftv1_${receiptData.receiptNo}.xlsx`;
+                        onClick={async () => {
+                            try {
+                                let key = '';
+                                let value = '';
+                                if (activeTab === 'STATEMENT') {
+                                    key = 'studio_draft_statement';
+                                    value = JSON.stringify(statementData);
+                                } else if (activeTab === 'CREDIT_NOTE') {
+                                    key = 'studio_draft_credit_note';
+                                    value = JSON.stringify(creditNoteData);
+                                } else if (activeTab === 'RECEIPT') {
+                                    key = 'studio_draft_receipt';
+                                    value = JSON.stringify(receiptData);
+                                } else if (activeTab === 'SSCAA_REPORT') {
+                                    key = 'studio_draft_sscaa';
+                                    value = JSON.stringify(sscaaData);
+                                }
+                                if (!key) return;
+                                const res = await fetch('/api/settings', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ updates: [{ key, value, description: 'Finance Studio draft' }] })
+                                });
+                                if (res.ok) {
+                                    setDraftSaved(true);
+                                    setTimeout(() => setDraftSaved(false), 2500);
+                                } else {
+                                    throw new Error('Server error');
+                                }
+                            } catch (e) {
+                                alert('Could not save draft. Please try again.');
                             }
-
-                            const ws = utils.json_to_sheet(data);
-                            utils.book_append_sheet(wb, ws, "Draft Data");
-                            writeFile(wb, filename);
                         }}
-                        className="flex items-center justify-center gap-2 bg-slate-800 text-white font-bold py-2.5 rounded-lg border border-slate-700 hover:bg-slate-700 hover:-translate-y-0.5 transition-all text-xs"
+                        className="flex items-center justify-center gap-2 font-bold py-2.5 rounded-lg border transition-all text-xs hover:-translate-y-0.5"
+                        style={{
+                            backgroundColor: draftSaved ? '#16a34a' : '#1e293b',
+                            borderColor: draftSaved ? '#15803d' : '#334155',
+                            color: '#ffffff'
+                        }}
                     >
-                        <PiFloppyDisk className="text-base" /> Save Draft (Short Form)
+                        <PiFloppyDisk className="text-base" />
+                        {draftSaved ? '✓ Saved to Cloud!' : 'Save Draft'}
                     </button>
                     <button
                         onClick={async (e) => {
@@ -1045,6 +1208,10 @@ function FinanceStudioContent() {
                                     MyDocument = <StatementPDF data={statementData} baseUrl={origin} settings={settings} />;
                                 } else if (activeTab === 'CREDIT_NOTE') {
                                     MyDocument = <CreditNotePDF data={creditNoteData} baseUrl={origin} settings={settings} />;
+                                } else if (activeTab === 'SSCAA_REPORT') {
+                                    const { periodStart: ps, periodEnd: pe, isLoading: _il, ...sscaaRest } = sscaaData;
+                                    const sscaaPeriod = ps && pe ? `${format(ps, 'dd MMM yyyy')} - ${format(pe, 'dd MMM yyyy')}` : 'All Time';
+                                    MyDocument = <SSCAAReportPDF data={{ ...sscaaRest, period: sscaaPeriod }} baseUrl={origin} settings={settings} />;
                                 } else {
                                     MyDocument = <ReceiptPDF data={receiptData} baseUrl={origin} settings={settings} />;
                                 }
@@ -1100,6 +1267,11 @@ function FinanceStudioContent() {
                                     const { periodStart, periodEnd, ...rest } = statementData;
                                     const period = periodStart && periodEnd ? `${format(periodStart, 'dd MMM yyyy')} - ${format(periodEnd, 'dd MMM yyyy')}` : '';
                                     return <CustomerStatementTemplate {...rest} period={period} />;
+                                })()}
+                                {activeTab === 'SSCAA_REPORT' && (() => {
+                                    const { periodStart, periodEnd, isLoading, ...rest } = sscaaData;
+                                    const period = periodStart && periodEnd ? `${format(periodStart, 'dd MMM yyyy')} - ${format(periodEnd, 'dd MMM yyyy')}` : 'All Time';
+                                    return <SSCAAStatementTemplate {...rest} period={period} />;
                                 })()}
                             </motion.div>
                         </AnimatePresence>

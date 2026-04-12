@@ -78,6 +78,9 @@ export default function NewRequisitionPage() {
     const [newAccountCode, setNewAccountCode] = useState("");
     const [accountCreateError, setAccountCreateError] = useState("");
     const [isSavingAccount, setIsSavingAccount] = useState(false);
+    const [isAccountOpen, setIsAccountOpen] = useState(false);
+    const [accountSearch, setAccountSearch] = useState("");
+    const [isTypeOpen, setIsTypeOpen] = useState(false);
 
     // Currency dropdown
     const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
@@ -315,10 +318,7 @@ export default function NewRequisitionPage() {
             return;
         }
 
-        if (!description.trim()) {
-            setFormMessage("Justification is required");
-            return;
-        }
+        // justification is now optional — no check needed
 
         // In quick mode, synthesize a single item from amount + category
         let resolvedItems = items;
@@ -456,101 +456,267 @@ export default function NewRequisitionPage() {
                     <div>
                         <h3 className="text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Request details</h3>
                         <div className="space-y-6">
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                    Requisition title <span className="text-rose-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all shadow-none placeholder:text-gray-300"
-                                    placeholder="What is this request for?"
-                                />
-                                {errors.title && (
-                                    <p className="text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1 leading-none">
-                                        <PiCheckCircle className="rotate-45" /> {errors.title}
-                                    </p>
-                                )}
-                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div className="md:col-span-1">
+                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                                        Type
+                                    </label>
+                                    <div className="relative">
+                                        {/* Custom Type Dropdown */}
+                                        <div
+                                            onClick={() => setIsTypeOpen(!isTypeOpen)}
+                                            className={`w-full bg-white border rounded-xl min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] ${
+                                                isTypeOpen ? 'border-[#29258D] ring-2 ring-[#29258D]/10' : 'border-gray-200'
+                                            }`}
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                {isSSCAEnabled ? (
+                                                    <>
+                                                        <PiCheckCircle className="text-[#29258D] text-sm" />
+                                                        <span className="text-sm font-semibold text-gray-900">SSCAA</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <PiStorefront className="text-gray-400 text-sm" />
+                                                        <span className="text-sm font-semibold text-gray-900">Standard</span>
+                                                    </>
+                                                )}
+                                            </span>
+                                            <PiCaretDown className={`text-gray-400 transition-transform text-sm ${isTypeOpen ? 'rotate-180' : ''}`} />
+                                        </div>
 
-                            {/* Special Workflow Toggle */}
-                            {process.env.NEXT_PUBLIC_APP_NAME !== "Pesanest" && (
-                            <div className={`border rounded-xl p-4 transition-all duration-300 ${isSSCAEnabled ? 'bg-[#29258D]/5 border-[#29258D]/20 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
-                                <div className="flex items-start gap-4">
-                                    <div className={`p-2 rounded-lg shrink-0 ${isSSCAEnabled ? 'bg-[#29258D] text-white' : 'bg-gray-100 text-gray-500'}`}>
-                                        <PiCheckCircle className="text-lg" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <label htmlFor="isSSCA" className="text-sm font-semibold text-gray-900 block cursor-pointer select-none">
-                                                    South Sudan civil aviation request
-                                                </label>
-                                                <p className="text-xs text-gray-500 mt-0.5 leading-tight">
-                                                    Enable expedited workflow for Civil Aviation fund requests.
-                                                </p>
-                                            </div>
-                                            <div className="relative inline-flex items-center cursor-pointer">
-                                                <label htmlFor="isSSCA" className="cursor-pointer flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        id="isSSCA"
-                                                        checked={isSSCAEnabled}
-                                                        onChange={(e) => {
+                                        {/* Dropdown Panel */}
+                                        {isTypeOpen && (
+                                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-2 animate-in fade-in zoom-in-95 duration-100">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { setIsSSCAEnabled(false); setIsTypeOpen(false); }}
+                                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
+                                                        !isSSCAEnabled ? 'bg-[#29258D]/8 text-[#29258D]' : 'hover:bg-gray-50 text-gray-700'
+                                                    }`}
+                                                >
+                                                    <PiStorefront className="text-sm opacity-70" />
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-bold leading-tight">Standard</p>
+                                                        <p className="text-[10px] opacity-60">Regular business request</p>
+                                                    </div>
+                                                </button>
+
+                                                {process.env.NEXT_PUBLIC_APP_NAME !== "Pesanest" && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
                                                             if ((session?.user as any)?.role !== 'SYSTEM_ADMIN') {
-                                                                e.preventDefault();
+                                                                setIsTypeOpen(false);
                                                                 setShowAccessDenied(true);
                                                                 return;
                                                             }
-                                                            setIsSSCAEnabled(e.target.checked);
+                                                            setIsSSCAEnabled(true);
+                                                            setIsTypeOpen(false);
                                                         }}
-                                                        className="sr-only peer"
-                                                    />
-                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#29258D]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#29258D]"></div>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        {isSSCAEnabled && (
-                                            <div className="mt-4 pt-4 border-t border-[#29258D]/10 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="flex items-center gap-3">
-                                                    <input
-                                                        type="checkbox"
-                                                        id="isStrictApproval"
-                                                        checked={isStrictApproval}
-                                                        onChange={(e) => setIsStrictApproval(e.target.checked)}
-                                                        className="h-4 w-4 text-[#29258D] focus:ring-[#29258D] border-gray-300 rounded cursor-pointer"
-                                                    />
-                                                    <label htmlFor="isStrictApproval" className="cursor-pointer select-none">
-                                                        <span className="text-xs font-semibold text-gray-900 block">Require strict approval</span>
-                                                        <span className="text-[10px] text-gray-500 block">Force Manager + Finance approval regardless of amount.</span>
-                                                    </label>
-                                                </div>
+                                                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left mt-1 ${
+                                                            isSSCAEnabled ? 'bg-[#29258D]/8 text-[#29258D]' : 'hover:bg-gray-50 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        <PiCheckCircle className="text-sm opacity-70" />
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-bold leading-tight">SSCAA Request</p>
+                                                            <p className="text-[10px] opacity-60">Civil Aviation workflow</p>
+                                                        </div>
+                                                    </button>
+                                                )}
                                             </div>
                                         )}
+                                        {isTypeOpen && <div className="fixed inset-0 z-40" onClick={() => setIsTypeOpen(false)} />}
                                     </div>
                                 </div>
+                                <div className="md:col-span-3">
+                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                                        Requisition title <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all shadow-none placeholder:text-gray-300"
+                                        placeholder="What is this request for?"
+                                    />
+                                    {errors.title && (
+                                        <p className="text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1 leading-none">
+                                            <PiCheckCircle className="rotate-45" /> {errors.title}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
+
+                            {isSSCAEnabled && (
+                                <div className="bg-[#29258D]/5 border border-[#29258D]/20 rounded-xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            id="isStrictApproval"
+                                            checked={isStrictApproval}
+                                            onChange={(e) => setIsStrictApproval(e.target.checked)}
+                                            className="h-4 w-4 text-[#29258D] focus:ring-[#29258D] border-gray-300 rounded cursor-pointer"
+                                        />
+                                        <label htmlFor="isStrictApproval" className="cursor-pointer select-none">
+                                            <span className="text-xs font-semibold text-gray-900 block">Require strict approval (SSCAA Workflow)</span>
+                                            <span className="text-[10px] text-gray-500 block">Force Manager + Finance approval regardless of amount for this Aviation request.</span>
+                                        </label>
+                                    </div>
+                                </div>
                             )}
+
+                            {/* GL Account — Custom Dropdown */}
+                            <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="block text-xs font-medium text-gray-700">Ledger Account <span className="text-gray-400 font-normal">(Optional)</span></label>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setIsCreatingAccount(!isCreatingAccount); setIsAccountOpen(false); }}
+                                        className="text-[#29258D] text-[10px] font-semibold hover:underline flex items-center gap-1"
+                                    >
+                                        <PiPlus /> {isCreatingAccount ? 'Cancel' : 'Create New'}
+                                    </button>
+                                </div>
+                                <div className="relative">
+                                    {/* Trigger */}
+                                    <div
+                                        onClick={() => { setIsAccountOpen(!isAccountOpen); setAccountSearch(""); }}
+                                        className={`w-full bg-white border rounded-xl min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] ${
+                                            isAccountOpen ? 'border-[#29258D] ring-2 ring-[#29258D]/10' : 'border-gray-200'
+                                        }`}
+                                    >
+                                        {customAccountId ? (() => {
+                                            const acc = expenseAccounts.find(a => a.id === customAccountId);
+                                            return acc ? (
+                                                <span className="flex items-center gap-2">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#29258D]/10 text-[#29258D] text-[10px] font-bold tracking-wide">{acc.code}</span>
+                                                    <span className="text-sm font-medium text-gray-900">{acc.name}</span>
+                                                </span>
+                                            ) : null;
+                                        })() : (
+                                            <span className="text-sm text-gray-400">Auto-mapped by category...</span>
+                                        )}
+                                        <PiCaretDown className={`text-gray-400 transition-transform text-sm ${isAccountOpen ? 'rotate-180' : ''}`} />
+                                    </div>
+
+                                    {/* Dropdown Panel */}
+                                    {isAccountOpen && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100">
+                                            {/* Search */}
+                                            <div className="relative mb-3">
+                                                <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                                                <input
+                                                    type="text"
+                                                    autoFocus
+                                                    placeholder="Search accounts..."
+                                                    value={accountSearch}
+                                                    onChange={e => setAccountSearch(e.target.value)}
+                                                    onClick={e => e.stopPropagation()}
+                                                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
+                                                />
+                                            </div>
+
+                                            <div className="max-h-52 overflow-y-auto space-y-0.5">
+                                                {/* Default option */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { setCustomAccountId(""); setIsAccountOpen(false); }}
+                                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
+                                                        !customAccountId ? 'bg-[#29258D]/8 border border-[#29258D]/20' : 'hover:bg-gray-50 border border-transparent'
+                                                    }`}
+                                                >
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-gray-500 text-[10px] font-bold">AUTO</span>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className={`text-sm font-semibold ${!customAccountId ? 'text-[#29258D]' : 'text-gray-700'}`}>Auto-mapped by Category</p>
+                                                        <p className="text-[10px] text-gray-400">System selects the GL account automatically</p>
+                                                    </div>
+                                                    {!customAccountId && <div className="w-2 h-2 rounded-full bg-[#29258D] shrink-0" />}
+                                                </button>
+
+                                                {/* Account list */}
+                                                {expenseAccounts
+                                                    .filter(acc =>
+                                                        acc.name.toLowerCase().includes(accountSearch.toLowerCase()) ||
+                                                        acc.code.toLowerCase().includes(accountSearch.toLowerCase())
+                                                    )
+                                                    .map(acc => (
+                                                        <button
+                                                            key={acc.id}
+                                                            type="button"
+                                                            onClick={() => { setCustomAccountId(acc.id); setIsAccountOpen(false); }}
+                                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
+                                                                customAccountId === acc.id ? 'bg-[#29258D]/8 border border-[#29258D]/20' : 'hover:bg-gray-50 border border-transparent'
+                                                            }`}
+                                                        >
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#29258D]/10 text-[#29258D] text-[10px] font-bold tracking-wide shrink-0">{acc.code}</span>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className={`text-sm font-semibold truncate ${customAccountId === acc.id ? 'text-[#29258D]' : 'text-gray-900'}`}>{acc.name}</p>
+                                                            </div>
+                                                            {customAccountId === acc.id && <div className="w-2 h-2 rounded-full bg-[#29258D] shrink-0" />}
+                                                        </button>
+                                                    ))
+                                                }
+
+                                                {/* Create new option */}
+                                                <button
+                                                    type="button"
+                                                    onClick={e => { e.stopPropagation(); setIsAccountOpen(false); setIsCreatingAccount(true); }}
+                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left border border-dashed border-[#29258D]/30 hover:border-[#29258D]/60 hover:bg-[#29258D]/5 mt-1"
+                                                >
+                                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#29258D]/10 text-[#29258D]"><PiPlus className="text-xs" /></span>
+                                                    <p className="text-sm font-semibold text-[#29258D]">Create New GL Account</p>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {isAccountOpen && <div className="fixed inset-0 z-40" onClick={() => setIsAccountOpen(false)} />}
+                                </div>
+
+                                {/* Inline create form */}
+                                {isCreatingAccount && (
+                                    <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <h4 className="text-xs font-bold text-gray-900">Create GL Account</h4>
+                                            <button type="button" onClick={() => setIsCreatingAccount(false)}><PiX className="text-gray-400 hover:text-gray-700" /></button>
+                                        </div>
+                                        {accountCreateError && <p className="text-red-500 text-[10px] mb-2">{accountCreateError}</p>}
+                                        <div className="grid grid-cols-2 gap-3 mb-3">
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-gray-700 mb-1">GL Code</label>
+                                                <input type="text" value={newAccountCode} onChange={e => setNewAccountCode(e.target.value)} placeholder="e.g. 6050" className="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-medium text-gray-700 mb-1">Account Name</label>
+                                                <input type="text" value={newAccountName} onChange={e => setNewAccountName(e.target.value)} placeholder="e.g. Special Event" className="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]" />
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleCreateAccount}
+                                            disabled={isSavingAccount}
+                                            className="w-full bg-[#29258D] text-white text-xs font-medium py-2 rounded flex justify-center items-center hover:bg-[#29258D]/90 disabled:opacity-50 transition-colors"
+                                        >
+                                            {isSavingAccount ? <PiArrowsClockwise className="animate-spin text-sm" /> : "Save Account"}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+
 
                             <div>
                                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                    Justification <span className="text-rose-500">*</span>
+                                    Justification <span className="text-gray-400 font-normal text-[10px]">(optional)</span>
                                 </label>
                                 <textarea
-                                    required
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all min-h-[100px] shadow-none resize-none placeholder:text-gray-300"
-                                    placeholder="Explain the business need and expected impact..."
+                                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all min-h-[80px] shadow-none resize-none placeholder:text-gray-300"
+                                    placeholder="Explain the business need (optional)..."
                                 />
-                                {errors.description && (
-                                    <p className="text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1 leading-none">
-                                        <PiCheckCircle className="rotate-45" /> {errors.description}
-                                    </p>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -577,12 +743,12 @@ export default function NewRequisitionPage() {
                                     </span>
                                     <input
                                         type="number"
-                                        step="0.01"
+                                        step="1"
                                         min="0"
                                         value={quickAmount}
                                         onChange={(e) => setQuickAmount(e.target.value)}
                                         className="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all font-mono"
-                                        placeholder="0.00"
+                                        placeholder="0"
                                     />
                                 </div>
                             </div>
@@ -738,7 +904,7 @@ export default function NewRequisitionPage() {
                                                     Qty: {item.quantity}
                                                 </span>
                                                 <span className="text-gray-600">
-                                                    @ {getCurrencySymbol(currency)}{item.unitPrice.toFixed(2)}
+                                                    @ {getCurrencySymbol(currency)}{item.unitPrice.toLocaleString()}
                                                 </span>
                                                 {item.isRecurring && (
                                                     <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold tracking-wide uppercase border border-blue-100">
@@ -746,7 +912,7 @@ export default function NewRequisitionPage() {
                                                     </span>
                                                 )}
                                                 <span className="font-semibold text-gray-900 ml-auto">
-                                                    {getCurrencySymbol(currency)}{(item.quantity * item.unitPrice).toFixed(2)}
+                                                    {getCurrencySymbol(currency)}{(item.quantity * item.unitPrice).toLocaleString()}
                                                 </span>
                                             </div>
                                         </div>
@@ -757,7 +923,7 @@ export default function NewRequisitionPage() {
                                 <div className="bg-[#29258D]/5 border border-[#29258D]/20 rounded-lg p-4 flex items-center justify-between">
                                     <span className="font-bold text-sm text-gray-900">Total Amount</span>
                                     <span className="font-bold text-lg text-[#29258D]">
-                                        {getCurrencySymbol(currency)}{calculateTotal().toFixed(2)}
+                                        {getCurrencySymbol(currency)}{calculateTotal().toLocaleString()}
                                     </span>
                                 </div>
                             </div>
@@ -945,7 +1111,7 @@ export default function NewRequisitionPage() {
 
                                     <div>
                                         <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                            Quantity <span className="text-rose-500">*</span>
+                                            Quantity <span className="text-gray-400 font-normal text-[10px]">(Optional)</span>
                                         </label>
                                         <input
                                             type="number"
@@ -966,12 +1132,12 @@ export default function NewRequisitionPage() {
                                             </span>
                                             <input
                                                 type="number"
-                                                step="0.01"
+                                                step="1"
                                                 min="0"
                                                 value={itemUnitPrice}
                                                 onChange={(e) => setItemUnitPrice(e.target.value)}
                                                 className="w-full bg-white border border-gray-200 rounded-lg pl-12 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all font-mono"
-                                                placeholder="0.00"
+                                                placeholder="0"
                                             />
                                         </div>
                                     </div>
@@ -1058,60 +1224,7 @@ export default function NewRequisitionPage() {
                     <div>
                         <h3 className="text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Logistics & accounting</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label className="block text-xs font-medium text-gray-700">Custom Ledger Account (Optional)</label>
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setIsCreatingAccount(true)}
-                                        className="text-[#29258D] text-[10px] font-semibold hover:underline flex items-center gap-1"
-                                    >
-                                        <PiPlus /> Create New
-                                    </button>
-                                </div>
-                                <select
-                                    value={customAccountId}
-                                    onChange={(e) => setCustomAccountId(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                >
-                                    <option value="">Default (Auto-mapped by Category)</option>
-                                    {expenseAccounts.map(acc => (
-                                        <option key={acc.id} value={acc.id}>
-                                            {acc.code} - {acc.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <p className="text-[10px] text-gray-500 mt-1">Specify an exact GL account for this request to override default behavior.</p>
-                                
-                                {isCreatingAccount && (
-                                    <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <h4 className="text-xs font-bold text-gray-900">Create GL Account</h4>
-                                            <button type="button" onClick={() => setIsCreatingAccount(false)}><PiX className="text-gray-400 hover:text-gray-700" /></button>
-                                        </div>
-                                        {accountCreateError && <p className="text-red-500 text-[10px] mb-2">{accountCreateError}</p>}
-                                        <div className="grid grid-cols-2 gap-3 mb-3">
-                                            <div>
-                                                <label className="block text-[10px] font-medium text-gray-700 mb-1">GL Code</label>
-                                                <input type="text" value={newAccountCode} onChange={e => setNewAccountCode(e.target.value)} placeholder="e.g. 6050" className="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-medium text-gray-700 mb-1">Account Name</label>
-                                                <input type="text" value={newAccountName} onChange={e => setNewAccountName(e.target.value)} placeholder="e.g. Special Event" className="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]" />
-                                            </div>
-                                        </div>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleCreateAccount}
-                                            disabled={isSavingAccount}
-                                            className="w-full bg-[#29258D] text-white text-xs font-medium py-2 rounded flex justify-center items-center hover:bg-[#29258D]/90 disabled:opacity-50 transition-colors"
-                                        >
-                                            {isSavingAccount ? <PiArrowsClockwise className="animate-spin text-sm" /> : "Save Account"}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                            
+
                             {process.env.NEXT_PUBLIC_APP_NAME === "PesaStack" && (
                                 <>
                                     <div>

@@ -1731,6 +1731,8 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
     const [newAccountCode, setNewAccountCode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [accountCreateError, setAccountCreateError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [isSavingAccount, setIsSavingAccount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isAccountOpen, setIsAccountOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [accountSearch, setAccountSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const filteredCategories = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$constants$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["EXPENSE_CATEGORIES"].filter((c)=>c.toLowerCase().includes(categorySearch.toLowerCase()));
     const filteredVendors = vendors.filter((v)=>v.name.toLowerCase().includes(vendorSearch.toLowerCase()));
     // Fetch Vendors & Accounts
@@ -1889,12 +1891,12 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                 className: "w-16 h-16 object-contain"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                lineNumber: 256,
+                                lineNumber: 259,
                                 columnNumber: 25
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 255,
+                            lineNumber: 258,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1904,7 +1906,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     children: "Emergency"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 259,
+                                    lineNumber: 262,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1912,19 +1914,19 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     children: "Enter the details of your expense below."
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 262,
+                                    lineNumber: 265,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 258,
+                            lineNumber: 261,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                    lineNumber: 254,
+                    lineNumber: 257,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1932,12 +1934,267 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center justify-between border-b border-gray-200 pb-2 mb-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                            className: "text-xs font-bold text-gray-900 uppercase tracking-wider",
+                                            children: "Account Routing"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                            lineNumber: 277,
+                                            columnNumber: 29
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: ()=>setIsCreatingAccount(true),
+                                            className: "text-xs font-bold text-[#29258D] hover:underline flex items-center gap-1",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiPlus"], {
+                                                    className: "text-[10px]"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                    lineNumber: 283,
+                                                    columnNumber: 33
+                                                }, this),
+                                                " Create New"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                            lineNumber: 278,
+                                            columnNumber: 29
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                    lineNumber: 276,
+                                    columnNumber: 25
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "relative",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            onClick: ()=>setIsAccountOpen(!isAccountOpen),
+                                            className: "w-full bg-white border border-gray-200 rounded-xl min-h-[48px] px-4 py-3 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] group shadow-sm",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex flex-col",
+                                                    children: customAccountId ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1",
+                                                                children: "Target Ledger"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                lineNumber: 294,
+                                                                columnNumber: 45
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "text-sm font-bold text-[#29258D]",
+                                                                        children: expenseAccounts.find((a)=>a.id === customAccountId)?.name
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                        lineNumber: 296,
+                                                                        columnNumber: 49
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "px-1.5 py-0.5 bg-[#29258D]/10 text-[#29258D] font-mono text-[10px] rounded border border-[#29258D]/20",
+                                                                        children: expenseAccounts.find((a)=>a.id === customAccountId)?.code
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                        lineNumber: 299,
+                                                                        columnNumber: 49
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                lineNumber: 295,
+                                                                columnNumber: 45
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "text-sm text-gray-400 font-medium",
+                                                        children: "Select target ledger account..."
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                        lineNumber: 305,
+                                                        columnNumber: 41
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                    lineNumber: 291,
+                                                    columnNumber: 33
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiCaretDown"], {
+                                                    className: `text-gray-400 transition-transform duration-200 ${isAccountOpen ? 'rotate-180' : ''}`
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                    lineNumber: 308,
+                                                    columnNumber: 33
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                            lineNumber: 287,
+                                            columnNumber: 29
+                                        }, this),
+                                        isAccountOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "p-3 border-b border-gray-50 flex items-center gap-3 bg-gray-50/50",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiMagnifyingGlass"], {
+                                                            className: "text-gray-400 text-lg shrink-0"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                            lineNumber: 314,
+                                                            columnNumber: 41
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            autoFocus: true,
+                                                            placeholder: "Search ledger accounts or GL codes...",
+                                                            value: accountSearch,
+                                                            onChange: (e)=>setAccountSearch(e.target.value),
+                                                            onClick: (e)=>e.stopPropagation(),
+                                                            className: "w-full bg-transparent border-none text-sm font-medium focus:ring-0 placeholder:text-gray-400"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                            lineNumber: 315,
+                                                            columnNumber: 41
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                    lineNumber: 313,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "max-h-64 overflow-y-auto custom-scrollbar p-2",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                            type: "button",
+                                                            onClick: ()=>{
+                                                                setCustomAccountId("");
+                                                                setIsAccountOpen(false);
+                                                            },
+                                                            className: `w-full text-left px-3 py-3 rounded-xl transition-all flex flex-col gap-0.5 mb-1 ${!customAccountId ? 'bg-[#29258D] text-white' : 'hover:bg-gray-50'}`,
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: `text-xs font-bold ${!customAccountId ? 'text-white/80' : 'text-gray-500'}`,
+                                                                    children: "DEFAULT ROUTING"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                    lineNumber: 331,
+                                                                    columnNumber: 45
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-[10px] opacity-70 italic",
+                                                                    children: "Category-based automated routing"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                    lineNumber: 332,
+                                                                    columnNumber: 45
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                            lineNumber: 326,
+                                                            columnNumber: 41
+                                                        }, this),
+                                                        expenseAccounts.filter((acc)=>acc.name.toLowerCase().includes(accountSearch.toLowerCase()) || acc.code.toLowerCase().includes(accountSearch.toLowerCase())).map((acc)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                type: "button",
+                                                                onClick: ()=>{
+                                                                    setCustomAccountId(acc.id);
+                                                                    setIsAccountOpen(false);
+                                                                },
+                                                                className: `w-full text-left px-3 py-3 rounded-xl transition-all flex items-center justify-between mb-1 ${customAccountId === acc.id ? 'bg-[#29258D] text-white shadow-lg shadow-[#29258D]/20' : 'hover:bg-gray-50'}`,
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "flex flex-col gap-0.5",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-sm font-bold leading-tight",
+                                                                                children: acc.name
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                                lineNumber: 346,
+                                                                                columnNumber: 53
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: `text-[10px] font-mono ${customAccountId === acc.id ? 'text-white/70' : 'text-gray-400'}`,
+                                                                                children: [
+                                                                                    "GL-",
+                                                                                    acc.code
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                                lineNumber: 347,
+                                                                                columnNumber: 53
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                        lineNumber: 345,
+                                                                        columnNumber: 49
+                                                                    }, this),
+                                                                    customAccountId === acc.id && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
+                                                                        className: "text-lg text-white"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                        lineNumber: 349,
+                                                                        columnNumber: 80
+                                                                    }, this)
+                                                                ]
+                                                            }, acc.id, true, {
+                                                                fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                                lineNumber: 339,
+                                                                columnNumber: 45
+                                                            }, this))
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                                    lineNumber: 325,
+                                                    columnNumber: 37
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                            lineNumber: 312,
+                                            columnNumber: 33
+                                        }, this),
+                                        isAccountOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "fixed inset-0 z-50",
+                                            onClick: ()=>setIsAccountOpen(false)
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                            lineNumber: 355,
+                                            columnNumber: 47
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                                    lineNumber: 286,
+                                    columnNumber: 25
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
+                            lineNumber: 275,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                     className: "text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4",
                                     children: "Transaction details"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 273,
+                                    lineNumber: 361,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1955,13 +2212,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                             children: "*"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 279,
+                                                            lineNumber: 367,
                                                             columnNumber: 90
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 278,
+                                                    lineNumber: 366,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$Input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1973,13 +2230,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     placeholder: mode === "quick" ? "E.g. Uber ride to airport" : "What is this expense for?"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 281,
+                                                    lineNumber: 369,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 277,
+                                            lineNumber: 365,
                                             columnNumber: 29
                                         }, this),
                                         mode === "full" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1989,17 +2246,17 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     children: [
                                                         "Description ",
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "text-rose-500",
-                                                            children: "*"
+                                                            className: "text-gray-400 font-normal text-[10px]",
+                                                            children: "(Optional)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 294,
+                                                            lineNumber: 382,
                                                             columnNumber: 115
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 294,
+                                                    lineNumber: 382,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$Textarea$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Textarea"], {
@@ -2010,25 +2267,25 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     placeholder: "Add any relevant context..."
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 295,
+                                                    lineNumber: 383,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 293,
+                                            lineNumber: 381,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 274,
+                                    lineNumber: 362,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 272,
+                            lineNumber: 360,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2038,7 +2295,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     children: "Financial overview"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 309,
+                                    lineNumber: 397,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2055,13 +2312,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                             children: "*"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 313,
+                                                            lineNumber: 401,
                                                             columnNumber: 106
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 313,
+                                                    lineNumber: 401,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2075,26 +2332,26 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     children: selectedCurrency.symbol
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 316,
+                                                                    lineNumber: 404,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$Input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
                                                                     type: "number",
                                                                     required: true,
-                                                                    step: "0.01",
+                                                                    step: "1",
                                                                     value: amount,
                                                                     onChange: (e)=>setAmount(e.target.value),
                                                                     className: "w-full bg-white border border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all font-mono shadow-none placeholder:text-gray-300",
-                                                                    placeholder: "0.00"
+                                                                    placeholder: "0"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 319,
+                                                                    lineNumber: 407,
                                                                     columnNumber: 41
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 315,
+                                                            lineNumber: 403,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2112,33 +2369,33 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                                     children: selectedCurrency.flag
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                    lineNumber: 336,
+                                                                                    lineNumber: 424,
                                                                                     columnNumber: 49
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                     children: selectedCurrency.code
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                    lineNumber: 337,
+                                                                                    lineNumber: 425,
                                                                                     columnNumber: 49
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                            lineNumber: 335,
+                                                                            lineNumber: 423,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                                             className: `text-gray-400 text-sm transition-transform ${isCurrencyOpen ? 'rotate-180' : ''}`
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                            lineNumber: 339,
+                                                                            lineNumber: 427,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 331,
+                                                                    lineNumber: 419,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 isCurrencyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2154,7 +2411,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                                     className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                    lineNumber: 344,
+                                                                                    lineNumber: 432,
                                                                                     columnNumber: 53
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2167,13 +2424,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                                     className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all shadow-none"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                    lineNumber: 345,
+                                                                                    lineNumber: 433,
                                                                                     columnNumber: 53
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                            lineNumber: 343,
+                                                                            lineNumber: 431,
                                                                             columnNumber: 49
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2192,7 +2449,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                                             children: cur.flag
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                            lineNumber: 366,
+                                                                                            lineNumber: 454,
                                                                                             columnNumber: 61
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2203,7 +2460,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                                                     children: cur.code
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                                    lineNumber: 368,
+                                                                                                    lineNumber: 456,
                                                                                                     columnNumber: 65
                                                                                                 }, this),
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2211,13 +2468,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                                                     children: cur.name
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                                    lineNumber: 369,
+                                                                                                    lineNumber: 457,
                                                                                                     columnNumber: 65
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                            lineNumber: 367,
+                                                                                            lineNumber: 455,
                                                                                             columnNumber: 61
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2225,31 +2482,31 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                                             children: cur.symbol
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                            lineNumber: 371,
+                                                                                            lineNumber: 459,
                                                                                             columnNumber: 61
                                                                                         }, this),
                                                                                         currency === cur.code && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                                             className: "w-2 h-2 rounded-full bg-[#29258D] shrink-0"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                            lineNumber: 373,
+                                                                                            lineNumber: 461,
                                                                                             columnNumber: 65
                                                                                         }, this)
                                                                                     ]
                                                                                 }, cur.code, true, {
                                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                                    lineNumber: 357,
+                                                                                    lineNumber: 445,
                                                                                     columnNumber: 57
                                                                                 }, this))
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                            lineNumber: 355,
+                                                                            lineNumber: 443,
                                                                             columnNumber: 49
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 342,
+                                                                    lineNumber: 430,
                                                                     columnNumber: 45
                                                                 }, this),
                                                                 isCurrencyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2257,25 +2514,25 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     onClick: ()=>setIsCurrencyOpen(false)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 380,
+                                                                    lineNumber: 468,
                                                                     columnNumber: 60
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 330,
+                                                            lineNumber: 418,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 314,
+                                                    lineNumber: 402,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 312,
+                                            lineNumber: 400,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2290,13 +2547,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                             children: "*"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 387,
+                                                            lineNumber: 475,
                                                             columnNumber: 108
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 387,
+                                                    lineNumber: 475,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2310,32 +2567,32 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                 children: category
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 394,
+                                                                lineNumber: 482,
                                                                 columnNumber: 45
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "text-sm text-gray-400",
                                                                 children: "Select a category..."
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 398,
+                                                                lineNumber: 486,
                                                                 columnNumber: 45
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 392,
+                                                            lineNumber: 480,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                             className: `text-gray-400 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 401,
+                                                            lineNumber: 489,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 388,
+                                                    lineNumber: 476,
                                                     columnNumber: 33
                                                 }, this),
                                                 isCategoryOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2348,7 +2605,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 408,
+                                                                    lineNumber: 496,
                                                                     columnNumber: 45
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2361,13 +2618,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all shadow-none"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 409,
+                                                                    lineNumber: 497,
                                                                     columnNumber: 45
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 407,
+                                                            lineNumber: 495,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2385,12 +2642,12 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                         children: cat
                                                                     }, cat, false, {
                                                                         fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                        lineNumber: 423,
+                                                                        lineNumber: 511,
                                                                         columnNumber: 57
                                                                     }, this))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 421,
+                                                                lineNumber: 509,
                                                                 columnNumber: 49
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "py-2 text-center",
@@ -2407,7 +2664,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                             className: "text-sm"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                            lineNumber: 452,
+                                                                            lineNumber: 540,
                                                                             columnNumber: 61
                                                                         }, this),
                                                                         'Create "',
@@ -2416,30 +2673,30 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 443,
+                                                                    lineNumber: 531,
                                                                     columnNumber: 57
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     className: "text-gray-500 text-xs",
                                                                     children: "No categories found"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 456,
+                                                                    lineNumber: 544,
                                                                     columnNumber: 57
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 441,
+                                                                lineNumber: 529,
                                                                 columnNumber: 49
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 419,
+                                                            lineNumber: 507,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 406,
+                                                    lineNumber: 494,
                                                     columnNumber: 37
                                                 }, this),
                                                 isCategoryOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2450,95 +2707,8 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 464,
+                                                    lineNumber: 552,
                                                     columnNumber: 37
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 386,
-                                            columnNumber: 29
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 310,
-                                    columnNumber: 25
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mb-6",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-xs font-medium text-gray-700 mb-1.5 cursor-help",
-                                            title: "Overrides standard category-based routing",
-                                            children: [
-                                                "Custom Ledger Account ",
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-gray-400 font-normal",
-                                                    children: "(Optional)"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 472,
-                                                    columnNumber: 55
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 471,
-                                            columnNumber: 29
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "flex gap-2",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                    value: customAccountId,
-                                                    onChange: (e)=>setCustomAccountId(e.target.value),
-                                                    className: "flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all shadow-none",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "",
-                                                            children: "Default Routing"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 480,
-                                                            columnNumber: 37
-                                                        }, this),
-                                                        expenseAccounts.map((acc)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                value: acc.id,
-                                                                children: [
-                                                                    acc.code,
-                                                                    " - ",
-                                                                    acc.name
-                                                                ]
-                                                            }, acc.id, true, {
-                                                                fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 482,
-                                                                columnNumber: 41
-                                                            }, this))
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 475,
-                                                    columnNumber: 33
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                    type: "button",
-                                                    onClick: ()=>setIsCreatingAccount(true),
-                                                    className: "px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[#29258D] hover:bg-[#29258D]/5 hover:border-[#29258D]/30 transition-all flex items-center gap-1.5 text-xs font-bold",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiPlus"], {
-                                                            className: "text-sm"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 492,
-                                                            columnNumber: 37
-                                                        }, this),
-                                                        " Create"
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 487,
-                                                    columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
@@ -2549,7 +2719,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 470,
+                                    lineNumber: 398,
                                     columnNumber: 25
                                 }, this),
                                 budgetStatus && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2559,7 +2729,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             className: `w-2 h-2 rounded-full shrink-0 ${budgetStatus.allowed ? budgetStatus.warning ? "bg-amber-500" : "bg-emerald-500" : "bg-rose-500"}`
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 505,
+                                            lineNumber: 567,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2567,19 +2737,19 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             children: budgetStatus.allowed ? budgetStatus.warning ? "Budget Warning" : `Budget Safe ($${budgetStatus.remainingAfter.toFixed(0)} left)` : "Limit Exceeded"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 509,
+                                            lineNumber: 571,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 499,
+                                    lineNumber: 561,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 308,
+                            lineNumber: 396,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2589,7 +2759,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     children: "Logistics & documentation"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 520,
+                                    lineNumber: 582,
                                     columnNumber: 25
                                 }, this),
                                 mode === "full" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2603,7 +2773,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     children: "Vendor name"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 527,
+                                                    lineNumber: 589,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2617,32 +2787,32 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                 children: merchant
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 534,
+                                                                lineNumber: 596,
                                                                 columnNumber: 49
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "text-sm text-gray-400",
                                                                 children: "Select vendor..."
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 538,
+                                                                lineNumber: 600,
                                                                 columnNumber: 49
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 532,
+                                                            lineNumber: 594,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                             className: `text-gray-400 transition-transform ${isVendorOpen ? 'rotate-180' : ''}`
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 541,
+                                                            lineNumber: 603,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 528,
+                                                    lineNumber: 590,
                                                     columnNumber: 37
                                                 }, this),
                                                 isVendorOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2655,7 +2825,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 548,
+                                                                    lineNumber: 610,
                                                                     columnNumber: 49
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2668,13 +2838,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all shadow-none"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 549,
+                                                                    lineNumber: 611,
                                                                     columnNumber: 49
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 547,
+                                                            lineNumber: 609,
                                                             columnNumber: 45
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2692,12 +2862,12 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                         children: v.name
                                                                     }, v.id, false, {
                                                                         fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                        lineNumber: 563,
+                                                                        lineNumber: 625,
                                                                         columnNumber: 61
                                                                     }, this))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 561,
+                                                                lineNumber: 623,
                                                                 columnNumber: 53
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "py-2 text-center",
@@ -2714,7 +2884,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                             className: "text-sm"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                            lineNumber: 592,
+                                                                            lineNumber: 654,
                                                                             columnNumber: 65
                                                                         }, this),
                                                                         'Use "',
@@ -2723,30 +2893,30 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 583,
+                                                                    lineNumber: 645,
                                                                     columnNumber: 61
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     className: "text-gray-500 text-xs",
                                                                     children: "No vendors found"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 596,
+                                                                    lineNumber: 658,
                                                                     columnNumber: 61
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                lineNumber: 581,
+                                                                lineNumber: 643,
                                                                 columnNumber: 53
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 559,
+                                                            lineNumber: 621,
                                                             columnNumber: 45
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 546,
+                                                    lineNumber: 608,
                                                     columnNumber: 41
                                                 }, this),
                                                 isVendorOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2757,13 +2927,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 604,
+                                                    lineNumber: 666,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 526,
+                                            lineNumber: 588,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2773,7 +2943,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     children: "Date of expense"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 610,
+                                                    lineNumber: 672,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$DatePicker$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DatePicker"], {
@@ -2783,19 +2953,19 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     className: "w-full"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 611,
+                                                    lineNumber: 673,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 609,
+                                            lineNumber: 671,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 524,
+                                    lineNumber: 586,
                                     columnNumber: 29
                                 }, this) : null,
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2805,7 +2975,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             children: "Receipt"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 623,
+                                            lineNumber: 685,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2817,7 +2987,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                     className: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 625,
+                                                    lineNumber: 687,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2830,13 +3000,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     className: "text-[#29258D] shrink-0 text-lg"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 635,
+                                                                    lineNumber: 697,
                                                                     columnNumber: 53
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiPaperclip"], {
                                                                     className: "text-gray-400 shrink-0 text-lg"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 635,
+                                                                    lineNumber: 697,
                                                                     columnNumber: 117
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2844,13 +3014,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                                     children: fileName || "Click to upload receipt"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                                    lineNumber: 636,
+                                                                    lineNumber: 698,
                                                                     columnNumber: 41
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 634,
+                                                            lineNumber: 696,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2858,37 +3028,37 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                                             children: "Browse"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                            lineNumber: 640,
+                                                            lineNumber: 702,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                                    lineNumber: 630,
+                                                    lineNumber: 692,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 624,
+                                            lineNumber: 686,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 622,
+                                    lineNumber: 684,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 519,
+                            lineNumber: 581,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                    lineNumber: 269,
+                    lineNumber: 272,
                     columnNumber: 17
                 }, this),
                 isCreatingAccount && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2902,7 +3072,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     children: "Create New Ledger Account"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 651,
+                                    lineNumber: 713,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2912,18 +3082,18 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                         className: "text-lg"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                        lineNumber: 653,
+                                        lineNumber: 715,
                                         columnNumber: 33
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 652,
+                                    lineNumber: 714,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 650,
+                            lineNumber: 712,
                             columnNumber: 25
                         }, this),
                         accountCreateError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2933,14 +3103,14 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     className: "text-base shrink-0"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 658,
+                                    lineNumber: 720,
                                     columnNumber: 33
                                 }, this),
                                 accountCreateError
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 657,
+                            lineNumber: 719,
                             columnNumber: 29
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2954,7 +3124,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             children: "Account Name"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 664,
+                                            lineNumber: 726,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$Input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -2965,13 +3135,13 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             className: "w-full text-sm font-medium"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 665,
+                                            lineNumber: 727,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 663,
+                                    lineNumber: 725,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2982,7 +3152,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             children: "GL Code"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 674,
+                                            lineNumber: 736,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$Input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -2993,19 +3163,19 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             className: "w-full text-sm font-mono"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 675,
+                                            lineNumber: 737,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 673,
+                                    lineNumber: 735,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 662,
+                            lineNumber: 724,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3020,7 +3190,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 685,
+                                    lineNumber: 747,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$Button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -3033,32 +3203,32 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                                             className: "animate-spin text-base mr-1.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 689,
+                                            lineNumber: 751,
                                             columnNumber: 52
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
                                             className: "text-base mr-1.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                            lineNumber: 689,
+                                            lineNumber: 751,
                                             columnNumber: 118
                                         }, this),
                                         "Save Account"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                                    lineNumber: 688,
+                                    lineNumber: 750,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 684,
+                            lineNumber: 746,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                    lineNumber: 649,
+                    lineNumber: 711,
                     columnNumber: 21
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3071,7 +3241,7 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                             children: "Cancel"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 699,
+                            lineNumber: 761,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3081,28 +3251,28 @@ function ExpenseForm({ mode, expense, onSuccess, onCancel }) {
                             children: isSubmitting ? "Saving..." : expense?.id ? "Update & Submit" : mode === "quick" ? "Save" : "Submit Claim"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                            lineNumber: 707,
+                            lineNumber: 769,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-                    lineNumber: 697,
+                    lineNumber: 759,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-            lineNumber: 251,
+            lineNumber: 254,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/expenses/ExpenseForm.tsx",
-        lineNumber: 250,
+        lineNumber: 253,
         columnNumber: 9
     }, this);
 }
-_s(ExpenseForm, "UvrFoakKOntz/otJQXAZnVcZzO8=", false, function() {
+_s(ExpenseForm, "t6nYZUqqlxNU16zKWEe6kF/93cI=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$ToastProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"]
     ];

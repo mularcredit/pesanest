@@ -32,7 +32,6 @@
     "jspdf-autotable": "^5.0.7",
     "next": "16.1.5",
     "next-auth": "^5.0.0-beta.30",
-    "prisma": "^5.22.0",
     "puppeteer": "^24.37.5",
     "react": "19.2.3",
     "react-chartjs-2": "^5.3.1",
@@ -55,6 +54,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.5",
+    "prisma": "^7.7.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

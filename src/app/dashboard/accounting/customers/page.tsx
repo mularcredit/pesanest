@@ -11,18 +11,49 @@ import {
     PiFileText,
     PiDownloadSimple,
     PiChartLineUp,
-    PiDotsThreeVertical
+    PiDotsThreeVertical,
+    PiTrash,
+    PiArrowCounterClockwise
 } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { DeleteEntityButton } from "@/components/dashboard/DeleteEntityButton";
+import { trashCustomer, restoreCustomer } from "@/app/actions/customers";
+import { TrashButton } from "./TrashButton"; // I will create this client component
 
-export default async function CustomersPage() {
+interface PageProps {
+    searchParams: Promise<{ view?: string }>
+}
+
+export default async function CustomersPage({ searchParams }: PageProps) {
+    const { view } = await searchParams;
+    const isTrashView = view === 'trash';
+
     const session = await auth();
     if (!session?.user) return redirect("/login");
 
+    // ONE-TIME DATA MIGRATION: Move requested airlines to trash
+    await prisma.customer.updateMany({
+        where: {
+            name: {
+                in: ["Saudi Arabian Airlines", "Flyadeal", "FLY Deal"]
+            },
+            isTrashed: false
+        },
+        data: {
+            isTrashed: true
+        }
+    });
+
+
+
+
+
     const customers = await prisma.customer.findMany({
+        where: {
+            isTrashed: isTrashView
+        },
         orderBy: { name: 'asc' },
         include: {
             sales: {
@@ -34,6 +65,15 @@ export default async function CustomersPage() {
         }
     });
 
+    const trashedCount = await prisma.customer.count({
+        where: { isTrashed: true }
+    });
+
+
+
+
+
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -43,12 +83,33 @@ export default async function CustomersPage() {
 
     return (
         <div className="space-y-8 animate-fade-in-up font-sans pb-12">
-            <div className="flex items-end justify-between">
-                <div>
-                    <h1 className="text-3xl font-heading font-bold text-[#0f172a] mb-1">Customer Portal</h1>
-                    <p className="text-gray-500 text-sm font-medium tracking-tight">
-                        Manage client relationships, receivables, and automated statements
-                    </p>
+            <div className="flex items-end justify-between border-b border-gray-100 pb-2">
+                <div className="flex gap-8">
+                    <Link
+                        href="/dashboard/accounting/customers"
+                        className={cn(
+                            "pb-4 text-sm font-bold tracking-tight transition-all relative",
+                            !isTrashView ? "text-[#5e48b8]" : "text-gray-400 hover:text-gray-600"
+                        )}
+                    >
+                        Active Customers
+                        {!isTrashView && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#5e48b8]" />}
+                    </Link>
+                    <Link
+                        href="/dashboard/accounting/customers?view=trash"
+                        className={cn(
+                            "pb-4 text-sm font-bold tracking-tight transition-all relative flex items-center gap-2",
+                            isTrashView ? "text-rose-600" : "text-gray-400 hover:text-gray-600"
+                        )}
+                    >
+                        Trash Bin
+                        {trashedCount > 0 && (
+                            <span className="px-1.5 py-0.5 bg-rose-50 text-[10px] rounded-full text-rose-600 border border-rose-100">
+                                {trashedCount}
+                            </span>
+                        )}
+                        {isTrashView && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-rose-600" />}
+                    </Link>
                 </div>
                 <Link href="/dashboard/accounting/customers/new">
                     <Button className="flex items-center gap-2 shadow-lg shadow-indigo-500/20 bg-[#5e48b8] hover:bg-[#4a369d] text-white">
@@ -59,13 +120,21 @@ export default async function CustomersPage() {
             </div>
 
             {customers.length === 0 ? (
-                <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-12 text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-indigo-50 mx-auto flex items-center justify-center">
-                        <PiUsersThree className="text-3xl text-[#5e48b8]" />
+                <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-16 text-center space-y-4">
+                    <div className="w-20 h-20 rounded-full bg-indigo-50 mx-auto flex items-center justify-center">
+                        {isTrashView ? (
+                            <PiTrash className="text-4xl text-rose-400" />
+                        ) : (
+                            <PiUsersThree className="text-4xl text-[#5e48b8]" />
+                        )}
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900">No customers yet</h3>
-                        <p className="text-sm text-gray-500 mt-1">Add your first customer to start tracking sales.</p>
+                        <h3 className="text-lg font-bold text-gray-900">
+                            {isTrashView ? "Your trash bin is empty" : "No customers yet"}
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                            {isTrashView ? "Items moved to trash will appear here." : "Add your first customer to start tracking sales."}
+                        </p>
                     </div>
                 </div>
             ) : (
@@ -116,17 +185,26 @@ export default async function CustomersPage() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end items-center gap-2">
-                                                    <Link
-                                                        href={`/dashboard/accounting/customers/${customer.id}/statement`}
-                                                        className="text-indigo-600 hover:text-indigo-800 text-xs font-semibold flex items-center gap-1 mr-2"
-                                                    >
-                                                        View Statement <PiArrowRight />
-                                                    </Link>
-                                                    <DeleteEntityButton
-                                                        id={customer.id}
-                                                        entityType="customer"
-                                                        entityName={customer.name}
-                                                    />
+                                                    {!isTrashView ? (
+                                                        <>
+                                                            <Link
+                                                                href={`/dashboard/accounting/customers/${customer.id}/statement`}
+                                                                className="text-indigo-600 hover:text-indigo-800 text-xs font-semibold flex items-center gap-1 mr-2"
+                                                            >
+                                                                View Statement <PiArrowRight />
+                                                            </Link>
+                                                            <TrashButton id={customer.id} entityType="customer" />
+                                                        </>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2">
+                                                            <TrashButton id={customer.id} entityType="customer" isRestore />
+                                                            <DeleteEntityButton
+                                                                id={customer.id}
+                                                                entityType="customer"
+                                                                entityName={customer.name}
+                                                            />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -136,8 +214,11 @@ export default async function CustomersPage() {
                         </table>
                     </div>
                     {/* Simple footer if needed */}
-                    <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 text-xs text-gray-500">
-                        {customers.length} Customers
+                    <div className="bg-[#f9fafb] px-6 py-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <span>{customers.length} {isTrashView ? 'Trashed' : 'Active'} Customers</span>
+                        {isTrashView && customers.length > 0 && (
+                            <span className="text-rose-400 normal-case font-medium italic">Items in trash can be restored or permanently removed</span>
+                        )}
                     </div>
                 </div>
             )}

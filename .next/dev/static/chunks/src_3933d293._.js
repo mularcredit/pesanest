@@ -1287,8 +1287,8 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                                     children: [
                                                         "Quantity ",
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "text-rose-500",
-                                                            children: "*"
+                                                            className: "text-gray-400 font-normal text-[10px]",
+                                                            children: "(Optional)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
                                                             lineNumber: 212,
@@ -1305,7 +1305,6 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                                     min: "1",
                                                     value: quantity,
                                                     onChange: (e)=>setQuantity(e.target.value),
-                                                    required: true,
                                                     className: "w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
@@ -1331,13 +1330,13 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                                             children: "*"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                                            lineNumber: 226,
+                                                            lineNumber: 225,
                                                             columnNumber: 61
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                                    lineNumber: 225,
+                                                    lineNumber: 224,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1348,33 +1347,33 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                                             children: formatCurrency(0, currency).replace(/[0-9.,\s]/g, '')
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                                            lineNumber: 229,
+                                                            lineNumber: 228,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                             type: "number",
-                                                            step: "0.01",
+                                                            step: "1",
                                                             min: "0",
                                                             value: unitPrice,
                                                             onChange: (e)=>setUnitPrice(e.target.value),
                                                             required: true,
                                                             className: "w-full bg-white border border-gray-200 rounded-lg pl-8 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all font-mono",
-                                                            placeholder: "0.00"
+                                                            placeholder: "0"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                                            lineNumber: 232,
+                                                            lineNumber: 231,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                                    lineNumber: 228,
+                                                    lineNumber: 227,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                            lineNumber: 224,
+                                            lineNumber: 223,
                                             columnNumber: 29
                                         }, this)
                                     ]
@@ -1391,7 +1390,7 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                             children: "Item Total"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                            lineNumber: 248,
+                                            lineNumber: 247,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1399,13 +1398,13 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                             children: formatCurrency((parseInt(quantity) || 0) * (parseFloat(unitPrice) || 0), currency)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                            lineNumber: 249,
+                                            lineNumber: 248,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                    lineNumber: 247,
+                                    lineNumber: 246,
                                     columnNumber: 29
                                 }, this)
                             ]
@@ -1424,7 +1423,7 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                    lineNumber: 257,
+                                    lineNumber: 256,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1436,20 +1435,20 @@ function AddItemModal({ isOpen, onClose, requisitionId, currency, onItemAdded })
                                             className: "text-sm"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                            lineNumber: 269,
+                                            lineNumber: 268,
                                             columnNumber: 29
                                         }, this),
                                         isSubmitting ? "Adding..." : "Add Item"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                                    lineNumber: 264,
+                                    lineNumber: 263,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/requisitions/AddItemModal.tsx",
-                            lineNumber: 256,
+                            lineNumber: 255,
                             columnNumber: 21
                         }, this)
                     ]

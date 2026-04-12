@@ -38,6 +38,7 @@ function ReceiptStudioContent() {
     const itemId = searchParams.get('itemId');
     const [isLoading, setIsLoading] = useState(false);
     const [settings, setSettings] = useState<Record<string, string>>({});
+    const [draftSaved, setDraftSaved] = useState(false);
 
     const [receiptData, setReceiptData] = useState({
         receiptNo: 'VCH-2026-8892',
@@ -138,12 +139,30 @@ function ReceiptStudioContent() {
         const fetchSettings = async () => {
             try {
                 const keys = [
-                    'voucher_header_logo', 'voucher_footer_logo', 'voucher_watermark_logo'
+                    'voucher_header_logo', 'voucher_footer_logo', 'voucher_watermark_logo',
+                    // Draft key
+                    'studio_draft_voucher'
                 ].join(',');
                 const res = await fetch(`/api/settings?keys=${keys}`);
                 if (res.ok) {
                     const data = await res.json();
                     setSettings(data);
+
+                    // Restore voucher draft from DB (only if not opened from a specific record)
+                    if (!paymentId && !requisitionId && !invoiceId && !expenseId && !itemId) {
+                        try {
+                            if (data.studio_draft_voucher) {
+                                const parsed = JSON.parse(data.studio_draft_voucher);
+                                setReceiptData({
+                                    ...parsed,
+                                    date: new Date(parsed.date),
+                                    items: parsed.items.map((item: any) => ({ ...item, date: new Date(item.date) }))
+                                });
+                            }
+                        } catch (e) {
+                            console.warn('Could not restore voucher draft:', e);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error("Failed to fetch settings:", err);
@@ -438,21 +457,38 @@ function ReceiptStudioContent() {
                 {/* BOTTOM ACTIONS - Matching Finance Studio exactly */}
                 <div className="p-5 border-t border-slate-800 bg-slate-900 shrink-0 grid grid-cols-2 gap-3 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.2)] print:hidden">
                     <button
-                        onClick={() => {
-                            const wb = utils.book_new();
-                            const data = receiptData.items.map(item => ({
-                                Description: item.description,
-                                Subtext: item.subtext,
-                                Amount: item.amount,
-                                Date: item.date.toLocaleDateString()
-                            }));
-                            const ws = utils.json_to_sheet(data);
-                            utils.book_append_sheet(wb, ws, "Voucher Items");
-                            writeFile(wb, `Draft_${receiptData.receiptNo}.xlsx`);
+                        onClick={async () => {
+                            try {
+                                const res = await fetch('/api/settings', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        updates: [{
+                                            key: 'studio_draft_voucher',
+                                            value: JSON.stringify(receiptData),
+                                            description: 'Voucher Studio draft'
+                                        }]
+                                    })
+                                });
+                                if (res.ok) {
+                                    setDraftSaved(true);
+                                    setTimeout(() => setDraftSaved(false), 2500);
+                                } else {
+                                    throw new Error('Server error');
+                                }
+                            } catch (e) {
+                                alert('Could not save draft. Please try again.');
+                            }
                         }}
-                        className="flex items-center justify-center gap-2 bg-slate-800 text-white font-bold py-2.5 rounded-lg border border-slate-700 hover:bg-slate-700 hover:-translate-y-0.5 transition-all text-xs"
+                        className="flex items-center justify-center gap-2 font-bold py-2.5 rounded-lg border transition-all text-xs hover:-translate-y-0.5 "
+                        style={{
+                            backgroundColor: draftSaved ? '#16a34a' : '#1e293b',
+                            borderColor: draftSaved ? '#15803d' : '#334155',
+                            color: '#ffffff'
+                        }}
                     >
-                        <PiFloppyDisk className="text-base" /> Save Draft (Short Form)
+                        <PiFloppyDisk className="text-base" />
+                        {draftSaved ? '✓ Saved to Cloud!' : 'Save Draft'}
                     </button>
                     <button
                         onClick={async (e) => {

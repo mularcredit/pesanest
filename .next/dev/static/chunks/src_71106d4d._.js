@@ -1002,7 +1002,7 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                                                     className: "w-full md:w-28 flex items-center gap-1 border-b border-gray-100",
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "text-gray-400 text-xs",
+                                                                            className: "text-gray-400 text-xs font-semibold",
                                                                             children: "$"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
@@ -1011,8 +1011,9 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                                             type: "number",
-                                                                            className: "w-full bg-transparent text-sm font-mono text-right focus:outline-none px-1 text-gray-900 placeholder:text-gray-300",
-                                                                            placeholder: "0.00",
+                                                                            step: "1",
+                                                                            className: "w-full bg-transparent text-sm font-mono font-bold text-right focus:outline-none px-1 text-gray-900 placeholder:text-gray-300",
+                                                                            placeholder: "0",
                                                                             value: item.amount || "",
                                                                             onChange: (e)=>updateItem(index, 'amount', e.target.value),
                                                                             onFocus: (e)=>e.target.select()
@@ -1033,12 +1034,12 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                                                     className: "text-gray-300 hover:text-rose-500 transition-colors pt-2 md:pt-0",
                                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PiTrash"], {}, void 0, false, {
                                                                         fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                                                        lineNumber: 387,
+                                                                        lineNumber: 388,
                                                                         columnNumber: 53
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                                                    lineNumber: 382,
+                                                                    lineNumber: 383,
                                                                     columnNumber: 49
                                                                 }, this)
                                                             ]
@@ -1086,26 +1087,26 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                         children: "New Estimated Total"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                        lineNumber: 400,
+                                        lineNumber: 401,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "text-xl font-mono font-bold text-[#29258D]",
+                                        className: "text-2xl font-mono font-bold text-[#29258D]",
                                         children: [
                                             "$",
                                             totalAmount.toLocaleString(undefined, {
-                                                minimumFractionDigits: 2
+                                                maximumFractionDigits: 0
                                             })
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                        lineNumber: 401,
+                                        lineNumber: 402,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                lineNumber: 399,
+                                lineNumber: 400,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1118,7 +1119,7 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                         children: "Cancel"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                        lineNumber: 407,
+                                        lineNumber: 408,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1132,7 +1133,7 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                                     className: "w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                                    lineNumber: 421,
+                                                    lineNumber: 422,
                                                     columnNumber: 39
                                                 }, this),
                                                 " Saving..."
@@ -1143,7 +1144,7 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                                     className: "text-base"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                                    lineNumber: 424,
+                                                    lineNumber: 425,
                                                     columnNumber: 41
                                                 }, this),
                                                 "Save Changes"
@@ -1151,19 +1152,19 @@ function EditBudgetModal({ isOpen, onClose, budget }) {
                                         }, void 0, true)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                        lineNumber: 414,
+                                        lineNumber: 415,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                                lineNumber: 406,
+                                lineNumber: 407,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/requisitions/EditBudgetModal.tsx",
-                        lineNumber: 398,
+                        lineNumber: 399,
                         columnNumber: 21
                     }, this)
                 ]

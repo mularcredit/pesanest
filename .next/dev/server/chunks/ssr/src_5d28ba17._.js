@@ -554,6 +554,9 @@ function NewRequisitionPage() {
     const [newAccountCode, setNewAccountCode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [accountCreateError, setAccountCreateError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [isSavingAccount, setIsSavingAccount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isAccountOpen, setIsAccountOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [accountSearch, setAccountSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [isTypeOpen, setIsTypeOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     // Currency dropdown
     const [isCurrencyOpen, setIsCurrencyOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [currencySearch, setCurrencySearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
@@ -929,10 +932,7 @@ function NewRequisitionPage() {
             setFormMessage("Requisition title is required");
             return;
         }
-        if (!description.trim()) {
-            setFormMessage("Justification is required");
-            return;
-        }
+        // justification is now optional — no check needed
         // In quick mode, synthesize a single item from amount + category
         let resolvedItems = items;
         if (formMode === "quick") {
@@ -1188,18 +1188,202 @@ function NewRequisitionPage() {
                                         className: "space-y-6",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "grid grid-cols-1 md:grid-cols-4 gap-4",
                                                 children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                        className: "block text-xs font-medium text-gray-700 mb-1.5",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "md:col-span-1",
                                                         children: [
-                                                            "Requisition title ",
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "text-rose-500",
-                                                                children: "*"
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                className: "block text-xs font-medium text-gray-700 mb-1.5",
+                                                                children: "Type"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
                                                                 lineNumber: 461,
-                                                                columnNumber: 55
+                                                                columnNumber: 37
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "relative",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        onClick: ()=>setIsTypeOpen(!isTypeOpen),
+                                                                        className: `w-full bg-white border rounded-xl min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] ${isTypeOpen ? 'border-[#29258D] ring-2 ring-[#29258D]/10' : 'border-gray-200'}`,
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "flex items-center gap-2",
+                                                                                children: isSSCAEnabled ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
+                                                                                            className: "text-[#29258D] text-sm"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 475,
+                                                                                            columnNumber: 57
+                                                                                        }, this),
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                            className: "text-sm font-semibold text-gray-900",
+                                                                                            children: "SSCAA"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 476,
+                                                                                            columnNumber: 57
+                                                                                        }, this)
+                                                                                    ]
+                                                                                }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiStorefront"], {
+                                                                                            className: "text-gray-400 text-sm"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 480,
+                                                                                            columnNumber: 57
+                                                                                        }, this),
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                            className: "text-sm font-semibold text-gray-900",
+                                                                                            children: "Standard"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 481,
+                                                                                            columnNumber: 57
+                                                                                        }, this)
+                                                                                    ]
+                                                                                }, void 0, true)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 472,
+                                                                                columnNumber: 45
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCaretDown"], {
+                                                                                className: `text-gray-400 transition-transform text-sm ${isTypeOpen ? 'rotate-180' : ''}`
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 485,
+                                                                                columnNumber: 45
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 466,
+                                                                        columnNumber: 41
+                                                                    }, this),
+                                                                    isTypeOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-2 animate-in fade-in zoom-in-95 duration-100",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                type: "button",
+                                                                                onClick: ()=>{
+                                                                                    setIsSSCAEnabled(false);
+                                                                                    setIsTypeOpen(false);
+                                                                                },
+                                                                                className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${!isSSCAEnabled ? 'bg-[#29258D]/8 text-[#29258D]' : 'hover:bg-gray-50 text-gray-700'}`,
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiStorefront"], {
+                                                                                        className: "text-sm opacity-70"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 498,
+                                                                                        columnNumber: 53
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "flex-1 min-w-0",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                className: "text-sm font-bold leading-tight",
+                                                                                                children: "Standard"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                                lineNumber: 500,
+                                                                                                columnNumber: 57
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                className: "text-[10px] opacity-60",
+                                                                                                children: "Regular business request"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                                lineNumber: 501,
+                                                                                                columnNumber: 57
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 499,
+                                                                                        columnNumber: 53
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 491,
+                                                                                columnNumber: 49
+                                                                            }, this),
+                                                                            ("TURBOPACK compile-time value", "Capital Pay") !== "Pesanest" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                type: "button",
+                                                                                onClick: ()=>{
+                                                                                    if (session?.user?.role !== 'SYSTEM_ADMIN') {
+                                                                                        setIsTypeOpen(false);
+                                                                                        setShowAccessDenied(true);
+                                                                                        return;
+                                                                                    }
+                                                                                    setIsSSCAEnabled(true);
+                                                                                    setIsTypeOpen(false);
+                                                                                },
+                                                                                className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left mt-1 ${isSSCAEnabled ? 'bg-[#29258D]/8 text-[#29258D]' : 'hover:bg-gray-50 text-gray-700'}`,
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
+                                                                                        className: "text-sm opacity-70"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 521,
+                                                                                        columnNumber: 57
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "flex-1 min-w-0",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                className: "text-sm font-bold leading-tight",
+                                                                                                children: "SSCAA Request"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                                lineNumber: 523,
+                                                                                                columnNumber: 61
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                className: "text-[10px] opacity-60",
+                                                                                                children: "Civil Aviation workflow"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                                lineNumber: 524,
+                                                                                                columnNumber: 61
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 522,
+                                                                                        columnNumber: 57
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 506,
+                                                                                columnNumber: 53
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 490,
+                                                                        columnNumber: 45
+                                                                    }, this),
+                                                                    isTypeOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "fixed inset-0 z-40",
+                                                                        onClick: ()=>setIsTypeOpen(false)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 530,
+                                                                        columnNumber: 56
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 464,
+                                                                columnNumber: 37
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
@@ -1207,35 +1391,62 @@ function NewRequisitionPage() {
                                                         lineNumber: 460,
                                                         columnNumber: 33
                                                     }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                        type: "text",
-                                                        required: true,
-                                                        value: title,
-                                                        onChange: (e)=>setTitle(e.target.value),
-                                                        className: "w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all shadow-none placeholder:text-gray-300",
-                                                        placeholder: "What is this request for?"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 463,
-                                                        columnNumber: 33
-                                                    }, this),
-                                                    errors.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                        className: "text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1 leading-none",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "md:col-span-3",
                                                         children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
-                                                                className: "rotate-45"
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                className: "block text-xs font-medium text-gray-700 mb-1.5",
+                                                                children: [
+                                                                    "Requisition title ",
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "text-rose-500",
+                                                                        children: "*"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 535,
+                                                                        columnNumber: 59
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 534,
+                                                                columnNumber: 37
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                type: "text",
+                                                                required: true,
+                                                                value: title,
+                                                                onChange: (e)=>setTitle(e.target.value),
+                                                                className: "w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all shadow-none placeholder:text-gray-300",
+                                                                placeholder: "What is this request for?"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 473,
-                                                                columnNumber: 41
+                                                                lineNumber: 537,
+                                                                columnNumber: 37
                                                             }, this),
-                                                            " ",
-                                                            errors.title
+                                                            errors.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1 leading-none",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
+                                                                        className: "rotate-45"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 547,
+                                                                        columnNumber: 45
+                                                                    }, this),
+                                                                    " ",
+                                                                    errors.title
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 546,
+                                                                columnNumber: 41
+                                                            }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 472,
-                                                        columnNumber: 37
+                                                        lineNumber: 533,
+                                                        columnNumber: 33
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
@@ -1243,172 +1454,496 @@ function NewRequisitionPage() {
                                                 lineNumber: 459,
                                                 columnNumber: 29
                                             }, this),
-                                            ("TURBOPACK compile-time value", "Capital Pay") !== "Pesanest" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: `border rounded-xl p-4 transition-all duration-300 ${isSSCAEnabled ? 'bg-[#29258D]/5 border-[#29258D]/20 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300'}`,
+                                            isSSCAEnabled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "bg-[#29258D]/5 border border-[#29258D]/20 rounded-xl p-4 animate-in fade-in slide-in-from-top-2 duration-300",
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "flex items-start gap-4",
+                                                    className: "flex items-center gap-3",
                                                     children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: `p-2 rounded-lg shrink-0 ${isSSCAEnabled ? 'bg-[#29258D] text-white' : 'bg-gray-100 text-gray-500'}`,
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
-                                                                className: "text-lg"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 483,
-                                                                columnNumber: 41
-                                                            }, this)
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "checkbox",
+                                                            id: "isStrictApproval",
+                                                            checked: isStrictApproval,
+                                                            onChange: (e)=>setIsStrictApproval(e.target.checked),
+                                                            className: "h-4 w-4 text-[#29258D] focus:ring-[#29258D] border-gray-300 rounded cursor-pointer"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                            lineNumber: 482,
-                                                            columnNumber: 37
+                                                            lineNumber: 556,
+                                                            columnNumber: 41
                                                         }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "flex-1",
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            htmlFor: "isStrictApproval",
+                                                            className: "cursor-pointer select-none",
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "flex items-center justify-between",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                            children: [
-                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                                    htmlFor: "isSSCA",
-                                                                                    className: "text-sm font-semibold text-gray-900 block cursor-pointer select-none",
-                                                                                    children: "South Sudan civil aviation request"
-                                                                                }, void 0, false, {
-                                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                    lineNumber: 488,
-                                                                                    columnNumber: 49
-                                                                                }, this),
-                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                                    className: "text-xs text-gray-500 mt-0.5 leading-tight",
-                                                                                    children: "Enable expedited workflow for Civil Aviation fund requests."
-                                                                                }, void 0, false, {
-                                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                    lineNumber: 491,
-                                                                                    columnNumber: 49
-                                                                                }, this)
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                            lineNumber: 487,
-                                                                            columnNumber: 45
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                            className: "relative inline-flex items-center cursor-pointer",
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                                htmlFor: "isSSCA",
-                                                                                className: "cursor-pointer flex items-center",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                                        type: "checkbox",
-                                                                                        id: "isSSCA",
-                                                                                        checked: isSSCAEnabled,
-                                                                                        onChange: (e)=>{
-                                                                                            if (session?.user?.role !== 'SYSTEM_ADMIN') {
-                                                                                                e.preventDefault();
-                                                                                                setShowAccessDenied(true);
-                                                                                                return;
-                                                                                            }
-                                                                                            setIsSSCAEnabled(e.target.checked);
-                                                                                        },
-                                                                                        className: "sr-only peer"
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 497,
-                                                                                        columnNumber: 53
-                                                                                    }, this),
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#29258D]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#29258D]"
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 511,
-                                                                                        columnNumber: 53
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 496,
-                                                                                columnNumber: 49
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                            lineNumber: 495,
-                                                                            columnNumber: 45
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                    lineNumber: 486,
-                                                                    columnNumber: 41
-                                                                }, this),
-                                                                isSSCAEnabled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "mt-4 pt-4 border-t border-[#29258D]/10 animate-in fade-in slide-in-from-top-2 duration-300",
-                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                        className: "flex items-center gap-3",
-                                                                        children: [
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                                type: "checkbox",
-                                                                                id: "isStrictApproval",
-                                                                                checked: isStrictApproval,
-                                                                                onChange: (e)=>setIsStrictApproval(e.target.checked),
-                                                                                className: "h-4 w-4 text-[#29258D] focus:ring-[#29258D] border-gray-300 rounded cursor-pointer"
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 519,
-                                                                                columnNumber: 53
-                                                                            }, this),
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                                htmlFor: "isStrictApproval",
-                                                                                className: "cursor-pointer select-none",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                        className: "text-xs font-semibold text-gray-900 block",
-                                                                                        children: "Require strict approval"
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 527,
-                                                                                        columnNumber: 57
-                                                                                    }, this),
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                        className: "text-[10px] text-gray-500 block",
-                                                                                        children: "Force Manager + Finance approval regardless of amount."
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 528,
-                                                                                        columnNumber: 57
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 526,
-                                                                                columnNumber: 53
-                                                                            }, this)
-                                                                        ]
-                                                                    }, void 0, true, {
-                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 518,
-                                                                        columnNumber: 49
-                                                                    }, this)
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-xs font-semibold text-gray-900 block",
+                                                                    children: "Require strict approval (SSCAA Workflow)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                    lineNumber: 517,
+                                                                    lineNumber: 564,
+                                                                    columnNumber: 45
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-[10px] text-gray-500 block",
+                                                                    children: "Force Manager + Finance approval regardless of amount for this Aviation request."
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                    lineNumber: 565,
                                                                     columnNumber: 45
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                            lineNumber: 485,
-                                                            columnNumber: 37
+                                                            lineNumber: 563,
+                                                            columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                    lineNumber: 481,
-                                                    columnNumber: 33
+                                                    lineNumber: 555,
+                                                    columnNumber: 37
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 480,
+                                                lineNumber: 554,
+                                                columnNumber: 33
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-center justify-between mb-1.5",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                className: "block text-xs font-medium text-gray-700",
+                                                                children: [
+                                                                    "Ledger Account ",
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "text-gray-400 font-normal",
+                                                                        children: "(Optional)"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 574,
+                                                                        columnNumber: 111
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 574,
+                                                                columnNumber: 37
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                type: "button",
+                                                                onClick: ()=>{
+                                                                    setIsCreatingAccount(!isCreatingAccount);
+                                                                    setIsAccountOpen(false);
+                                                                },
+                                                                className: "text-[#29258D] text-[10px] font-semibold hover:underline flex items-center gap-1",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiPlus"], {}, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 580,
+                                                                        columnNumber: 41
+                                                                    }, this),
+                                                                    " ",
+                                                                    isCreatingAccount ? 'Cancel' : 'Create New'
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 575,
+                                                                columnNumber: 37
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                        lineNumber: 573,
+                                                        columnNumber: 33
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "relative",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                onClick: ()=>{
+                                                                    setIsAccountOpen(!isAccountOpen);
+                                                                    setAccountSearch("");
+                                                                },
+                                                                className: `w-full bg-white border rounded-xl min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] ${isAccountOpen ? 'border-[#29258D] ring-2 ring-[#29258D]/10' : 'border-gray-200'}`,
+                                                                children: [
+                                                                    customAccountId ? (()=>{
+                                                                        const acc = expenseAccounts.find((a)=>a.id === customAccountId);
+                                                                        return acc ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "flex items-center gap-2",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "inline-flex items-center px-2 py-0.5 rounded-md bg-[#29258D]/10 text-[#29258D] text-[10px] font-bold tracking-wide",
+                                                                                    children: acc.code
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                    lineNumber: 595,
+                                                                                    columnNumber: 53
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "text-sm font-medium text-gray-900",
+                                                                                    children: acc.name
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                    lineNumber: 596,
+                                                                                    columnNumber: 53
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                            lineNumber: 594,
+                                                                            columnNumber: 49
+                                                                        }, this) : null;
+                                                                    })() : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "text-sm text-gray-400",
+                                                                        children: "Auto-mapped by category..."
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 600,
+                                                                        columnNumber: 45
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCaretDown"], {
+                                                                        className: `text-gray-400 transition-transform text-sm ${isAccountOpen ? 'rotate-180' : ''}`
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 602,
+                                                                        columnNumber: 41
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 585,
+                                                                columnNumber: 37
+                                                            }, this),
+                                                            isAccountOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "relative mb-3",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiMagnifyingGlass"], {
+                                                                                className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 610,
+                                                                                columnNumber: 49
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                type: "text",
+                                                                                autoFocus: true,
+                                                                                placeholder: "Search accounts...",
+                                                                                value: accountSearch,
+                                                                                onChange: (e)=>setAccountSearch(e.target.value),
+                                                                                onClick: (e)=>e.stopPropagation(),
+                                                                                className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 611,
+                                                                                columnNumber: 49
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 609,
+                                                                        columnNumber: 45
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "max-h-52 overflow-y-auto space-y-0.5",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                type: "button",
+                                                                                onClick: ()=>{
+                                                                                    setCustomAccountId("");
+                                                                                    setIsAccountOpen(false);
+                                                                                },
+                                                                                className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${!customAccountId ? 'bg-[#29258D]/8 border border-[#29258D]/20' : 'hover:bg-gray-50 border border-transparent'}`,
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: "inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-gray-500 text-[10px] font-bold",
+                                                                                        children: "AUTO"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 631,
+                                                                                        columnNumber: 53
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "flex-1 min-w-0",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                className: `text-sm font-semibold ${!customAccountId ? 'text-[#29258D]' : 'text-gray-700'}`,
+                                                                                                children: "Auto-mapped by Category"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                                lineNumber: 633,
+                                                                                                columnNumber: 57
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                className: "text-[10px] text-gray-400",
+                                                                                                children: "System selects the GL account automatically"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                                lineNumber: 634,
+                                                                                                columnNumber: 57
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 632,
+                                                                                        columnNumber: 53
+                                                                                    }, this),
+                                                                                    !customAccountId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "w-2 h-2 rounded-full bg-[#29258D] shrink-0"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 636,
+                                                                                        columnNumber: 74
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 624,
+                                                                                columnNumber: 49
+                                                                            }, this),
+                                                                            expenseAccounts.filter((acc)=>acc.name.toLowerCase().includes(accountSearch.toLowerCase()) || acc.code.toLowerCase().includes(accountSearch.toLowerCase())).map((acc)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                    type: "button",
+                                                                                    onClick: ()=>{
+                                                                                        setCustomAccountId(acc.id);
+                                                                                        setIsAccountOpen(false);
+                                                                                    },
+                                                                                    className: `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${customAccountId === acc.id ? 'bg-[#29258D]/8 border border-[#29258D]/20' : 'hover:bg-gray-50 border border-transparent'}`,
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                            className: "inline-flex items-center px-2 py-0.5 rounded-md bg-[#29258D]/10 text-[#29258D] text-[10px] font-bold tracking-wide shrink-0",
+                                                                                            children: acc.code
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 654,
+                                                                                            columnNumber: 61
+                                                                                        }, this),
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                            className: "flex-1 min-w-0",
+                                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                                className: `text-sm font-semibold truncate ${customAccountId === acc.id ? 'text-[#29258D]' : 'text-gray-900'}`,
+                                                                                                children: acc.name
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                                lineNumber: 656,
+                                                                                                columnNumber: 65
+                                                                                            }, this)
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 655,
+                                                                                            columnNumber: 61
+                                                                                        }, this),
+                                                                                        customAccountId === acc.id && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                            className: "w-2 h-2 rounded-full bg-[#29258D] shrink-0"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 658,
+                                                                                            columnNumber: 92
+                                                                                        }, this)
+                                                                                    ]
+                                                                                }, acc.id, true, {
+                                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                    lineNumber: 646,
+                                                                                    columnNumber: 57
+                                                                                }, this)),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                type: "button",
+                                                                                onClick: (e)=>{
+                                                                                    e.stopPropagation();
+                                                                                    setIsAccountOpen(false);
+                                                                                    setIsCreatingAccount(true);
+                                                                                },
+                                                                                className: "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left border border-dashed border-[#29258D]/30 hover:border-[#29258D]/60 hover:bg-[#29258D]/5 mt-1",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: "inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#29258D]/10 text-[#29258D]",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiPlus"], {
+                                                                                            className: "text-xs"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                            lineNumber: 669,
+                                                                                            columnNumber: 163
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 669,
+                                                                                        columnNumber: 53
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                                        className: "text-sm font-semibold text-[#29258D]",
+                                                                                        children: "Create New GL Account"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                        lineNumber: 670,
+                                                                                        columnNumber: 53
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 664,
+                                                                                columnNumber: 49
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 622,
+                                                                        columnNumber: 45
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 607,
+                                                                columnNumber: 41
+                                                            }, this),
+                                                            isAccountOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "fixed inset-0 z-40",
+                                                                onClick: ()=>setIsAccountOpen(false)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 675,
+                                                                columnNumber: 55
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                        lineNumber: 583,
+                                                        columnNumber: 33
+                                                    }, this),
+                                                    isCreatingAccount && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex justify-between items-center mb-3",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                                        className: "text-xs font-bold text-gray-900",
+                                                                        children: "Create GL Account"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 682,
+                                                                        columnNumber: 45
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                        type: "button",
+                                                                        onClick: ()=>setIsCreatingAccount(false),
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiX"], {
+                                                                            className: "text-gray-400 hover:text-gray-700"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                            lineNumber: 683,
+                                                                            columnNumber: 111
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 683,
+                                                                        columnNumber: 45
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 681,
+                                                                columnNumber: 41
+                                                            }, this),
+                                                            accountCreateError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-red-500 text-[10px] mb-2",
+                                                                children: accountCreateError
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 685,
+                                                                columnNumber: 64
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "grid grid-cols-2 gap-3 mb-3",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                                className: "block text-[10px] font-medium text-gray-700 mb-1",
+                                                                                children: "GL Code"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 688,
+                                                                                columnNumber: 49
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                type: "text",
+                                                                                value: newAccountCode,
+                                                                                onChange: (e)=>setNewAccountCode(e.target.value),
+                                                                                placeholder: "e.g. 6050",
+                                                                                className: "w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 689,
+                                                                                columnNumber: 49
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 687,
+                                                                        columnNumber: 45
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                                className: "block text-[10px] font-medium text-gray-700 mb-1",
+                                                                                children: "Account Name"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 692,
+                                                                                columnNumber: 49
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                type: "text",
+                                                                                value: newAccountName,
+                                                                                onChange: (e)=>setNewAccountName(e.target.value),
+                                                                                placeholder: "e.g. Special Event",
+                                                                                className: "w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                                lineNumber: 693,
+                                                                                columnNumber: 49
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                        lineNumber: 691,
+                                                                        columnNumber: 45
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 686,
+                                                                columnNumber: 41
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                type: "button",
+                                                                onClick: handleCreateAccount,
+                                                                disabled: isSavingAccount,
+                                                                className: "w-full bg-[#29258D] text-white text-xs font-medium py-2 rounded flex justify-center items-center hover:bg-[#29258D]/90 disabled:opacity-50 transition-colors",
+                                                                children: isSavingAccount ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiArrowsClockwise"], {
+                                                                    className: "animate-spin text-sm"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                    lineNumber: 702,
+                                                                    columnNumber: 64
+                                                                }, this) : "Save Account"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                                lineNumber: 696,
+                                                                columnNumber: 41
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                        lineNumber: 680,
+                                                        columnNumber: 37
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
+                                                lineNumber: 572,
                                                 columnNumber: 29
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1418,52 +1953,33 @@ function NewRequisitionPage() {
                                                         children: [
                                                             "Justification ",
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "text-rose-500",
-                                                                children: "*"
+                                                                className: "text-gray-400 font-normal text-[10px]",
+                                                                children: "(optional)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 540,
+                                                                lineNumber: 712,
                                                                 columnNumber: 51
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 539,
+                                                        lineNumber: 711,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
-                                                        required: true,
                                                         value: description,
                                                         onChange: (e)=>setDescription(e.target.value),
-                                                        className: "w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all min-h-[100px] shadow-none resize-none placeholder:text-gray-300",
-                                                        placeholder: "Explain the business need and expected impact..."
+                                                        className: "w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all min-h-[80px] shadow-none resize-none placeholder:text-gray-300",
+                                                        placeholder: "Explain the business need (optional)..."
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 542,
+                                                        lineNumber: 714,
                                                         columnNumber: 33
-                                                    }, this),
-                                                    errors.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                        className: "text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1 leading-none",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCheckCircle"], {
-                                                                className: "rotate-45"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 551,
-                                                                columnNumber: 41
-                                                            }, this),
-                                                            " ",
-                                                            errors.description
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 550,
-                                                        columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 538,
+                                                lineNumber: 710,
                                                 columnNumber: 29
                                             }, this)
                                         ]
@@ -1492,18 +2008,18 @@ function NewRequisitionPage() {
                                                     children: "*"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                    lineNumber: 562,
+                                                    lineNumber: 728,
                                                     columnNumber: 88
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                            lineNumber: 561,
+                                            lineNumber: 727,
                                             columnNumber: 29
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 560,
+                                        lineNumber: 726,
                                         columnNumber: 25
                                     }, this),
                                     formMode === "quick" ? /* ── Quick mode: single amount + category ── */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1520,13 +2036,13 @@ function NewRequisitionPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 572,
+                                                                lineNumber: 738,
                                                                 columnNumber: 50
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 571,
+                                                        lineNumber: 737,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1537,32 +2053,32 @@ function NewRequisitionPage() {
                                                                 children: getCurrencySymbol(currency)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 575,
+                                                                lineNumber: 741,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                                 type: "number",
-                                                                step: "0.01",
+                                                                step: "1",
                                                                 min: "0",
                                                                 value: quickAmount,
                                                                 onChange: (e)=>setQuickAmount(e.target.value),
                                                                 className: "w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all font-mono",
-                                                                placeholder: "0.00"
+                                                                placeholder: "0"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 578,
+                                                                lineNumber: 744,
                                                                 columnNumber: 37
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 574,
+                                                        lineNumber: 740,
                                                         columnNumber: 33
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 570,
+                                                lineNumber: 736,
                                                 columnNumber: 29
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1572,7 +2088,7 @@ function NewRequisitionPage() {
                                                         children: "Currency"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 592,
+                                                        lineNumber: 758,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1590,14 +2106,14 @@ function NewRequisitionPage() {
                                                                                 children: selectedCurrency.flag
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 599,
+                                                                                lineNumber: 765,
                                                                                 columnNumber: 45
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 children: selectedCurrency.code
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 600,
+                                                                                lineNumber: 766,
                                                                                 columnNumber: 45
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1605,26 +2121,26 @@ function NewRequisitionPage() {
                                                                                 children: selectedCurrency.symbol
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 601,
+                                                                                lineNumber: 767,
                                                                                 columnNumber: 45
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 598,
+                                                                        lineNumber: 764,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                                         className: `text-gray-400 transition-transform text-sm ${isCurrencyOpen ? 'rotate-180' : ''}`
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 603,
+                                                                        lineNumber: 769,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 594,
+                                                                lineNumber: 760,
                                                                 columnNumber: 37
                                                             }, this),
                                                             isCurrencyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1640,7 +2156,7 @@ function NewRequisitionPage() {
                                                                                 className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 608,
+                                                                                lineNumber: 774,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1653,13 +2169,13 @@ function NewRequisitionPage() {
                                                                                 className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 609,
+                                                                                lineNumber: 775,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 607,
+                                                                        lineNumber: 773,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1678,7 +2194,7 @@ function NewRequisitionPage() {
                                                                                         children: cur.flag
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 614,
+                                                                                        lineNumber: 780,
                                                                                         columnNumber: 57
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1689,7 +2205,7 @@ function NewRequisitionPage() {
                                                                                                 children: cur.code
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 616,
+                                                                                                lineNumber: 782,
                                                                                                 columnNumber: 61
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1697,13 +2213,13 @@ function NewRequisitionPage() {
                                                                                                 children: cur.name
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 617,
+                                                                                                lineNumber: 783,
                                                                                                 columnNumber: 61
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 615,
+                                                                                        lineNumber: 781,
                                                                                         columnNumber: 57
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1711,31 +2227,31 @@ function NewRequisitionPage() {
                                                                                         children: cur.symbol
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 619,
+                                                                                        lineNumber: 785,
                                                                                         columnNumber: 57
                                                                                     }, this),
                                                                                     currency === cur.code && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                                         className: "w-2 h-2 rounded-full bg-[#29258D] shrink-0"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 620,
+                                                                                        lineNumber: 786,
                                                                                         columnNumber: 83
                                                                                     }, this)
                                                                                 ]
                                                                             }, cur.code, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 613,
+                                                                                lineNumber: 779,
                                                                                 columnNumber: 53
                                                                             }, this))
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 611,
+                                                                        lineNumber: 777,
                                                                         columnNumber: 45
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 606,
+                                                                lineNumber: 772,
                                                                 columnNumber: 41
                                                             }, this),
                                                             isCurrencyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1743,19 +2259,19 @@ function NewRequisitionPage() {
                                                                 onClick: ()=>setIsCurrencyOpen(false)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 626,
+                                                                lineNumber: 792,
                                                                 columnNumber: 56
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 593,
+                                                        lineNumber: 759,
                                                         columnNumber: 33
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 591,
+                                                lineNumber: 757,
                                                 columnNumber: 29
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1770,13 +2286,13 @@ function NewRequisitionPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 633,
+                                                                lineNumber: 799,
                                                                 columnNumber: 46
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 632,
+                                                        lineNumber: 798,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1791,27 +2307,27 @@ function NewRequisitionPage() {
                                                                         children: quickCategory
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 641,
+                                                                        lineNumber: 807,
                                                                         columnNumber: 45
                                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         className: "text-sm text-gray-400",
                                                                         children: "Select a category..."
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 643,
+                                                                        lineNumber: 809,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                                         className: `text-gray-400 transition-transform ${isQuickCategoryOpen ? 'rotate-180' : ''}`
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 645,
+                                                                        lineNumber: 811,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 636,
+                                                                lineNumber: 802,
                                                                 columnNumber: 37
                                                             }, this),
                                                             isQuickCategoryOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1824,7 +2340,7 @@ function NewRequisitionPage() {
                                                                                 className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 650,
+                                                                                lineNumber: 816,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1837,13 +2353,13 @@ function NewRequisitionPage() {
                                                                                 className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 651,
+                                                                                lineNumber: 817,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 649,
+                                                                        lineNumber: 815,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1858,7 +2374,7 @@ function NewRequisitionPage() {
                                                                                         children: group.label
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 659,
+                                                                                        lineNumber: 825,
                                                                                         columnNumber: 61
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1874,30 +2390,30 @@ function NewRequisitionPage() {
                                                                                                 children: cat
                                                                                             }, cat, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 662,
+                                                                                                lineNumber: 828,
                                                                                                 columnNumber: 69
                                                                                             }, this))
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 660,
+                                                                                        lineNumber: 826,
                                                                                         columnNumber: 61
                                                                                     }, this)
                                                                                 ]
                                                                             }, group.label, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 658,
+                                                                                lineNumber: 824,
                                                                                 columnNumber: 57
                                                                             }, this);
                                                                         })
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 653,
+                                                                        lineNumber: 819,
                                                                         columnNumber: 45
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 648,
+                                                                lineNumber: 814,
                                                                 columnNumber: 41
                                                             }, this),
                                                             isQuickCategoryOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1905,13 +2421,13 @@ function NewRequisitionPage() {
                                                                 onClick: ()=>setIsQuickCategoryOpen(false)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 673,
+                                                                lineNumber: 839,
                                                                 columnNumber: 61
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 635,
+                                                        lineNumber: 801,
                                                         columnNumber: 33
                                                     }, this),
                                                     quickCategory === "Custom" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1925,24 +2441,24 @@ function NewRequisitionPage() {
                                                             autoFocus: true
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                            lineNumber: 678,
+                                                            lineNumber: 844,
                                                             columnNumber: 41
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 677,
+                                                        lineNumber: 843,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 631,
+                                                lineNumber: 797,
                                                 columnNumber: 29
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 568,
+                                        lineNumber: 734,
                                         columnNumber: 25
                                     }, this) : /* ── Itemized mode: existing multi-item list ── */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         children: [
@@ -1964,7 +2480,7 @@ function NewRequisitionPage() {
                                                                                         children: item.title
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 702,
+                                                                                        lineNumber: 868,
                                                                                         columnNumber: 53
                                                                                     }, this),
                                                                                     item.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1972,13 +2488,13 @@ function NewRequisitionPage() {
                                                                                         children: item.description
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 704,
+                                                                                        lineNumber: 870,
                                                                                         columnNumber: 57
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 701,
+                                                                                lineNumber: 867,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2000,12 +2516,12 @@ function NewRequisitionPage() {
                                                                                     className: "text-gray-400 group-hover:text-amber-500"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                    lineNumber: 723,
+                                                                                    lineNumber: 889,
                                                                                     columnNumber: 53
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 707,
+                                                                                lineNumber: 873,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2016,18 +2532,18 @@ function NewRequisitionPage() {
                                                                                     className: "text-gray-400 group-hover:text-rose-500"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                    lineNumber: 730,
+                                                                                    lineNumber: 896,
                                                                                     columnNumber: 53
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 725,
+                                                                                lineNumber: 891,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 700,
+                                                                        lineNumber: 866,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2038,7 +2554,7 @@ function NewRequisitionPage() {
                                                                                 children: item.category
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 734,
+                                                                                lineNumber: 900,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2049,7 +2565,7 @@ function NewRequisitionPage() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 737,
+                                                                                lineNumber: 903,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2057,11 +2573,11 @@ function NewRequisitionPage() {
                                                                                 children: [
                                                                                     "@ ",
                                                                                     getCurrencySymbol(currency),
-                                                                                    item.unitPrice.toFixed(2)
+                                                                                    item.unitPrice.toLocaleString()
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 740,
+                                                                                lineNumber: 906,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             item.isRecurring && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2069,7 +2585,7 @@ function NewRequisitionPage() {
                                                                                 children: [
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiArrowsClockwise"], {}, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 745,
+                                                                                        lineNumber: 911,
                                                                                         columnNumber: 57
                                                                                     }, this),
                                                                                     " ",
@@ -2077,35 +2593,35 @@ function NewRequisitionPage() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 744,
+                                                                                lineNumber: 910,
                                                                                 columnNumber: 53
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 className: "font-semibold text-gray-900 ml-auto",
                                                                                 children: [
                                                                                     getCurrencySymbol(currency),
-                                                                                    (item.quantity * item.unitPrice).toFixed(2)
+                                                                                    (item.quantity * item.unitPrice).toLocaleString()
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 748,
+                                                                                lineNumber: 914,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 733,
+                                                                        lineNumber: 899,
                                                                         columnNumber: 45
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 699,
+                                                                lineNumber: 865,
                                                                 columnNumber: 41
                                                             }, this)
                                                         }, item.id, false, {
                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                            lineNumber: 698,
+                                                            lineNumber: 864,
                                                             columnNumber: 37
                                                         }, this)),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2116,30 +2632,30 @@ function NewRequisitionPage() {
                                                                 children: "Total Amount"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 758,
+                                                                lineNumber: 924,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "font-bold text-lg text-[#29258D]",
                                                                 children: [
                                                                     getCurrencySymbol(currency),
-                                                                    calculateTotal().toFixed(2)
+                                                                    calculateTotal().toLocaleString()
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 759,
+                                                                lineNumber: 925,
                                                                 columnNumber: 37
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 757,
+                                                        lineNumber: 923,
                                                         columnNumber: 33
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 696,
+                                                lineNumber: 862,
                                                 columnNumber: 29
                                             }, this),
                                             showItemForm ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2153,7 +2669,7 @@ function NewRequisitionPage() {
                                                                 children: "Add New Item"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 770,
+                                                                lineNumber: 936,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2164,18 +2680,18 @@ function NewRequisitionPage() {
                                                                     className: "text-gray-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                    lineNumber: 776,
+                                                                    lineNumber: 942,
                                                                     columnNumber: 41
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 771,
+                                                                lineNumber: 937,
                                                                 columnNumber: 37
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 769,
+                                                        lineNumber: 935,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2193,13 +2709,13 @@ function NewRequisitionPage() {
                                                                                 children: "*"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 783,
+                                                                                lineNumber: 949,
                                                                                 columnNumber: 56
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 782,
+                                                                        lineNumber: 948,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2210,13 +2726,13 @@ function NewRequisitionPage() {
                                                                         placeholder: "e.g., Laptop Computer"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 785,
+                                                                        lineNumber: 951,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 781,
+                                                                lineNumber: 947,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2227,7 +2743,7 @@ function NewRequisitionPage() {
                                                                         children: "Description"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 795,
+                                                                        lineNumber: 961,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2238,13 +2754,13 @@ function NewRequisitionPage() {
                                                                         placeholder: "Optional details..."
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 796,
+                                                                        lineNumber: 962,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 794,
+                                                                lineNumber: 960,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2258,13 +2774,13 @@ function NewRequisitionPage() {
                                                                                 children: "*"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 807,
+                                                                                lineNumber: 973,
                                                                                 columnNumber: 54
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 806,
+                                                                        lineNumber: 972,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2279,27 +2795,27 @@ function NewRequisitionPage() {
                                                                                         children: itemCategory
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 815,
+                                                                                        lineNumber: 981,
                                                                                         columnNumber: 53
                                                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                         className: "text-sm text-gray-400",
                                                                                         children: "Select category..."
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 817,
+                                                                                        lineNumber: 983,
                                                                                         columnNumber: 53
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                                                         className: `text-gray-400 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 819,
+                                                                                        lineNumber: 985,
                                                                                         columnNumber: 49
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 810,
+                                                                                lineNumber: 976,
                                                                                 columnNumber: 45
                                                                             }, this),
                                                                             isCategoryOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2312,7 +2828,7 @@ function NewRequisitionPage() {
                                                                                                 className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 825,
+                                                                                                lineNumber: 991,
                                                                                                 columnNumber: 57
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2325,13 +2841,13 @@ function NewRequisitionPage() {
                                                                                                 className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 826,
+                                                                                                lineNumber: 992,
                                                                                                 columnNumber: 57
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 824,
+                                                                                        lineNumber: 990,
                                                                                         columnNumber: 53
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2343,7 +2859,7 @@ function NewRequisitionPage() {
                                                                                                         children: group.label
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                        lineNumber: 840,
+                                                                                                        lineNumber: 1006,
                                                                                                         columnNumber: 69
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2359,36 +2875,36 @@ function NewRequisitionPage() {
                                                                                                                 children: cat
                                                                                                             }, cat, false, {
                                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                                lineNumber: 843,
+                                                                                                                lineNumber: 1009,
                                                                                                                 columnNumber: 77
                                                                                                             }, this))
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                        lineNumber: 841,
+                                                                                                        lineNumber: 1007,
                                                                                                         columnNumber: 69
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, group.label, true, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 839,
+                                                                                                lineNumber: 1005,
                                                                                                 columnNumber: 65
                                                                                             }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                                             className: "py-4 text-center text-gray-400 text-xs",
                                                                                             children: "No categories found"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                            lineNumber: 863,
+                                                                                            lineNumber: 1029,
                                                                                             columnNumber: 61
                                                                                         }, this)
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 836,
+                                                                                        lineNumber: 1002,
                                                                                         columnNumber: 53
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 823,
+                                                                                lineNumber: 989,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             isCategoryOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2396,13 +2912,13 @@ function NewRequisitionPage() {
                                                                                 onClick: ()=>setIsCategoryOpen(false)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 871,
+                                                                                lineNumber: 1037,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 809,
+                                                                        lineNumber: 975,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     itemCategory === "Custom" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2416,18 +2932,18 @@ function NewRequisitionPage() {
                                                                             autoFocus: true
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                            lineNumber: 877,
+                                                                            lineNumber: 1043,
                                                                             columnNumber: 49
                                                                         }, this)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 876,
+                                                                        lineNumber: 1042,
                                                                         columnNumber: 45
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 805,
+                                                                lineNumber: 971,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2437,7 +2953,7 @@ function NewRequisitionPage() {
                                                                         children: "Currency"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 890,
+                                                                        lineNumber: 1056,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2455,14 +2971,14 @@ function NewRequisitionPage() {
                                                                                                 children: selectedCurrency.flag
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 897,
+                                                                                                lineNumber: 1063,
                                                                                                 columnNumber: 53
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                                 children: selectedCurrency.code
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 898,
+                                                                                                lineNumber: 1064,
                                                                                                 columnNumber: 53
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2470,26 +2986,26 @@ function NewRequisitionPage() {
                                                                                                 children: selectedCurrency.symbol
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 899,
+                                                                                                lineNumber: 1065,
                                                                                                 columnNumber: 53
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 896,
+                                                                                        lineNumber: 1062,
                                                                                         columnNumber: 49
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                                                         className: `text-gray-400 transition-transform text-sm ${isCurrencyOpen ? 'rotate-180' : ''}`
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 901,
+                                                                                        lineNumber: 1067,
                                                                                         columnNumber: 49
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 892,
+                                                                                lineNumber: 1058,
                                                                                 columnNumber: 45
                                                                             }, this),
                                                                             isCurrencyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2505,7 +3021,7 @@ function NewRequisitionPage() {
                                                                                                 className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 906,
+                                                                                                lineNumber: 1072,
                                                                                                 columnNumber: 57
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2518,13 +3034,13 @@ function NewRequisitionPage() {
                                                                                                 className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 907,
+                                                                                                lineNumber: 1073,
                                                                                                 columnNumber: 57
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 905,
+                                                                                        lineNumber: 1071,
                                                                                         columnNumber: 53
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2543,7 +3059,7 @@ function NewRequisitionPage() {
                                                                                                         children: cur.flag
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                        lineNumber: 928,
+                                                                                                        lineNumber: 1094,
                                                                                                         columnNumber: 65
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2554,7 +3070,7 @@ function NewRequisitionPage() {
                                                                                                                 children: cur.code
                                                                                                             }, void 0, false, {
                                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                                lineNumber: 930,
+                                                                                                                lineNumber: 1096,
                                                                                                                 columnNumber: 69
                                                                                                             }, this),
                                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2562,13 +3078,13 @@ function NewRequisitionPage() {
                                                                                                                 children: cur.name
                                                                                                             }, void 0, false, {
                                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                                lineNumber: 931,
+                                                                                                                lineNumber: 1097,
                                                                                                                 columnNumber: 69
                                                                                                             }, this)
                                                                                                         ]
                                                                                                     }, void 0, true, {
                                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                        lineNumber: 929,
+                                                                                                        lineNumber: 1095,
                                                                                                         columnNumber: 65
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2576,31 +3092,31 @@ function NewRequisitionPage() {
                                                                                                         children: cur.symbol
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                        lineNumber: 933,
+                                                                                                        lineNumber: 1099,
                                                                                                         columnNumber: 65
                                                                                                     }, this),
                                                                                                     currency === cur.code && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                                                         className: "w-2 h-2 rounded-full bg-[#29258D] shrink-0"
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                        lineNumber: 935,
+                                                                                                        lineNumber: 1101,
                                                                                                         columnNumber: 69
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, cur.code, true, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 919,
+                                                                                                lineNumber: 1085,
                                                                                                 columnNumber: 61
                                                                                             }, this))
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 917,
+                                                                                        lineNumber: 1083,
                                                                                         columnNumber: 53
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 904,
+                                                                                lineNumber: 1070,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             isCurrencyOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2608,19 +3124,19 @@ function NewRequisitionPage() {
                                                                                 onClick: ()=>setIsCurrencyOpen(false)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 942,
+                                                                                lineNumber: 1108,
                                                                                 columnNumber: 64
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 891,
+                                                                        lineNumber: 1057,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 889,
+                                                                lineNumber: 1055,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2630,17 +3146,17 @@ function NewRequisitionPage() {
                                                                         children: [
                                                                             "Quantity ",
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                className: "text-rose-500",
-                                                                                children: "*"
+                                                                                className: "text-gray-400 font-normal text-[10px]",
+                                                                                children: "(Optional)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 948,
+                                                                                lineNumber: 1114,
                                                                                 columnNumber: 54
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 947,
+                                                                        lineNumber: 1113,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2651,13 +3167,13 @@ function NewRequisitionPage() {
                                                                         className: "w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 950,
+                                                                        lineNumber: 1116,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 946,
+                                                                lineNumber: 1112,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2671,13 +3187,13 @@ function NewRequisitionPage() {
                                                                                 children: "*"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 961,
+                                                                                lineNumber: 1127,
                                                                                 columnNumber: 56
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 960,
+                                                                        lineNumber: 1126,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2688,32 +3204,32 @@ function NewRequisitionPage() {
                                                                                 children: getCurrencySymbol(currency)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 964,
+                                                                                lineNumber: 1130,
                                                                                 columnNumber: 45
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                                                 type: "number",
-                                                                                step: "0.01",
+                                                                                step: "1",
                                                                                 min: "0",
                                                                                 value: itemUnitPrice,
                                                                                 onChange: (e)=>setItemUnitPrice(e.target.value),
                                                                                 className: "w-full bg-white border border-gray-200 rounded-lg pl-12 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all font-mono",
-                                                                                placeholder: "0.00"
+                                                                                placeholder: "0"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 967,
+                                                                                lineNumber: 1133,
                                                                                 columnNumber: 45
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 963,
+                                                                        lineNumber: 1129,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 959,
+                                                                lineNumber: 1125,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2729,7 +3245,7 @@ function NewRequisitionPage() {
                                                                                         children: "Make Recurring"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 983,
+                                                                                        lineNumber: 1149,
                                                                                         columnNumber: 49
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2737,13 +3253,13 @@ function NewRequisitionPage() {
                                                                                         children: "Automatically generate a new requisition for this item on a schedule"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 984,
+                                                                                        lineNumber: 1150,
                                                                                         columnNumber: 49
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 982,
+                                                                                lineNumber: 1148,
                                                                                 columnNumber: 45
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2754,18 +3270,18 @@ function NewRequisitionPage() {
                                                                                     className: `pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ease-in-out ${itemIsRecurring ? 'translate-x-5' : 'translate-x-0'}`
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                    lineNumber: 991,
+                                                                                    lineNumber: 1157,
                                                                                     columnNumber: 49
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 986,
+                                                                                lineNumber: 1152,
                                                                                 columnNumber: 45
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 981,
+                                                                        lineNumber: 1147,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     itemIsRecurring && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2778,7 +3294,7 @@ function NewRequisitionPage() {
                                                                                         children: "Frequency"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 998,
+                                                                                        lineNumber: 1164,
                                                                                         columnNumber: 53
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -2791,7 +3307,7 @@ function NewRequisitionPage() {
                                                                                                 children: "Daily"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 1004,
+                                                                                                lineNumber: 1170,
                                                                                                 columnNumber: 57
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2799,7 +3315,7 @@ function NewRequisitionPage() {
                                                                                                 children: "Weekly"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 1005,
+                                                                                                lineNumber: 1171,
                                                                                                 columnNumber: 57
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2807,7 +3323,7 @@ function NewRequisitionPage() {
                                                                                                 children: "Monthly"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 1006,
+                                                                                                lineNumber: 1172,
                                                                                                 columnNumber: 57
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2815,7 +3331,7 @@ function NewRequisitionPage() {
                                                                                                 children: "Quarterly"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 1007,
+                                                                                                lineNumber: 1173,
                                                                                                 columnNumber: 57
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2823,19 +3339,19 @@ function NewRequisitionPage() {
                                                                                                 children: "Yearly"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                                lineNumber: 1008,
+                                                                                                lineNumber: 1174,
                                                                                                 columnNumber: 57
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 999,
+                                                                                        lineNumber: 1165,
                                                                                         columnNumber: 53
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 997,
+                                                                                lineNumber: 1163,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2845,7 +3361,7 @@ function NewRequisitionPage() {
                                                                                         children: "First Run Date"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 1012,
+                                                                                        lineNumber: 1178,
                                                                                         columnNumber: 53
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$DatePicker$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DatePicker"], {
@@ -2855,31 +3371,31 @@ function NewRequisitionPage() {
                                                                                         className: "w-full"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                        lineNumber: 1013,
+                                                                                        lineNumber: 1179,
                                                                                         columnNumber: 53
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1011,
+                                                                                lineNumber: 1177,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 996,
+                                                                        lineNumber: 1162,
                                                                         columnNumber: 45
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 980,
+                                                                lineNumber: 1146,
                                                                 columnNumber: 37
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 780,
+                                                        lineNumber: 946,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2894,14 +3410,14 @@ function NewRequisitionPage() {
                                                                         className: "text-sm"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1031,
+                                                                        lineNumber: 1197,
                                                                         columnNumber: 41
                                                                     }, this),
                                                                     "Add Item"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1026,
+                                                                lineNumber: 1192,
                                                                 columnNumber: 37
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2911,19 +3427,19 @@ function NewRequisitionPage() {
                                                                 children: "Cancel"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1034,
+                                                                lineNumber: 1200,
                                                                 columnNumber: 37
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1025,
+                                                        lineNumber: 1191,
                                                         columnNumber: 33
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 768,
+                                                lineNumber: 934,
                                                 columnNumber: 29
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 type: "button",
@@ -2934,26 +3450,26 @@ function NewRequisitionPage() {
                                                         className: "text-lg"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1049,
+                                                        lineNumber: 1215,
                                                         columnNumber: 33
                                                     }, this),
                                                     "Add Item"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 1044,
+                                                lineNumber: 1210,
                                                 columnNumber: 29
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 692,
+                                        lineNumber: 858,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 559,
+                                lineNumber: 725,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2963,222 +3479,12 @@ function NewRequisitionPage() {
                                         children: "Logistics & accounting"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 1059,
+                                        lineNumber: 1225,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "grid grid-cols-1 md:grid-cols-2 gap-6",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "flex items-center justify-between mb-1.5",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                className: "block text-xs font-medium text-gray-700",
-                                                                children: "Custom Ledger Account (Optional)"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1063,
-                                                                columnNumber: 37
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                type: "button",
-                                                                onClick: ()=>setIsCreatingAccount(true),
-                                                                className: "text-[#29258D] text-[10px] font-semibold hover:underline flex items-center gap-1",
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiPlus"], {}, void 0, false, {
-                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1069,
-                                                                        columnNumber: 41
-                                                                    }, this),
-                                                                    " Create New"
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1064,
-                                                                columnNumber: 37
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1062,
-                                                        columnNumber: 33
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                        value: customAccountId,
-                                                        onChange: (e)=>setCustomAccountId(e.target.value),
-                                                        className: "w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                value: "",
-                                                                children: "Default (Auto-mapped by Category)"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1077,
-                                                                columnNumber: 37
-                                                            }, this),
-                                                            expenseAccounts.map((acc)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: acc.id,
-                                                                    children: [
-                                                                        acc.code,
-                                                                        " - ",
-                                                                        acc.name
-                                                                    ]
-                                                                }, acc.id, true, {
-                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                    lineNumber: 1079,
-                                                                    columnNumber: 41
-                                                                }, this))
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1072,
-                                                        columnNumber: 33
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                        className: "text-[10px] text-gray-500 mt-1",
-                                                        children: "Specify an exact GL account for this request to override default behavior."
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1084,
-                                                        columnNumber: 33
-                                                    }, this),
-                                                    isCreatingAccount && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "flex justify-between items-center mb-3",
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                                        className: "text-xs font-bold text-gray-900",
-                                                                        children: "Create GL Account"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1089,
-                                                                        columnNumber: 45
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                        type: "button",
-                                                                        onClick: ()=>setIsCreatingAccount(false),
-                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiX"], {
-                                                                            className: "text-gray-400 hover:text-gray-700"
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                            lineNumber: 1090,
-                                                                            columnNumber: 111
-                                                                        }, this)
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1090,
-                                                                        columnNumber: 45
-                                                                    }, this)
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1088,
-                                                                columnNumber: 41
-                                                            }, this),
-                                                            accountCreateError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                className: "text-red-500 text-[10px] mb-2",
-                                                                children: accountCreateError
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1092,
-                                                                columnNumber: 64
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "grid grid-cols-2 gap-3 mb-3",
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                        children: [
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                                className: "block text-[10px] font-medium text-gray-700 mb-1",
-                                                                                children: "GL Code"
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1095,
-                                                                                columnNumber: 49
-                                                                            }, this),
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                                type: "text",
-                                                                                value: newAccountCode,
-                                                                                onChange: (e)=>setNewAccountCode(e.target.value),
-                                                                                placeholder: "e.g. 6050",
-                                                                                className: "w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]"
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1096,
-                                                                                columnNumber: 49
-                                                                            }, this)
-                                                                        ]
-                                                                    }, void 0, true, {
-                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1094,
-                                                                        columnNumber: 45
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                        children: [
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                                className: "block text-[10px] font-medium text-gray-700 mb-1",
-                                                                                children: "Account Name"
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1099,
-                                                                                columnNumber: 49
-                                                                            }, this),
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                                type: "text",
-                                                                                value: newAccountName,
-                                                                                onChange: (e)=>setNewAccountName(e.target.value),
-                                                                                placeholder: "e.g. Special Event",
-                                                                                className: "w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]"
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1100,
-                                                                                columnNumber: 49
-                                                                            }, this)
-                                                                        ]
-                                                                    }, void 0, true, {
-                                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1098,
-                                                                        columnNumber: 45
-                                                                    }, this)
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1093,
-                                                                columnNumber: 41
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                type: "button",
-                                                                onClick: handleCreateAccount,
-                                                                disabled: isSavingAccount,
-                                                                className: "w-full bg-[#29258D] text-white text-xs font-medium py-2 rounded flex justify-center items-center hover:bg-[#29258D]/90 disabled:opacity-50 transition-colors",
-                                                                children: isSavingAccount ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiArrowsClockwise"], {
-                                                                    className: "animate-spin text-sm"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                    lineNumber: 1109,
-                                                                    columnNumber: 64
-                                                                }, this) : "Save Account"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1103,
-                                                                columnNumber: 41
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1087,
-                                                        columnNumber: 37
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 1061,
-                                                columnNumber: 29
-                                            }, this),
                                             ("TURBOPACK compile-time value", "Capital Pay") === "PesaStack" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3188,7 +3494,7 @@ function NewRequisitionPage() {
                                                                 children: "Target Branch"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1118,
+                                                                lineNumber: 1231,
                                                                 columnNumber: 41
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3199,13 +3505,13 @@ function NewRequisitionPage() {
                                                                 placeholder: "e.g. Headquarters"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1119,
+                                                                lineNumber: 1232,
                                                                 columnNumber: 41
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1117,
+                                                        lineNumber: 1230,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3215,7 +3521,7 @@ function NewRequisitionPage() {
                                                                 children: "Department"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1128,
+                                                                lineNumber: 1241,
                                                                 columnNumber: 41
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3226,13 +3532,13 @@ function NewRequisitionPage() {
                                                                 placeholder: "e.g. IT, Operations"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1129,
+                                                                lineNumber: 1242,
                                                                 columnNumber: 33
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1127,
+                                                        lineNumber: 1240,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
@@ -3244,7 +3550,7 @@ function NewRequisitionPage() {
                                                         children: "Expected Delivery Date"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1140,
+                                                        lineNumber: 1253,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$DatePicker$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DatePicker"], {
@@ -3254,13 +3560,13 @@ function NewRequisitionPage() {
                                                         className: "w-full"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1141,
+                                                        lineNumber: 1254,
                                                         columnNumber: 33
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 1139,
+                                                lineNumber: 1252,
                                                 columnNumber: 29
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3270,7 +3576,7 @@ function NewRequisitionPage() {
                                                         children: "Preferred Vendor (Optional)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1149,
+                                                        lineNumber: 1262,
                                                         columnNumber: 33
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3287,7 +3593,7 @@ function NewRequisitionPage() {
                                                                                 className: "text-[#29258D]"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1157,
+                                                                                lineNumber: 1270,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             " ",
@@ -3295,34 +3601,34 @@ function NewRequisitionPage() {
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1156,
+                                                                        lineNumber: 1269,
                                                                         columnNumber: 45
                                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         className: "text-sm text-gray-400 flex items-center gap-2",
                                                                         children: [
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiStorefront"], {}, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1161,
+                                                                                lineNumber: 1274,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             " Select or search vendor..."
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1160,
+                                                                        lineNumber: 1273,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$pi$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["PiCaretDown"], {
                                                                         className: `text-gray-400 transition-transform ${isVendorOpen ? 'rotate-180' : ''}`
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1164,
+                                                                        lineNumber: 1277,
                                                                         columnNumber: 41
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1151,
+                                                                lineNumber: 1264,
                                                                 columnNumber: 37
                                                             }, this),
                                                             isVendorOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3335,7 +3641,7 @@ function NewRequisitionPage() {
                                                                                 className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1169,
+                                                                                lineNumber: 1282,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3348,13 +3654,13 @@ function NewRequisitionPage() {
                                                                                 className: "w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1170,
+                                                                                lineNumber: 1283,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1168,
+                                                                        lineNumber: 1281,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3375,7 +3681,7 @@ function NewRequisitionPage() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1182,
+                                                                                lineNumber: 1295,
                                                                                 columnNumber: 53
                                                                             }, this),
                                                                             vendors.filter((v)=>v.name.toLowerCase().includes(vendorSearch.toLowerCase())).map((v)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3398,7 +3704,7 @@ function NewRequisitionPage() {
                                                                                             children: v.name
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                            lineNumber: 1207,
+                                                                                            lineNumber: 1320,
                                                                                             columnNumber: 61
                                                                                         }, this),
                                                                                         v.bankName && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3409,13 +3715,13 @@ function NewRequisitionPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                            lineNumber: 1209,
+                                                                                            lineNumber: 1322,
                                                                                             columnNumber: 65
                                                                                         }, this)
                                                                                     ]
                                                                                 }, v.id, true, {
                                                                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                    lineNumber: 1191,
+                                                                                    lineNumber: 1304,
                                                                                     columnNumber: 57
                                                                                 }, this)),
                                                                             vendors.filter((v)=>v.name.toLowerCase().includes(vendorSearch.toLowerCase())).length === 0 && !vendorSearch && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3423,19 +3729,19 @@ function NewRequisitionPage() {
                                                                                 children: "No vendors yet. Type a name to use manually."
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                                lineNumber: 1214,
+                                                                                lineNumber: 1327,
                                                                                 columnNumber: 53
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                        lineNumber: 1180,
+                                                                        lineNumber: 1293,
                                                                         columnNumber: 45
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1167,
+                                                                lineNumber: 1280,
                                                                 columnNumber: 41
                                                             }, this),
                                                             isVendorOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3443,13 +3749,13 @@ function NewRequisitionPage() {
                                                                 onClick: ()=>setIsVendorOpen(false)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                                lineNumber: 1219,
+                                                                lineNumber: 1332,
                                                                 columnNumber: 54
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1150,
+                                                        lineNumber: 1263,
                                                         columnNumber: 33
                                                     }, this),
                                                     vendor && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3462,25 +3768,25 @@ function NewRequisitionPage() {
                                                         children: "Clear vendor"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1222,
+                                                        lineNumber: 1335,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 1148,
+                                                lineNumber: 1261,
                                                 columnNumber: 29
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 1060,
+                                        lineNumber: 1226,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1058,
+                                lineNumber: 1224,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3490,7 +3796,7 @@ function NewRequisitionPage() {
                                         children: "Payment method"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 1232,
+                                        lineNumber: 1345,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3498,7 +3804,7 @@ function NewRequisitionPage() {
                                         children: "How should this be paid when approved? Finance will use this to prepare the right channel."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 1233,
+                                        lineNumber: 1346,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3548,12 +3854,12 @@ function NewRequisitionPage() {
                                                             className: "text-white text-[8px]"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                            lineNumber: 1254,
+                                                            lineNumber: 1367,
                                                             columnNumber: 45
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1253,
+                                                        lineNumber: 1366,
                                                         columnNumber: 41
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3566,12 +3872,12 @@ function NewRequisitionPage() {
                                                             className: "object-contain w-full h-full"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                            lineNumber: 1258,
+                                                            lineNumber: 1371,
                                                             columnNumber: 41
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1257,
+                                                        lineNumber: 1370,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3579,18 +3885,18 @@ function NewRequisitionPage() {
                                                         children: opt.label
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                        lineNumber: 1266,
+                                                        lineNumber: 1379,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, opt.value, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 1243,
+                                                lineNumber: 1356,
                                                 columnNumber: 33
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 1234,
+                                        lineNumber: 1347,
                                         columnNumber: 25
                                     }, this),
                                     paymentMethod && paymentMethod !== 'CASH' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3606,7 +3912,7 @@ function NewRequisitionPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 1275,
+                                                lineNumber: 1388,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3617,19 +3923,19 @@ function NewRequisitionPage() {
                                                 placeholder: paymentMethod === 'MPESA_TILL' ? 'e.g. 123456' : paymentMethod === 'MPESA_PAYBILL' ? 'e.g. 247247 / account number' : paymentMethod === 'BANK_TRANSFER' ? 'e.g. 01234567890000' : paymentMethod === 'AIRTEL_MONEY' ? 'e.g. +254 712 345 678' : 'Reference number'
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                                lineNumber: 1282,
+                                                lineNumber: 1395,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                        lineNumber: 1274,
+                                        lineNumber: 1387,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1231,
+                                lineNumber: 1344,
                                 columnNumber: 21
                             }, this)
                         ]
@@ -3647,7 +3953,7 @@ function NewRequisitionPage() {
                                 children: "Cancel"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1302,
+                                lineNumber: 1415,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3660,7 +3966,7 @@ function NewRequisitionPage() {
                                             className: "text-sm"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                            lineNumber: 1315,
+                                            lineNumber: 1428,
                                             columnNumber: 33
                                         }, this),
                                         "Submit Requisition"
@@ -3668,13 +3974,13 @@ function NewRequisitionPage() {
                                 }, void 0, true)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1308,
+                                lineNumber: 1421,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                        lineNumber: 1301,
+                        lineNumber: 1414,
                         columnNumber: 17
                     }, this)
                 ]
@@ -3697,12 +4003,12 @@ function NewRequisitionPage() {
                                     children: "😔"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                    lineNumber: 1329,
+                                    lineNumber: 1442,
                                     columnNumber: 33
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1328,
+                                lineNumber: 1441,
                                 columnNumber: 29
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -3710,7 +4016,7 @@ function NewRequisitionPage() {
                                 children: "Access Restricted"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1331,
+                                lineNumber: 1444,
                                 columnNumber: 29
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3718,7 +4024,7 @@ function NewRequisitionPage() {
                                 children: "Sorry, you cannot access this service at the moment. Please request an admin for access."
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1332,
+                                lineNumber: 1445,
                                 columnNumber: 29
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3727,23 +4033,23 @@ function NewRequisitionPage() {
                                 children: "Dismiss"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                                lineNumber: 1335,
+                                lineNumber: 1448,
                                 columnNumber: 29
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                        lineNumber: 1327,
+                        lineNumber: 1440,
                         columnNumber: 25
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                    lineNumber: 1326,
+                    lineNumber: 1439,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/dashboard/requisitions/new/page.tsx",
-                lineNumber: 1325,
+                lineNumber: 1438,
                 columnNumber: 17
             }, this)
         ]

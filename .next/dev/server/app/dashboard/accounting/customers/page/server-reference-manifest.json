@@ -89,6 +89,66 @@
       },
       "exportedName": "deleteRequisition",
       "filename": "src/app/dashboard/requisitions/actions.ts"
+    },
+    "407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "trashVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "trashVendor",
+      "filename": "src/app/actions/vendors.ts"
+    },
+    "40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "restoreVendor",
+          "filename": "src/app/actions/vendors.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "restoreVendor",
+      "filename": "src/app/actions/vendors.ts"
+    },
+    "4054f3fb890cd5d9dc0bfc313126889bc773ac888f": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "trashCustomer",
+          "filename": "src/app/actions/customers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "trashCustomer",
+      "filename": "src/app/actions/customers.ts"
+    },
+    "40549c2a41b0eed1ffd0c210ca392ee2575bb956fd": {
+      "workers": {
+        "app/dashboard/accounting/customers/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "restoreCustomer",
+          "filename": "src/app/actions/customers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/accounting/customers/page": "action-browser"
+      },
+      "exportedName": "restoreCustomer",
+      "filename": "src/app/actions/customers.ts"
     }
   },
   "edge": {}

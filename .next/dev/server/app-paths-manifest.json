@@ -3,19 +3,7 @@
   "/api/approvals/route": "app/api/approvals/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/notifications/route": "app/api/notifications/route.js",
-  "/api/salaries/route": "app/api/salaries/route.js",
   "/api/system/setup-status/route": "app/api/system/setup-status/route.js",
-  "/api/workflow/analytics/route": "app/api/workflow/analytics/route.js",
-  "/dashboard/accounting/ledger/page": "app/dashboard/accounting/ledger/page.js",
-  "/dashboard/expenses/page": "app/dashboard/expenses/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/reports/page": "app/dashboard/reports/page.js",
-  "/dashboard/requisitions/[id]/page": "app/dashboard/requisitions/[id]/page.js",
-  "/dashboard/requisitions/new/page": "app/dashboard/requisitions/new/page.js",
-  "/dashboard/requisitions/page": "app/dashboard/requisitions/page.js",
-  "/dashboard/salaries/page": "app/dashboard/salaries/page.js",
-  "/dashboard/workflow-analytics/page": "app/dashboard/workflow-analytics/page.js",
-  "/login/page": "app/login/page.js",
-  "/page": "app/page.js",
-  "/signup/page": "app/signup/page.js"
+  "/dashboard/accounting/customers/page": "app/dashboard/accounting/customers/page.js",
+  "/dashboard/requisitions/new/page": "app/dashboard/requisitions/new/page.js"
 }

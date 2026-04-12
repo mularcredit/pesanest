@@ -9,11 +9,16 @@ import {
     PiGlobe,
     PiTagBold,
     PiCurrencyDollar,
-    PiPlus
+    PiPlus,
+    PiTrash,
+    PiArrowCounterClockwise,
+    PiWarningCircle
 } from "react-icons/pi"
 import { CreateVendorModal } from "@/components/dashboard/CreateVendorModal"
 import { EditVendorModal } from "@/components/dashboard/EditVendorModal"
 import { DeleteEntityButton } from "@/components/dashboard/DeleteEntityButton"
+import { trashVendor, restoreVendor } from "@/app/actions/vendors"
+import { useToast } from "@/components/ui/ToastProvider"
 
 interface VendorsClientProps {
     vendors: any[]
@@ -22,14 +27,52 @@ interface VendorsClientProps {
 export function VendorsClient({ vendors }: VendorsClientProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [editingVendor, setEditingVendor] = useState<any>(null)
+    const [activeTab, setActiveTab] = useState<"active" | "trash">("active")
+    const { showToast } = useToast()
+
+    const filteredVendors = vendors.filter(vendor => 
+        activeTab === "active" ? !vendor.isTrashed : vendor.isTrashed
+    )
+
+    const handleTrash = async (id: string) => {
+        const res = await trashVendor(id)
+        if (res.success) showToast(res.message, "success")
+        else showToast(res.message, "error")
+    }
+
+    const handleRestore = async (id: string) => {
+        const res = await restoreVendor(id)
+        if (res.success) showToast(res.message, "success")
+        else showToast(res.message, "error")
+    }
 
     return (
         <div className="space-y-8 animate-fade-in-up">
-            <div className="flex items-end justify-between">
-                <div>
-                    <p className="text-gds-text-muted text-sm font-medium tracking-wide">
-                        Approved suppliers & partners
-                    </p>
+            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                <div className="flex gap-8">
+                    <button
+                        onClick={() => setActiveTab("active")}
+                        className={cn(
+                            "pb-4 text-sm font-bold tracking-tight transition-all relative",
+                            activeTab === "active" ? "text-[#29258D]" : "text-gray-400 hover:text-gray-600"
+                        )}
+                    >
+                        Active Vendors
+                        {activeTab === "active" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#29258D]" />}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("trash")}
+                        className={cn(
+                            "pb-4 text-sm font-bold tracking-tight transition-all relative flex items-center gap-2",
+                            activeTab === "trash" ? "text-rose-600" : "text-gray-400 hover:text-gray-600"
+                        )}
+                    >
+                        Trash Bin
+                        <span className="px-1.5 py-0.5 bg-gray-100 text-[10px] rounded-full text-gray-500">
+                            {vendors.filter(v => v.isTrashed).length}
+                        </span>
+                        {activeTab === "trash" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-rose-600" />}
+                    </button>
                 </div>
                 <div className="flex gap-4">
                     <button
@@ -43,13 +86,19 @@ export function VendorsClient({ vendors }: VendorsClientProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {vendors.length === 0 ? (
-                    <div className="col-span-full py-20 text-center text-gds-text-muted italic bg-white border border-dashed border-gray-200 rounded-xl">
-                        No vendors found in the system.
+                {filteredVendors.length === 0 ? (
+                    <div className="col-span-full py-20 text-center text-gds-text-muted italic bg-white border border-dashed border-gray-200 rounded-xl flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-300">
+                            {activeTab === "active" ? <PiBuildings size={24} /> : <PiTrash size={24} />}
+                        </div>
+                        <p>{activeTab === "active" ? "No vendors found in the system." : "Trash bin is empty."}</p>
                     </div>
                 ) : (
-                    vendors.map((vendor) => (
-                        <div key={vendor.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col group hover:shadow-lg hover:border-indigo-200 transition-all">
+                    filteredVendors.map((vendor) => (
+                        <div key={vendor.id} className={cn(
+                            "bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col group transition-all",
+                            vendor.isTrashed ? "opacity-75 grayscale-[0.2]" : "hover:shadow-lg hover:border-indigo-200"
+                        )}>
                             {/* Header - Matching "Ready to Pay" Batch Header */}
                             <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
                                 <div className="flex items-center gap-2.5">
@@ -67,11 +116,13 @@ export function VendorsClient({ vendors }: VendorsClientProps) {
                                 </div>
                                 <span className={cn(
                                     "px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border",
-                                    vendor.isActive
-                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                        : "bg-gray-50 text-gray-500 border-gray-200"
+                                    vendor.isTrashed 
+                                        ? "bg-rose-50 text-rose-700 border-rose-200"
+                                        : vendor.isActive
+                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                            : "bg-gray-50 text-gray-500 border-gray-200"
                                 )}>
-                                    {vendor.isActive ? "Active" : "Inactive"}
+                                    {vendor.isTrashed ? "Trashed" : vendor.isActive ? "Active" : "Inactive"}
                                 </span>
                             </div>
 
@@ -98,33 +149,53 @@ export function VendorsClient({ vendors }: VendorsClientProps) {
                                 </div>
                             </div>
 
-                            {/* Footer - Matching "Confirm Disbursement" Button Styling */}
+                            {/* Footer */}
                             <div className="px-4 py-3 border-t border-gray-200 bg-gray-50/30 mt-auto">
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => setEditingVendor(vendor)}
-                                        className="py-2 px-6 rounded-lg text-xs font-bold text-gray-500 bg-transparent border border-gray-200 hover:bg-indigo-50/50 hover:border-indigo-200 hover:text-indigo-600 transition-all"
-                                    >
-                                        Manage
-                                    </button>
-                                    <div className="flex items-center gap-1">
-                                        {vendor.website && (
-                                            <a href={vendor.website} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-indigo-600 transition-colors" title="Visit Website">
-                                                <PiGlobe className="text-lg" />
-                                            </a>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        {!vendor.isTrashed ? (
+                                            <>
+                                                <button
+                                                    onClick={() => setEditingVendor(vendor)}
+                                                    className="py-2 px-6 rounded-lg text-xs font-bold text-gray-500 bg-transparent border border-gray-200 hover:bg-black/5 hover:border-black/20 hover:text-black transition-all"
+                                                >
+                                                    Manage
+                                                </button>
+                                                <button
+                                                    onClick={() => handleTrash(vendor.id)}
+                                                    className="p-2 text-gray-400 hover:text-rose-600 transition-colors"
+                                                    title="Move to Trash"
+                                                >
+                                                    <PiTrash className="text-lg" />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    onClick={() => handleRestore(vendor.id)}
+                                                    className="py-2 px-4 rounded-lg text-xs font-bold text-emerald-600 bg-white border border-emerald-200 hover:bg-emerald-50 transition-all flex items-center gap-2"
+                                                >
+                                                    <PiArrowCounterClockwise className="text-sm" /> Restore
+                                                </button>
+                                                <DeleteEntityButton
+                                                    id={vendor.id}
+                                                    entityType="vendor"
+                                                    entityName={vendor.name}
+                                                    className="p-2 text-rose-400 hover:text-rose-700 bg-rose-50/50 rounded-lg"
+                                                />
+                                            </>
                                         )}
-                                        <DeleteEntityButton
-                                            id={vendor.id}
-                                            entityType="vendor"
-                                            entityName={vendor.name}
-                                            className="p-2 text-gray-400 hover:text-rose-600 transition-colors"
-                                        />
                                     </div>
+                                    {!vendor.isTrashed && vendor.website && (
+                                        <a href={vendor.website} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-[#29258D] transition-colors" title="Visit Website">
+                                            <PiGlobe className="text-lg" />
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     ))
-                )}
+                )})}
             </div>
 
             <CreateVendorModal

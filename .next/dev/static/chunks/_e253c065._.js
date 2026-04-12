@@ -1459,6 +1459,7 @@ exports.Prisma.VendorScalarFieldEnum = {
     category: 'category',
     isPreferred: 'isPreferred',
     isActive: 'isActive',
+    isTrashed: 'isTrashed',
     paymentTerms: 'paymentTerms',
     currency: 'currency',
     bankName: 'bankName',
@@ -1483,6 +1484,7 @@ exports.Prisma.CustomerScalarFieldEnum = {
     taxId: 'taxId',
     currency: 'currency',
     isActive: 'isActive',
+    isTrashed: 'isTrashed',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };

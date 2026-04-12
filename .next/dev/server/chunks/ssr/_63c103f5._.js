@@ -483,18 +483,22 @@ class ApprovalWorkflowEngine {
         }
         return approvals;
     }
-    /**
-     * Process an approval decision
-     */ async processApproval(approvalId, decision, comments, isOverride = false) {
+    async processApproval(approvalId, decision, comments, isOverride = false, actualApproverId) {
+        const updateData = {
+            status: decision,
+            comments,
+            approvedAt: new Date()
+        };
+        // If an admin is overriding the approval, update the approverId so 
+        // the audit log reflects exactly who performed the action.
+        if (isOverride && actualApproverId) {
+            updateData.approverId = actualApproverId;
+        }
         const approval = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].approval.update({
             where: {
                 id: approvalId
             },
-            data: {
-                status: decision,
-                comments,
-                approvedAt: new Date()
-            },
+            data: updateData,
             include: {
                 expense: {
                     include: {
@@ -1263,11 +1267,15 @@ async function createExpenseAccountAction(data) {
 "[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"40a4f25cab38431ee6c3e60b097dcb851512c82b59":"deleteVendor","60ae654f556411640b05f4a45038e76b892ed6b201":"updateVendor","60c8a8c5c07686c35591fe5f3a0e126af73dac1e6b":"createVendor"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7":"trashVendor","40a4f25cab38431ee6c3e60b097dcb851512c82b59":"deleteVendor","40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6":"restoreVendor","60ae654f556411640b05f4a45038e76b892ed6b201":"updateVendor","60c8a8c5c07686c35591fe5f3a0e126af73dac1e6b":"createVendor"},"",""] */ __turbopack_context__.s([
     "createVendor",
     ()=>createVendor,
     "deleteVendor",
     ()=>deleteVendor,
+    "restoreVendor",
+    ()=>restoreVendor,
+    "trashVendor",
+    ()=>trashVendor,
     "updateVendor",
     ()=>updateVendor
 ]);
@@ -1355,6 +1363,66 @@ async function createVendor(prevState, formData) {
         };
     }
 }
+async function trashVendor(id) {
+    const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+    if (!session?.user?.id) {
+        return {
+            message: "Unauthorized",
+            success: false
+        };
+    }
+    try {
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].vendor.update({
+            where: {
+                id
+            },
+            data: {
+                isTrashed: true
+            }
+        });
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/vendors");
+        return {
+            message: "Vendor moved to trash",
+            success: true
+        };
+    } catch (e) {
+        console.error("Failed to trash vendor:", e);
+        return {
+            message: "Failed to move vendor to trash",
+            success: false
+        };
+    }
+}
+async function restoreVendor(id) {
+    const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+    if (!session?.user?.id) {
+        return {
+            message: "Unauthorized",
+            success: false
+        };
+    }
+    try {
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].vendor.update({
+            where: {
+                id
+            },
+            data: {
+                isTrashed: false
+            }
+        });
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/vendors");
+        return {
+            message: "Vendor restored successfully",
+            success: true
+        };
+    } catch (e) {
+        console.error("Failed to restore vendor:", e);
+        return {
+            message: "Failed to restore vendor",
+            success: false
+        };
+    }
+}
 async function deleteVendor(id) {
     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
     if (!session?.user?.id) {
@@ -1379,41 +1447,11 @@ async function deleteVendor(id) {
     const isAdmin = user?.role === 'SYSTEM_ADMIN' || user?.customRole?.isSystem;
     if (!isAdmin) {
         return {
-            message: "Only System Admins can delete vendors",
+            message: "Only System Admins can permanently delete vendors",
             success: false
         };
     }
     try {
-        // Check for existing transactions
-        const vendor = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].vendor.findUnique({
-            where: {
-                id
-            },
-            include: {
-                invoices: true
-            }
-        });
-        if (!vendor) return {
-            message: "Vendor not found",
-            success: false
-        };
-        if (vendor.invoices.length > 0) {
-            // Soft delete
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].vendor.update({
-                where: {
-                    id
-                },
-                data: {
-                    isActive: false
-                }
-            });
-            (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/vendors");
-            return {
-                message: "Vendor archived (has existing transactions)",
-                success: true
-            };
-        }
-        // Hard delete
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].vendor.delete({
             where: {
                 id
@@ -1421,13 +1459,13 @@ async function deleteVendor(id) {
         });
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/vendors");
         return {
-            message: "Vendor deleted successfully",
+            message: "Vendor permanently deleted",
             success: true
         };
     } catch (e) {
         console.error("Failed to delete vendor:", e);
         return {
-            message: "Failed to delete vendor",
+            message: "Failed to delete vendor. You may need to trash it instead.",
             success: false
         };
     }
@@ -1480,19 +1518,27 @@ async function updateVendor(id, formData) {
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     createVendor,
+    trashVendor,
+    restoreVendor,
     deleteVendor,
     updateVendor
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createVendor, "60c8a8c5c07686c35591fe5f3a0e126af73dac1e6b", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(trashVendor, "407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(restoreVendor, "40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteVendor, "40a4f25cab38431ee6c3e60b097dcb851512c82b59", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateVendor, "60ae654f556411640b05f4a45038e76b892ed6b201", null);
 }),
 "[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"40ca75e3957829e48693d042037e04f87f11b16372":"deleteCustomer"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"40549c2a41b0eed1ffd0c210ca392ee2575bb956fd":"restoreCustomer","4054f3fb890cd5d9dc0bfc313126889bc773ac888f":"trashCustomer","40ca75e3957829e48693d042037e04f87f11b16372":"deleteCustomer"},"",""] */ __turbopack_context__.s([
     "deleteCustomer",
-    ()=>deleteCustomer
+    ()=>deleteCustomer,
+    "restoreCustomer",
+    ()=>restoreCustomer,
+    "trashCustomer",
+    ()=>trashCustomer
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/prisma.ts [app-rsc] (ecmascript)");
@@ -1503,6 +1549,66 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 ;
 ;
+async function trashCustomer(id) {
+    const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+    if (!session?.user?.id) {
+        return {
+            message: "Unauthorized",
+            success: false
+        };
+    }
+    try {
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].customer.update({
+            where: {
+                id
+            },
+            data: {
+                isTrashed: true
+            }
+        });
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/accounting/customers");
+        return {
+            message: "Customer moved to trash",
+            success: true
+        };
+    } catch (e) {
+        console.error("Failed to trash customer:", e);
+        return {
+            message: "Failed to move customer to trash",
+            success: false
+        };
+    }
+}
+async function restoreCustomer(id) {
+    const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
+    if (!session?.user?.id) {
+        return {
+            message: "Unauthorized",
+            success: false
+        };
+    }
+    try {
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].customer.update({
+            where: {
+                id
+            },
+            data: {
+                isTrashed: false
+            }
+        });
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/accounting/customers");
+        return {
+            message: "Customer restored successfully",
+            success: true
+        };
+    } catch (e) {
+        console.error("Failed to restore customer:", e);
+        return {
+            message: "Failed to restore customer",
+            success: false
+        };
+    }
+}
 async function deleteCustomer(id) {
     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["auth"])();
     if (!session?.user?.id) {
@@ -1527,44 +1633,11 @@ async function deleteCustomer(id) {
     const isAdmin = user?.role === 'SYSTEM_ADMIN' || user?.customRole?.isSystem;
     if (!isAdmin) {
         return {
-            message: "Only System Admins can delete customers",
+            message: "Only System Admins can permanently delete customers",
             success: false
         };
     }
     try {
-        // Check for existing transactions
-        const customer = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].customer.findUnique({
-            where: {
-                id
-            },
-            include: {
-                sales: true,
-                payments: true,
-                creditNotes: true
-            }
-        });
-        if (!customer) return {
-            message: "Customer not found",
-            success: false
-        };
-        const hasTransactions = customer.sales.length > 0 || customer.payments.length > 0 || customer.creditNotes.length > 0;
-        if (hasTransactions) {
-            // Soft delete
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].customer.update({
-                where: {
-                    id
-                },
-                data: {
-                    isActive: false
-                }
-            });
-            (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/accounting/customers");
-            return {
-                message: "Customer archived (has existing transactions)",
-                success: true
-            };
-        }
-        // Hard delete
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].customer.delete({
             where: {
                 id
@@ -1572,21 +1645,25 @@ async function deleteCustomer(id) {
         });
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])("/dashboard/accounting/customers");
         return {
-            message: "Customer deleted successfully",
+            message: "Customer permanently deleted",
             success: true
         };
     } catch (e) {
         console.error("Failed to delete customer:", e);
         return {
-            message: "Failed to delete customer",
+            message: "Failed to delete customer. You may need to trash it instead.",
             success: false
         };
     }
 }
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
+    trashCustomer,
+    restoreCustomer,
     deleteCustomer
 ]);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(trashCustomer, "4054f3fb890cd5d9dc0bfc313126889bc773ac888f", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(restoreCustomer, "40549c2a41b0eed1ffd0c210ca392ee2575bb956fd", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteCustomer, "40ca75e3957829e48693d042037e04f87f11b16372", null);
 }),
 "[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
@@ -1922,6 +1999,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$r
 ;
 ;
 ;
+;
+;
+;
+;
 }),
 "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)", ((__turbopack_context__) => {
 "use strict";
@@ -1931,12 +2012,20 @@ __turbopack_context__.s([
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCategoriesAction"],
     "00da2e63c392810a63b6438f5c38c682a140091ef0",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getEligibleRequisitions"],
+    "40549c2a41b0eed1ffd0c210ca392ee2575bb956fd",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["restoreCustomer"],
+    "4054f3fb890cd5d9dc0bfc313126889bc773ac888f",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["trashCustomer"],
+    "407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["trashVendor"],
     "40a4f25cab38431ee6c3e60b097dcb851512c82b59",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteVendor"],
     "40ca75e3957829e48693d042037e04f87f11b16372",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteCustomer"],
     "40e14673047f6f15b55678ea0a5e7d0350fa0bce6c",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteRequisition"],
+    "40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["restoreVendor"],
     "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addItemToRequisition"]
 ]);

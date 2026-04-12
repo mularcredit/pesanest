@@ -108,6 +108,9 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
     const [accountCreateError, setAccountCreateError] = useState("");
     const [isSavingAccount, setIsSavingAccount] = useState(false);
 
+    const [isAccountOpen, setIsAccountOpen] = useState(false);
+    const [accountSearch, setAccountSearch] = useState("");
+
     const filteredCategories = EXPENSE_CATEGORIES.filter(c =>
         c.toLowerCase().includes(categorySearch.toLowerCase())
     );
@@ -268,6 +271,91 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
                 {/* 2. BODY: White Background with Sections */}
                 <div className="bg-white p-6 lg:p-8 space-y-8">
 
+                    {/* Section 0: Account Routing (NEW TOP SECTION) */}
+                    <div>
+                        <div className="flex items-center justify-between border-b border-gray-200 pb-2 mb-4">
+                            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Account Routing</h3>
+                            <button
+                                type="button"
+                                onClick={() => setIsCreatingAccount(true)}
+                                className="text-xs font-bold text-[#29258D] hover:underline flex items-center gap-1"
+                            >
+                                <PiPlus className="text-[10px]" /> Create New
+                            </button>
+                        </div>
+                        <div className="relative">
+                            <div
+                                onClick={() => setIsAccountOpen(!isAccountOpen)}
+                                className="w-full bg-white border border-gray-200 rounded-xl min-h-[48px] px-4 py-3 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] group shadow-sm"
+                            >
+                                <div className="flex flex-col">
+                                    {customAccountId ? (
+                                        <>
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Target Ledger</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-bold text-[#29258D]">
+                                                    {expenseAccounts.find(a => a.id === customAccountId)?.name}
+                                                </span>
+                                                <span className="px-1.5 py-0.5 bg-[#29258D]/10 text-[#29258D] font-mono text-[10px] rounded border border-[#29258D]/20">
+                                                    {expenseAccounts.find(a => a.id === customAccountId)?.code}
+                                                </span>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <span className="text-sm text-gray-400 font-medium">Select target ledger account...</span>
+                                    )}
+                                </div>
+                                <PiCaretDown className={`text-gray-400 transition-transform duration-200 ${isAccountOpen ? 'rotate-180' : ''}`} />
+                            </div>
+
+                            {isAccountOpen && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                    <div className="p-3 border-b border-gray-50 flex items-center gap-3 bg-gray-50/50">
+                                        <PiMagnifyingGlass className="text-gray-400 text-lg shrink-0" />
+                                        <input
+                                            type="text"
+                                            autoFocus
+                                            placeholder="Search ledger accounts or GL codes..."
+                                            value={accountSearch}
+                                            onChange={(e) => setAccountSearch(e.target.value)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="w-full bg-transparent border-none text-sm font-medium focus:ring-0 placeholder:text-gray-400"
+                                        />
+                                    </div>
+                                    <div className="max-h-64 overflow-y-auto custom-scrollbar p-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => { setCustomAccountId(""); setIsAccountOpen(false); }}
+                                            className={`w-full text-left px-3 py-3 rounded-xl transition-all flex flex-col gap-0.5 mb-1 ${!customAccountId ? 'bg-[#29258D] text-white' : 'hover:bg-gray-50'}`}
+                                        >
+                                            <span className={`text-xs font-bold ${!customAccountId ? 'text-white/80' : 'text-gray-500'}`}>DEFAULT ROUTING</span>
+                                            <span className="text-[10px] opacity-70 italic">Category-based automated routing</span>
+                                        </button>
+                                        
+                                        {expenseAccounts.filter(acc => 
+                                            acc.name.toLowerCase().includes(accountSearch.toLowerCase()) || 
+                                            acc.code.toLowerCase().includes(accountSearch.toLowerCase())
+                                        ).map(acc => (
+                                            <button
+                                                key={acc.id}
+                                                type="button"
+                                                onClick={() => { setCustomAccountId(acc.id); setIsAccountOpen(false); }}
+                                                className={`w-full text-left px-3 py-3 rounded-xl transition-all flex items-center justify-between mb-1 ${customAccountId === acc.id ? 'bg-[#29258D] text-white shadow-lg shadow-[#29258D]/20' : 'hover:bg-gray-50'}`}
+                                            >
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-bold leading-tight">{acc.name}</span>
+                                                    <span className={`text-[10px] font-mono ${customAccountId === acc.id ? 'text-white/70' : 'text-gray-400'}`}>GL-{acc.code}</span>
+                                                </div>
+                                                {customAccountId === acc.id && <PiCheckCircle className="text-lg text-white" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {isAccountOpen && <div className="fixed inset-0 z-50" onClick={() => setIsAccountOpen(false)} />}
+                        </div>
+                    </div>
+
                     {/* Section 1: Transaction Details */}
                     <div>
                         <h3 className="text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Transaction details</h3>
@@ -291,7 +379,7 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
                             {/* Additional Notes (Full Mode) */}
                             {mode === "full" && (
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Description <span className="text-rose-500">*</span></label>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Description <span className="text-gray-400 font-normal text-[10px]">(Optional)</span></label>
                                     <Textarea
                                         rows={3}
                                         value={description}
@@ -319,11 +407,11 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
                                         <Input
                                             type="number"
                                             required
-                                            step="0.01"
+                                            step="1"
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
                                             className="w-full bg-white border border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all font-mono shadow-none placeholder:text-gray-300"
-                                            placeholder="0.00"
+                                            placeholder="0"
                                         />
                                     </div>
                                     {/* ── Currency Dropdown ── */}
@@ -466,33 +554,7 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
                             </div>
                         </div>
 
-                        {/* Custom Ledger Account */}
-                        <div className="mb-6">
-                            <label className="block text-xs font-medium text-gray-700 mb-1.5 cursor-help" title="Overrides standard category-based routing">
-                                Custom Ledger Account <span className="text-gray-400 font-normal">(Optional)</span>
-                            </label>
-                            <div className="flex gap-2">
-                                <select
-                                    value={customAccountId}
-                                    onChange={(e) => setCustomAccountId(e.target.value)}
-                                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all shadow-none"
-                                >
-                                    <option value="">Default Routing</option>
-                                    {expenseAccounts.map((acc: any) => (
-                                        <option key={acc.id} value={acc.id}>
-                                            {acc.code} - {acc.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <button
-                                    type="button"
-                                    onClick={() => setIsCreatingAccount(true)}
-                                    className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[#29258D] hover:bg-[#29258D]/5 hover:border-[#29258D]/30 transition-all flex items-center gap-1.5 text-xs font-bold"
-                                >
-                                    <PiPlus className="text-sm" /> Create
-                                </button>
-                            </div>
-                        </div>
+
 
                         {/* Budget Widget (Moved inside Financial Overview) */}
                         {budgetStatus && (

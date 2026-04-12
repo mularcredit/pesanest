@@ -500,6 +500,7 @@ model Vendor {
   category               String?
   isPreferred            Boolean   @default(false)
   isActive               Boolean   @default(true)
+  isTrashed              Boolean   @default(false)
   paymentTerms           String?
   currency               String    @default("USD")
   bankName               String?
@@ -517,6 +518,7 @@ model Vendor {
   @@index([name])
   @@index([stripeAccountId])
   @@index([branchId])
+  @@index([isTrashed])
 }
 
 model Customer {
@@ -531,6 +533,7 @@ model Customer {
   taxId         String?
   currency      String            @default("USD")
   isActive      Boolean           @default(true)
+  isTrashed     Boolean           @default(false)
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   creditNotes   CreditNote[]
@@ -538,6 +541,7 @@ model Customer {
   sales         Sale[]
 
   @@index([name])
+  @@index([isTrashed])
 }
 
 model Sale {

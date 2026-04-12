@@ -44,6 +44,21 @@
       },
       "exportedName": "getStatementData",
       "filename": "src/app/actions/finance-studio.ts"
+    },
+    "60e3e9500bc2083b70857ee2c7e3451021cf857bcc": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": "[project]/.next-internal/server/app/finance-studio/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions/finance-studio.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getSSCAAStatementData",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "exportedName": "getSSCAAStatementData",
+      "filename": "src/app/actions/finance-studio.ts"
     }
   },
   "edge": {}

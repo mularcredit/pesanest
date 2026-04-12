@@ -2,11 +2,13 @@ module.exports = [
 "[project]/src/app/actions/finance-studio.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"00a6961e48ac7589e517facb851bf6c1b911c720eb":"getCustomersForStudio","40552767a146714903ec705d5e415fd0574ae876d9":"checkCreditNoteNumberUniqueness","704062f8e5c77cad4cb2cd5f78e01856771cbf17f5":"getStatementData"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"00a6961e48ac7589e517facb851bf6c1b911c720eb":"getCustomersForStudio","40552767a146714903ec705d5e415fd0574ae876d9":"checkCreditNoteNumberUniqueness","60e3e9500bc2083b70857ee2c7e3451021cf857bcc":"getSSCAAStatementData","704062f8e5c77cad4cb2cd5f78e01856771cbf17f5":"getStatementData"},"",""] */ __turbopack_context__.s([
     "checkCreditNoteNumberUniqueness",
     ()=>checkCreditNoteNumberUniqueness,
     "getCustomersForStudio",
     ()=>getCustomersForStudio,
+    "getSSCAAStatementData",
+    ()=>getSSCAAStatementData,
     "getStatementData",
     ()=>getStatementData
 ]);
@@ -247,21 +249,92 @@ async function checkCreditNoteNumberUniqueness(cnNumber) {
         };
     }
 }
+async function getSSCAAStatementData(fromDate, toDate) {
+    try {
+        const whereClause = {
+            OR: [
+                {
+                    type: 'SOUTH_SUDAN'
+                },
+                {
+                    type: 'SOUTH_SUDAN_STRICT'
+                },
+                {
+                    branch: 'SSCAA'
+                },
+                {
+                    category: {
+                        contains: 'SSCAA',
+                        mode: 'insensitive'
+                    }
+                }
+            ]
+        };
+        if (fromDate && toDate) {
+            const startDate = new Date(fromDate);
+            const endDateInclusive = new Date(toDate);
+            endDateInclusive.setHours(23, 59, 59, 999);
+            whereClause.createdAt = {
+                gte: startDate,
+                lte: endDateInclusive
+            };
+        }
+        const requisitions = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].requisition.findMany({
+            where: whereClause,
+            orderBy: {
+                createdAt: 'asc'
+            }
+        });
+        let runningBalance = 0;
+        const formattedTransactions = requisitions.map((req, idx)=>{
+            runningBalance += req.amount;
+            return {
+                id: req.id,
+                operator: req.description || req.title,
+                invoiceRef: `REQ-${req.id.substring(0, 8)}`,
+                period: req.createdAt.toLocaleDateString('en-GB'),
+                amount: req.amount,
+                balance: runningBalance
+            };
+        });
+        return {
+            customer: {
+                name: 'South Sudanese Civil Aviation Authority',
+                group: 'Government Agency',
+                country: 'South Sudan',
+                accountType: 'Treasury Beneficiary'
+            },
+            summary: {
+                openingBalance: 0,
+                totalCharges: runningBalance,
+                totalPayments: runningBalance,
+                outstandingBalance: runningBalance
+            },
+            transactions: formattedTransactions
+        };
+    } catch (error) {
+        console.error("Error generating SSCAA statement data:", error);
+        return null;
+    }
+}
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     getCustomersForStudio,
     getStatementData,
-    checkCreditNoteNumberUniqueness
+    checkCreditNoteNumberUniqueness,
+    getSSCAAStatementData
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCustomersForStudio, "00a6961e48ac7589e517facb851bf6c1b911c720eb", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getStatementData, "704062f8e5c77cad4cb2cd5f78e01856771cbf17f5", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(checkCreditNoteNumberUniqueness, "40552767a146714903ec705d5e415fd0574ae876d9", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getSSCAAStatementData, "60e3e9500bc2083b70857ee2c7e3451021cf857bcc", null);
 }),
 "[project]/.next-internal/server/app/finance-studio/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions/finance-studio.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>", ((__turbopack_context__) => {
 "use strict";
 
 __turbopack_context__.s([]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$finance$2d$studio$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/actions/finance-studio.ts [app-rsc] (ecmascript)");
+;
 ;
 ;
 ;
@@ -274,6 +347,8 @@ __turbopack_context__.s([
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$finance$2d$studio$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCustomersForStudio"],
     "40552767a146714903ec705d5e415fd0574ae876d9",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$finance$2d$studio$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["checkCreditNoteNumberUniqueness"],
+    "60e3e9500bc2083b70857ee2c7e3451021cf857bcc",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$finance$2d$studio$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getSSCAAStatementData"],
     "704062f8e5c77cad4cb2cd5f78e01856771cbf17f5",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$finance$2d$studio$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getStatementData"]
 ]);

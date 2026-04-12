@@ -73,6 +73,44 @@ export async function createVendor(prevState: any, formData: FormData) {
     }
 }
 
+export async function trashVendor(id: string) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { message: "Unauthorized", success: false };
+    }
+
+    try {
+        await prisma.vendor.update({
+            where: { id },
+            data: { isTrashed: true }
+        });
+        revalidatePath("/dashboard/vendors");
+        return { message: "Vendor moved to trash", success: true };
+    } catch (e) {
+        console.error("Failed to trash vendor:", e);
+        return { message: "Failed to move vendor to trash", success: false };
+    }
+}
+
+export async function restoreVendor(id: string) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { message: "Unauthorized", success: false };
+    }
+
+    try {
+        await prisma.vendor.update({
+            where: { id },
+            data: { isTrashed: false }
+        });
+        revalidatePath("/dashboard/vendors");
+        return { message: "Vendor restored successfully", success: true };
+    } catch (e) {
+        console.error("Failed to restore vendor:", e);
+        return { message: "Failed to restore vendor", success: false };
+    }
+}
+
 export async function deleteVendor(id: string) {
     const session = await auth();
     if (!session?.user?.id) {
@@ -86,38 +124,19 @@ export async function deleteVendor(id: string) {
 
     const isAdmin = user?.role === 'SYSTEM_ADMIN' || user?.customRole?.isSystem;
     if (!isAdmin) {
-        return { message: "Only System Admins can delete vendors", success: false };
+        return { message: "Only System Admins can permanently delete vendors", success: false };
     }
 
     try {
-        // Check for existing transactions
-        const vendor = await prisma.vendor.findUnique({
-            where: { id },
-            include: { invoices: true }
-        });
-
-        if (!vendor) return { message: "Vendor not found", success: false };
-
-        if (vendor.invoices.length > 0) {
-            // Soft delete
-            await prisma.vendor.update({
-                where: { id },
-                data: { isActive: false }
-            });
-            revalidatePath("/dashboard/vendors");
-            return { message: "Vendor archived (has existing transactions)", success: true };
-        }
-
-        // Hard delete
         await prisma.vendor.delete({
             where: { id }
         });
 
         revalidatePath("/dashboard/vendors");
-        return { message: "Vendor deleted successfully", success: true };
+        return { message: "Vendor permanently deleted", success: true };
     } catch (e) {
         console.error("Failed to delete vendor:", e);
-        return { message: "Failed to delete vendor", success: false };
+        return { message: "Failed to delete vendor. You may need to trash it instead.", success: false };
     }
 }
 
