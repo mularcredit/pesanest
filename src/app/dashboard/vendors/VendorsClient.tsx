@@ -195,7 +195,7 @@ export function VendorsClient({ vendors }: VendorsClientProps) {
                             </div>
                         </div>
                     ))
-                )})}
+                )}
             </div>
 
             <CreateVendorModal
