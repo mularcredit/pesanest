@@ -1099,7 +1099,7 @@ function FinanceStudioContent() {
                                         <StudioDateRangePicker
                                             startDate={sscaaData.periodStart}
                                             endDate={sscaaData.periodEnd}
-                                            onSelect={(start, end) => setSscaaData({ ...sscaaData, periodStart: start, periodEnd: end })}
+                                            onChange={(start, end) => setSscaaData({ ...sscaaData, periodStart: start, periodEnd: end })}
                                         />
                                     </div>
                                     <button
