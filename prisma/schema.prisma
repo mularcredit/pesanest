@@ -555,6 +555,7 @@ model Sale {
   currency      String            @default("USD")
   status        String            @default("DRAFT")
   notes         String?
+  invoiceUrl    String?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   payments      CustomerPayment[]
@@ -588,6 +589,7 @@ model CustomerPayment {
   reference   String?
   saleId      String?
   notes       String?
+  invoiceUrl  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   customer    Customer @relation(fields: [customerId], references: [id])
@@ -605,6 +607,7 @@ model CreditNote {
   reason         String
   customerId     String
   status         String         @default("DRAFT")
+  invoiceUrl     String?
   createdAt      DateTime       @default(now())
   customer       Customer       @relation(fields: [customerId], references: [id])
   journalEntries JournalEntry[]

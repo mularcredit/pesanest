@@ -1,6 +1,6 @@
 {
   "node": {
-    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+    "6055fb0a7ef28c6beeec47be5e69ca4c39ed617a85": {
       "workers": {
         "app/dashboard/invoices/new/page": {
           "moduleId": 736433,
@@ -15,7 +15,7 @@
       "exportedName": "addItemToRequisition",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+    "00992a9e0e7a8f284426540e0ae018965a5cdde94a": {
       "workers": {
         "app/dashboard/invoices/new/page": {
           "moduleId": 736433,
@@ -30,7 +30,7 @@
       "exportedName": "getCategoriesAction",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+    "00e447cbe792f07f5dfe4778dc13e52f6a726fa17b": {
       "workers": {
         "app/dashboard/invoices/new/page": {
           "moduleId": 736433,

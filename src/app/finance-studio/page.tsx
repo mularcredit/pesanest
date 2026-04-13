@@ -1205,7 +1205,9 @@ function FinanceStudioContent() {
                                 // Select and render the correct Vector PDF
                                 let MyDocument;
                                 if (activeTab === 'STATEMENT') {
-                                    MyDocument = <StatementPDF data={statementData} baseUrl={origin} settings={settings} />;
+                                    const { periodStart: ps, periodEnd: pe, ...stmtRest } = statementData;
+                                    const stmtPeriod = ps && pe ? `${format(ps, 'dd MMM yyyy')} - ${format(pe, 'dd MMM yyyy')}` : 'All Time';
+                                    MyDocument = <StatementPDF data={{ ...stmtRest, period: stmtPeriod }} baseUrl={origin} settings={settings} />;
                                 } else if (activeTab === 'CREDIT_NOTE') {
                                     MyDocument = <CreditNotePDF data={creditNoteData} baseUrl={origin} settings={settings} />;
                                 } else if (activeTab === 'SSCAA_REPORT') {

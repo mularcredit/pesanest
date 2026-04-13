@@ -1,3 +1,0 @@
-module.exports=[710419,a=>{"use strict";var b=a.i(405050);let c=(0,b.createServerReference)("000c6532ed3867ed4abeede9b524f9ea180aa0f446",b.callServer,void 0,b.findSourceMapURL,"getExpenseAccountsAction");a.s(["getExpenseAccountsAction",()=>c])},139765,a=>{"use strict";var b=a.i(405050);let c=(0,b.createServerReference)("40f63b9d2a7c789f85ddafe526696ac9551e57313f",b.callServer,void 0,b.findSourceMapURL,"createExpenseAccountAction");a.s(["createExpenseAccountAction",()=>c])}];
-
-//# sourceMappingURL=src_app_dashboard_requisitions_new_d1e43311._.js.map

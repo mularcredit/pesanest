@@ -1,6 +1,6 @@
 {
   "node": {
-    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+    "6055fb0a7ef28c6beeec47be5e69ca4c39ed617a85": {
       "workers": {
         "app/dashboard/requisitions/categories/page": {
           "moduleId": 100220,
@@ -15,7 +15,7 @@
       "exportedName": "addItemToRequisition",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+    "00992a9e0e7a8f284426540e0ae018965a5cdde94a": {
       "workers": {
         "app/dashboard/requisitions/categories/page": {
           "moduleId": 100220,
@@ -30,7 +30,7 @@
       "exportedName": "getCategoriesAction",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+    "00e447cbe792f07f5dfe4778dc13e52f6a726fa17b": {
       "workers": {
         "app/dashboard/requisitions/categories/page": {
           "moduleId": 100220,
@@ -45,7 +45,7 @@
       "exportedName": "getEligibleRequisitions",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "40fea340c869728a8980e35c6697c83092225000f5": {
+    "40aa865098a0fed9d37d9e2d4b33f0871f9499eae9": {
       "workers": {
         "app/dashboard/requisitions/categories/page": {
           "moduleId": 100220,
@@ -60,7 +60,7 @@
       "exportedName": "createCustomCategory",
       "filename": "src/app/dashboard/requisitions/category-actions.ts"
     },
-    "406f76cd353f8532919a68724bd3145a1433e0508b": {
+    "40a2c1d49c2406fff7a6f99347b8c8f79c3371efa4": {
       "workers": {
         "app/dashboard/requisitions/categories/page": {
           "moduleId": 100220,
@@ -75,7 +75,7 @@
       "exportedName": "deleteCustomCategory",
       "filename": "src/app/dashboard/requisitions/category-actions.ts"
     },
-    "00d930b401f04e943e349d52ddd9ccdbf1fbdd8bff": {
+    "007b8525dde710d3107b6b93de46028bc44a974a1d": {
       "workers": {
         "app/dashboard/requisitions/categories/page": {
           "moduleId": 100220,

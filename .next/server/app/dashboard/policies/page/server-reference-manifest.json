@@ -1,6 +1,6 @@
 {
   "node": {
-    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+    "6055fb0a7ef28c6beeec47be5e69ca4c39ed617a85": {
       "workers": {
         "app/dashboard/policies/page": {
           "moduleId": 621923,
@@ -15,7 +15,7 @@
       "exportedName": "addItemToRequisition",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+    "00992a9e0e7a8f284426540e0ae018965a5cdde94a": {
       "workers": {
         "app/dashboard/policies/page": {
           "moduleId": 621923,
@@ -30,7 +30,7 @@
       "exportedName": "getCategoriesAction",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+    "00e447cbe792f07f5dfe4778dc13e52f6a726fa17b": {
       "workers": {
         "app/dashboard/policies/page": {
           "moduleId": 621923,
@@ -45,7 +45,7 @@
       "exportedName": "getEligibleRequisitions",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "605843176a9ef537dea7491e7167752edb74f3b774": {
+    "6029e052507f86acfe0efb54e0890931c112027344": {
       "workers": {
         "app/dashboard/policies/page": {
           "moduleId": 621923,
@@ -60,7 +60,7 @@
       "exportedName": "togglePolicy",
       "filename": "src/app/dashboard/policies/actions.ts"
     },
-    "40e421ff8b86bb0856216091c6492edc3d2bc481ab": {
+    "40b1fb8e91b4949a3a9ef132a10bc8d12ef0bb175e": {
       "workers": {
         "app/dashboard/policies/page": {
           "moduleId": 621923,
@@ -75,7 +75,7 @@
       "exportedName": "deletePolicy",
       "filename": "src/app/dashboard/policies/actions.ts"
     },
-    "400750a14ce1a59de0f99d063569833ab126c97907": {
+    "400a88ccc5b40c3b6a6756f86326aff6b2d8d8d595": {
       "workers": {
         "app/dashboard/policies/page": {
           "moduleId": 621923,

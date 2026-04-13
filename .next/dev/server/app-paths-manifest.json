@@ -2,8 +2,10 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/api/approvals/route": "app/api/approvals/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/customers/upload-invoice/route": "app/api/customers/upload-invoice/route.js",
   "/api/notifications/route": "app/api/notifications/route.js",
   "/api/system/setup-status/route": "app/api/system/setup-status/route.js",
+  "/dashboard/accounting/customers/[id]/statement/page": "app/dashboard/accounting/customers/[id]/statement/page.js",
   "/dashboard/accounting/customers/page": "app/dashboard/accounting/customers/page.js",
-  "/dashboard/requisitions/new/page": "app/dashboard/requisitions/new/page.js"
+  "/dashboard/accounting/sales/[id]/page": "app/dashboard/accounting/sales/[id]/page.js"
 }

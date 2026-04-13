@@ -309,7 +309,7 @@ const { handlers, signIn, signOut, auth } = (0, __TURBOPACK__imported__module__$
 "[project]/src/lib/onboarding.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"00736a24011915c80a96bf9d569c6222918814bd88":"createStandardChartOfAccounts","00c0af776d6992b05855ffc2492887e79411879dc5":"checkSystemSetup"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"0048d2b8d7c95e51ce3e0f0edd26bbde974d2484e5":"checkSystemSetup","00e94a6f35871a14ce3395ff757a1cf4e7db2a6b22":"createStandardChartOfAccounts"},"",""] */ __turbopack_context__.s([
     "checkSystemSetup",
     ()=>checkSystemSetup,
     "createStandardChartOfAccounts",
@@ -657,8 +657,8 @@ async function createStandardChartOfAccounts() {
     checkSystemSetup,
     createStandardChartOfAccounts
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["registerServerReference"])(checkSystemSetup, "00c0af776d6992b05855ffc2492887e79411879dc5", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["registerServerReference"])(createStandardChartOfAccounts, "00736a24011915c80a96bf9d569c6222918814bd88", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["registerServerReference"])(checkSystemSetup, "0048d2b8d7c95e51ce3e0f0edd26bbde974d2484e5", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["registerServerReference"])(createStandardChartOfAccounts, "00e94a6f35871a14ce3395ff757a1cf4e7db2a6b22", null);
 }),
 "[project]/src/app/api/system/setup-status/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";

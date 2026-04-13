@@ -1,6 +1,6 @@
 {
   "node": {
-    "40421fb57a829df51b122ada5ad822bcba62473c0f": {
+    "40305cde673a502b29d49185bf9e92df1ed735da8a": {
       "workers": {
         "app/finance-studio/page": {
           "moduleId": 15743,
@@ -15,7 +15,7 @@
       "exportedName": "checkCreditNoteNumberUniqueness",
       "filename": "src/app/actions/finance-studio.ts"
     },
-    "0098bd620327e0d7d00b6b38aa1871bd609bd9ef8e": {
+    "004cd3b07bb442cb4bea69fdc6450e3e46e324cf1c": {
       "workers": {
         "app/finance-studio/page": {
           "moduleId": 15743,
@@ -30,7 +30,7 @@
       "exportedName": "getCustomersForStudio",
       "filename": "src/app/actions/finance-studio.ts"
     },
-    "70f48c3bf9e6f33e2663507c2e5a3a194ef9c80d2c": {
+    "705d3080ebc18cc41da5bba4dca04d9168353970dc": {
       "workers": {
         "app/finance-studio/page": {
           "moduleId": 15743,
@@ -43,6 +43,21 @@
         "app/finance-studio/page": "action-browser"
       },
       "exportedName": "getStatementData",
+      "filename": "src/app/actions/finance-studio.ts"
+    },
+    "605ee31089773dffb7ed8b420a7e3bf8333a205c4c": {
+      "workers": {
+        "app/finance-studio/page": {
+          "moduleId": 15743,
+          "async": false,
+          "exportedName": "getSSCAAStatementData",
+          "filename": "src/app/actions/finance-studio.ts"
+        }
+      },
+      "layer": {
+        "app/finance-studio/page": "action-browser"
+      },
+      "exportedName": "getSSCAAStatementData",
       "filename": "src/app/actions/finance-studio.ts"
     }
   },

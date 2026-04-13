@@ -483,18 +483,22 @@ class ApprovalWorkflowEngine {
         }
         return approvals;
     }
-    /**
-     * Process an approval decision
-     */ async processApproval(approvalId, decision, comments, isOverride = false) {
+    async processApproval(approvalId, decision, comments, isOverride = false, actualApproverId) {
+        const updateData = {
+            status: decision,
+            comments,
+            approvedAt: new Date()
+        };
+        // If an admin is overriding the approval, update the approverId so 
+        // the audit log reflects exactly who performed the action.
+        if (isOverride && actualApproverId) {
+            updateData.approverId = actualApproverId;
+        }
         const approval = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].approval.update({
             where: {
                 id: approvalId
             },
-            data: {
-                status: decision,
-                comments,
-                approvedAt: new Date()
-            },
+            data: updateData,
             include: {
                 expense: {
                     include: {
@@ -682,7 +686,7 @@ const approvalWorkflow = new ApprovalWorkflowEngine();
 "[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"0055ad71838ff70d1e9df2e7fb7df6728aa730ac9a":"getExpenseAccountsAction","00759d09b12d20c3d57c9ac1915c9f6e67486cd37d":"getUserBranchAndDepartmentAction","0091a92555f278240af27907405115155c98dadd58":"getCategoriesAction","00da2e63c392810a63b6438f5c38c682a140091ef0":"getEligibleRequisitions","00eb32d07ce872f4d06f644c06492316c1f91587f3":"getVendorsAction","4097090b14f3694beb8d26a31e2b39646a909d56a7":"createRequisitionWithItems","40ce350df0d7e11b23077af3a50f4fd58849efd1f4":"createExpenseAccountAction","605e94e6d019fd67ba1466bcceca4ce4d13bc833f7":"addItemToRequisition"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"0023337bb152b90c357ceb07398bebaa613492e7d4":"getEligibleRequisitions","00532b8bde0172191f397aba09c1b4f1d37771b330":"getCategoriesAction","005cc89b0153a06570708b51d34b15691b9e0fc1cd":"getVendorsAction","005e1c7c35228b50faef99b43a8f2f70a069145b58":"getExpenseAccountsAction","0073f1f9f9a557db3f2705b07fa570a002f129dd00":"getUserBranchAndDepartmentAction","401d63cc51f29db322c6042d7eea7ae854f230b855":"createRequisitionWithItems","40f68af841b45087036b7e6ad31749ca53ada7b6e2":"createExpenseAccountAction","60da60fdf060d36c0f703bae135a5f4e0fd527c50a":"addItemToRequisition"},"",""] */ __turbopack_context__.s([
     "addItemToRequisition",
     ()=>addItemToRequisition,
     "createExpenseAccountAction",
@@ -1251,14 +1255,14 @@ async function createExpenseAccountAction(data) {
     getExpenseAccountsAction,
     createExpenseAccountAction
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createRequisitionWithItems, "4097090b14f3694beb8d26a31e2b39646a909d56a7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addItemToRequisition, "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getEligibleRequisitions, "00da2e63c392810a63b6438f5c38c682a140091ef0", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCategoriesAction, "0091a92555f278240af27907405115155c98dadd58", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getVendorsAction, "00eb32d07ce872f4d06f644c06492316c1f91587f3", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserBranchAndDepartmentAction, "00759d09b12d20c3d57c9ac1915c9f6e67486cd37d", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getExpenseAccountsAction, "0055ad71838ff70d1e9df2e7fb7df6728aa730ac9a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createExpenseAccountAction, "40ce350df0d7e11b23077af3a50f4fd58849efd1f4", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createRequisitionWithItems, "401d63cc51f29db322c6042d7eea7ae854f230b855", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addItemToRequisition, "60da60fdf060d36c0f703bae135a5f4e0fd527c50a", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getEligibleRequisitions, "0023337bb152b90c357ceb07398bebaa613492e7d4", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCategoriesAction, "00532b8bde0172191f397aba09c1b4f1d37771b330", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getVendorsAction, "005cc89b0153a06570708b51d34b15691b9e0fc1cd", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserBranchAndDepartmentAction, "0073f1f9f9a557db3f2705b07fa570a002f129dd00", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getExpenseAccountsAction, "005e1c7c35228b50faef99b43a8f2f70a069145b58", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createExpenseAccountAction, "40f68af841b45087036b7e6ad31749ca53ada7b6e2", null);
 }),
 "[project]/.next-internal/server/app/dashboard/accounting/customers/[id]/statement/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>", ((__turbopack_context__) => {
 "use strict";
@@ -1273,11 +1277,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$r
 "use strict";
 
 __turbopack_context__.s([
-    "0091a92555f278240af27907405115155c98dadd58",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCategoriesAction"],
-    "00da2e63c392810a63b6438f5c38c682a140091ef0",
+    "0023337bb152b90c357ceb07398bebaa613492e7d4",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getEligibleRequisitions"],
-    "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7",
+    "00532b8bde0172191f397aba09c1b4f1d37771b330",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCategoriesAction"],
+    "60da60fdf060d36c0f703bae135a5f4e0fd527c50a",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addItemToRequisition"]
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$dashboard$2f$accounting$2f$customers$2f5b$id$5d2f$statement$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/dashboard/accounting/customers/[id]/statement/page/actions.js { ACTIONS_MODULE0 => "[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');

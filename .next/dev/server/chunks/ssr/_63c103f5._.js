@@ -686,7 +686,7 @@ const approvalWorkflow = new ApprovalWorkflowEngine();
 "[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"0055ad71838ff70d1e9df2e7fb7df6728aa730ac9a":"getExpenseAccountsAction","00759d09b12d20c3d57c9ac1915c9f6e67486cd37d":"getUserBranchAndDepartmentAction","0091a92555f278240af27907405115155c98dadd58":"getCategoriesAction","00da2e63c392810a63b6438f5c38c682a140091ef0":"getEligibleRequisitions","00eb32d07ce872f4d06f644c06492316c1f91587f3":"getVendorsAction","4097090b14f3694beb8d26a31e2b39646a909d56a7":"createRequisitionWithItems","40ce350df0d7e11b23077af3a50f4fd58849efd1f4":"createExpenseAccountAction","605e94e6d019fd67ba1466bcceca4ce4d13bc833f7":"addItemToRequisition"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"0023337bb152b90c357ceb07398bebaa613492e7d4":"getEligibleRequisitions","00532b8bde0172191f397aba09c1b4f1d37771b330":"getCategoriesAction","005cc89b0153a06570708b51d34b15691b9e0fc1cd":"getVendorsAction","005e1c7c35228b50faef99b43a8f2f70a069145b58":"getExpenseAccountsAction","0073f1f9f9a557db3f2705b07fa570a002f129dd00":"getUserBranchAndDepartmentAction","401d63cc51f29db322c6042d7eea7ae854f230b855":"createRequisitionWithItems","40f68af841b45087036b7e6ad31749ca53ada7b6e2":"createExpenseAccountAction","60da60fdf060d36c0f703bae135a5f4e0fd527c50a":"addItemToRequisition"},"",""] */ __turbopack_context__.s([
     "addItemToRequisition",
     ()=>addItemToRequisition,
     "createExpenseAccountAction",
@@ -1255,19 +1255,19 @@ async function createExpenseAccountAction(data) {
     getExpenseAccountsAction,
     createExpenseAccountAction
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createRequisitionWithItems, "4097090b14f3694beb8d26a31e2b39646a909d56a7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addItemToRequisition, "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getEligibleRequisitions, "00da2e63c392810a63b6438f5c38c682a140091ef0", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCategoriesAction, "0091a92555f278240af27907405115155c98dadd58", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getVendorsAction, "00eb32d07ce872f4d06f644c06492316c1f91587f3", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserBranchAndDepartmentAction, "00759d09b12d20c3d57c9ac1915c9f6e67486cd37d", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getExpenseAccountsAction, "0055ad71838ff70d1e9df2e7fb7df6728aa730ac9a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createExpenseAccountAction, "40ce350df0d7e11b23077af3a50f4fd58849efd1f4", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createRequisitionWithItems, "401d63cc51f29db322c6042d7eea7ae854f230b855", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addItemToRequisition, "60da60fdf060d36c0f703bae135a5f4e0fd527c50a", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getEligibleRequisitions, "0023337bb152b90c357ceb07398bebaa613492e7d4", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCategoriesAction, "00532b8bde0172191f397aba09c1b4f1d37771b330", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getVendorsAction, "005cc89b0153a06570708b51d34b15691b9e0fc1cd", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserBranchAndDepartmentAction, "0073f1f9f9a557db3f2705b07fa570a002f129dd00", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getExpenseAccountsAction, "005e1c7c35228b50faef99b43a8f2f70a069145b58", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createExpenseAccountAction, "40f68af841b45087036b7e6ad31749ca53ada7b6e2", null);
 }),
 "[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7":"trashVendor","40a4f25cab38431ee6c3e60b097dcb851512c82b59":"deleteVendor","40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6":"restoreVendor","60ae654f556411640b05f4a45038e76b892ed6b201":"updateVendor","60c8a8c5c07686c35591fe5f3a0e126af73dac1e6b":"createVendor"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"40161c741ddc97b3e0770b5425d42bd3f4de84d511":"deleteVendor","40d36ba54c1e85fc0c3c27208011500121d3144889":"trashVendor","40d576e2b04ea7d55d8f975c5b64a71e1bc6e77d3a":"restoreVendor","605ad61729d3f2e53cbf7328bec45fcd2e7ab6855f":"createVendor","60d1fa25bbda2d83f257962e4c04444f19919f6936":"updateVendor"},"",""] */ __turbopack_context__.s([
     "createVendor",
     ()=>createVendor,
     "deleteVendor",
@@ -1523,16 +1523,16 @@ async function updateVendor(id, formData) {
     deleteVendor,
     updateVendor
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createVendor, "60c8a8c5c07686c35591fe5f3a0e126af73dac1e6b", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(trashVendor, "407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(restoreVendor, "40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteVendor, "40a4f25cab38431ee6c3e60b097dcb851512c82b59", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateVendor, "60ae654f556411640b05f4a45038e76b892ed6b201", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createVendor, "605ad61729d3f2e53cbf7328bec45fcd2e7ab6855f", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(trashVendor, "40d36ba54c1e85fc0c3c27208011500121d3144889", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(restoreVendor, "40d576e2b04ea7d55d8f975c5b64a71e1bc6e77d3a", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteVendor, "40161c741ddc97b3e0770b5425d42bd3f4de84d511", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateVendor, "60d1fa25bbda2d83f257962e4c04444f19919f6936", null);
 }),
 "[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"40549c2a41b0eed1ffd0c210ca392ee2575bb956fd":"restoreCustomer","4054f3fb890cd5d9dc0bfc313126889bc773ac888f":"trashCustomer","40ca75e3957829e48693d042037e04f87f11b16372":"deleteCustomer"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"4052dc47dc3827e4d0e19919708ce40140bc4a7ebe":"deleteCustomer","40762a7e319a28e54cf056affe8a439b40f6a99365":"trashCustomer","40c35c4bd67d7c3a5a745d7e9a9f97963ddf15b121":"restoreCustomer"},"",""] */ __turbopack_context__.s([
     "deleteCustomer",
     ()=>deleteCustomer,
     "restoreCustomer",
@@ -1662,14 +1662,14 @@ async function deleteCustomer(id) {
     restoreCustomer,
     deleteCustomer
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(trashCustomer, "4054f3fb890cd5d9dc0bfc313126889bc773ac888f", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(restoreCustomer, "40549c2a41b0eed1ffd0c210ca392ee2575bb956fd", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteCustomer, "40ca75e3957829e48693d042037e04f87f11b16372", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(trashCustomer, "40762a7e319a28e54cf056affe8a439b40f6a99365", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(restoreCustomer, "40c35c4bd67d7c3a5a745d7e9a9f97963ddf15b121", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteCustomer, "4052dc47dc3827e4d0e19919708ce40140bc4a7ebe", null);
 }),
 "[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"4056bc53f0d80d8629f0dd5dfc17637703ec641596":"fulfillRequisition","40bc8ef0fcbe24f24edd0b3945be4e23836c92ecc3":"createItemPaymentBatch","40e14673047f6f15b55678ea0a5e7d0350fa0bce6c":"deleteRequisition","40e1e69edab14277e88444f56cefc0388179236fe3":"updateRequisition"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"4002134acdf26d871df6ea1a72f0261453e3e17804":"fulfillRequisition","4031fe4e909d8bda2d671f6cdb509360ddbe60fa59":"createItemPaymentBatch","4036857974f01a43ebd7fb713c7e63a40f72c82742":"updateRequisition","40a112ea445e5da19e300ba60d645db97dfc33bdac":"deleteRequisition"},"",""] */ __turbopack_context__.s([
     "createItemPaymentBatch",
     ()=>createItemPaymentBatch,
     "deleteRequisition",
@@ -1980,10 +1980,10 @@ async function createItemPaymentBatch(itemId) {
     updateRequisition,
     createItemPaymentBatch
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(fulfillRequisition, "4056bc53f0d80d8629f0dd5dfc17637703ec641596", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteRequisition, "40e14673047f6f15b55678ea0a5e7d0350fa0bce6c", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateRequisition, "40e1e69edab14277e88444f56cefc0388179236fe3", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createItemPaymentBatch, "40bc8ef0fcbe24f24edd0b3945be4e23836c92ecc3", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(fulfillRequisition, "4002134acdf26d871df6ea1a72f0261453e3e17804", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteRequisition, "40a112ea445e5da19e300ba60d645db97dfc33bdac", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateRequisition, "4036857974f01a43ebd7fb713c7e63a40f72c82742", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createItemPaymentBatch, "4031fe4e909d8bda2d671f6cdb509360ddbe60fa59", null);
 }),
 "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>", ((__turbopack_context__) => {
 "use strict";
@@ -2008,25 +2008,25 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$r
 "use strict";
 
 __turbopack_context__.s([
-    "0091a92555f278240af27907405115155c98dadd58",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCategoriesAction"],
-    "00da2e63c392810a63b6438f5c38c682a140091ef0",
+    "0023337bb152b90c357ceb07398bebaa613492e7d4",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getEligibleRequisitions"],
-    "40549c2a41b0eed1ffd0c210ca392ee2575bb956fd",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["restoreCustomer"],
-    "4054f3fb890cd5d9dc0bfc313126889bc773ac888f",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["trashCustomer"],
-    "407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["trashVendor"],
-    "40a4f25cab38431ee6c3e60b097dcb851512c82b59",
+    "00532b8bde0172191f397aba09c1b4f1d37771b330",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCategoriesAction"],
+    "40161c741ddc97b3e0770b5425d42bd3f4de84d511",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteVendor"],
-    "40ca75e3957829e48693d042037e04f87f11b16372",
+    "4052dc47dc3827e4d0e19919708ce40140bc4a7ebe",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteCustomer"],
-    "40e14673047f6f15b55678ea0a5e7d0350fa0bce6c",
+    "40762a7e319a28e54cf056affe8a439b40f6a99365",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["trashCustomer"],
+    "40a112ea445e5da19e300ba60d645db97dfc33bdac",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteRequisition"],
-    "40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6",
+    "40c35c4bd67d7c3a5a745d7e9a9f97963ddf15b121",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["restoreCustomer"],
+    "40d36ba54c1e85fc0c3c27208011500121d3144889",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["trashVendor"],
+    "40d576e2b04ea7d55d8f975c5b64a71e1bc6e77d3a",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["restoreVendor"],
-    "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7",
+    "60da60fdf060d36c0f703bae135a5f4e0fd527c50a",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addItemToRequisition"]
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$dashboard$2f$accounting$2f$customers$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$new$2f$multi$2d$item$2d$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2f$vendors$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE2__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2f$customers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE3__$3d3e$__$225b$project$5d2f$src$2f$app$2f$dashboard$2f$requisitions$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => "[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)", ACTIONS_MODULE2 => "[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)", ACTIONS_MODULE3 => "[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');

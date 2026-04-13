@@ -24,6 +24,7 @@
   "/api/branches/route": "/api/branches",
   "/api/budgets/route": "/api/budgets",
   "/api/categories/route": "/api/categories",
+  "/api/customers/upload-invoice/route": "/api/customers/upload-invoice",
   "/api/dashboard/route": "/api/dashboard",
   "/api/expenses/route": "/api/expenses",
   "/api/expenses/validate/route": "/api/expenses/validate",

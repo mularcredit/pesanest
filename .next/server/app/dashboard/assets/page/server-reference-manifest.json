@@ -1,6 +1,6 @@
 {
   "node": {
-    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+    "6055fb0a7ef28c6beeec47be5e69ca4c39ed617a85": {
       "workers": {
         "app/dashboard/assets/page": {
           "moduleId": 581035,
@@ -15,7 +15,7 @@
       "exportedName": "addItemToRequisition",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+    "00992a9e0e7a8f284426540e0ae018965a5cdde94a": {
       "workers": {
         "app/dashboard/assets/page": {
           "moduleId": 581035,
@@ -30,7 +30,7 @@
       "exportedName": "getCategoriesAction",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+    "00e447cbe792f07f5dfe4778dc13e52f6a726fa17b": {
       "workers": {
         "app/dashboard/assets/page": {
           "moduleId": 581035,
@@ -45,22 +45,7 @@
       "exportedName": "getEligibleRequisitions",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "002dec93e728fef43042cecb8085080133d535bc6a": {
-      "workers": {
-        "app/dashboard/assets/page": {
-          "moduleId": 581035,
-          "async": false,
-          "exportedName": "getAssetStats",
-          "filename": "src/app/dashboard/assets/actions.ts"
-        }
-      },
-      "layer": {
-        "app/dashboard/assets/page": "rsc"
-      },
-      "exportedName": "getAssetStats",
-      "filename": "src/app/dashboard/assets/actions.ts"
-    },
-    "007f61a4db223424de0cdde3899973c9f2d303b17c": {
+    "001979d8587710504afe4bcd0634f99d21d90689f6": {
       "workers": {
         "app/dashboard/assets/page": {
           "moduleId": 581035,
@@ -75,7 +60,22 @@
       "exportedName": "runDepreciation",
       "filename": "src/app/dashboard/assets/actions.ts"
     },
-    "40025ac87f3fd4bf0e521f6698bc7ef8ed42716654": {
+    "0080941ca042f42596a4753c4e54f98b04f7b5d157": {
+      "workers": {
+        "app/dashboard/assets/page": {
+          "moduleId": 581035,
+          "async": false,
+          "exportedName": "getAssetStats",
+          "filename": "src/app/dashboard/assets/actions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/assets/page": "rsc"
+      },
+      "exportedName": "getAssetStats",
+      "filename": "src/app/dashboard/assets/actions.ts"
+    },
+    "400264abb4bd422e3e2cb32b0eb27b7de8859e968a": {
       "workers": {
         "app/dashboard/assets/page": {
           "moduleId": 581035,
@@ -90,7 +90,7 @@
       "exportedName": "getAssets",
       "filename": "src/app/dashboard/assets/actions.ts"
     },
-    "404f038f3c58eee11d3055e4c86e3ba08927354fa0": {
+    "40eeda3b11e5cfcee2c6540ceb5478d89b33cfdcaf": {
       "workers": {
         "app/dashboard/assets/page": {
           "moduleId": 581035,
@@ -105,7 +105,7 @@
       "exportedName": "deleteAsset",
       "filename": "src/app/dashboard/assets/actions.ts"
     },
-    "40ca76100a5d1c4b998cff9a23821ed62c6980a60d": {
+    "40f67913ed4b5040d064972e01356c23fb5ef98f54": {
       "workers": {
         "app/dashboard/assets/page": {
           "moduleId": 581035,

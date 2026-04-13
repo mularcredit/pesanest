@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/mac/Desktop/prudenceapp/src/app/receipt-studio/layout.tsx"],"sourcesContent":["import type { Metadata } from \"next\";\r\n\r\nconst appName = process.env.NEXT_PUBLIC_APP_NAME || \"CapitalPay\";\r\n\r\nexport const metadata: Metadata = {\r\n    title: `Voucher Studio | ${appName}`,\r\n    description: \"Create & issue official disbursement vouchers\",\r\n};\r\n\r\n/**\r\n * Voucher Studio layout intentionally resets the global Avenir Next font back\r\n * to the system/Lexend stack. This studio has its own dark-mode design language\r\n * and should not inherit the Avenir Next global font.\r\n */\r\nexport default function VoucherStudioLayout({ children }: { children: React.ReactNode }) {\r\n    return (\r\n        <div style={{\r\n            fontFamily: 'var(--font-lexend), -apple-system, BlinkMacSystemFont, \"SF Pro Display\", \"SF Pro Text\", \"Helvetica Neue\", Helvetica, Arial, sans-serif',\r\n        }}>\r\n            {children}\r\n        </div>\r\n    );\r\n}\r\n"],"names":[],"mappings":";;;;;;;;AAEA,MAAM,UAAU,mDAAoC;AAE7C,MAAM,WAAqB;IAC9B,OAAO,CAAC,iBAAiB,EAAE,SAAS;IACpC,aAAa;AACjB;AAOe,SAAS,oBAAoB,EAAE,QAAQ,EAAiC;IACnF,qBACI,8OAAC;QAAI,OAAO;YACR,YAAY;QAChB;kBACK;;;;;;AAGb"}}]
-}

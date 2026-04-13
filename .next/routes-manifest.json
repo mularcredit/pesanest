@@ -296,6 +296,12 @@
       "namedRegex": "^/api/categories(?:/)?$"
     },
     {
+      "page": "/api/customers/upload-invoice",
+      "regex": "^/api/customers/upload\\-invoice(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/customers/upload\\-invoice(?:/)?$"
+    },
+    {
       "page": "/api/dashboard",
       "regex": "^/api/dashboard(?:/)?$",
       "routeKeys": {},

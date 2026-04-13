@@ -193,15 +193,15 @@ export const SSCAAStatementTemplate: React.FC<SSCAAStatementProps> = ({
                                 <span>{formatCurrency(summary.openingBalance)}</span>
                             </div>
                             <div className="flex justify-between mb-[4px] text-[10px]">
-                                <span>Total Charges (Overflight Services)</span>
+                                <span>Total Charges to SSCAA</span>
                                 <span>{formatCurrency(summary.totalCharges)}</span>
                             </div>
                             <div className="flex justify-between mb-[4px] text-[10px]">
-                                <span>Total Payments Received</span>
+                                <span>Total Amount Remitted</span>
                                 <span>({formatCurrency(summary.totalPayments)})</span>
                             </div>
                             <div className="flex justify-between mb-[4px] text-[11px] font-bold text-[#236A9E] border-t-2 border-[#e2e8f0] pt-[4px] mt-[4px]">
-                                <span>Outstanding Balance</span>
+                                <span>Closing Balance</span>
                                 <span>{formatCurrency(summary.outstandingBalance)}</span>
                             </div>
                         </div>
@@ -254,9 +254,9 @@ export const SSCAAStatementTemplate: React.FC<SSCAAStatementProps> = ({
 
                         {/* OUTSTANDING BALANCE HIGHLIGHT */}
                         <div className="bg-[#dc2626] text-white p-[10px] rounded-[4px] text-center mb-[15px]">
-                            <h3 className="text-[11px] font-semibold m-0 mb-[5px] uppercase">Total Outstanding Balance</h3>
+                            <h3 className="text-[11px] font-semibold m-0 mb-[5px] uppercase">Total Amount Remitted to SSCAA</h3>
                             <p className="text-[20px] font-[900] m-0">{formatCurrency(summary.outstandingBalance)}</p>
-                            <p className="text-[11px] m-[8px_0_0_0] opacity-90">Payment Due Upon Receipt</p>
+                            <p className="text-[11px] m-[8px_0_0_0] opacity-90">All amounts above have been duly remitted</p>
                         </div>
                     </div>
 

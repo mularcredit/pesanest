@@ -1,6 +1,6 @@
 {
   "node": {
-    "00da2e63c392810a63b6438f5c38c682a140091ef0": {
+    "0023337bb152b90c357ceb07398bebaa613492e7d4": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -15,7 +15,7 @@
       "exportedName": "getEligibleRequisitions",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "605e94e6d019fd67ba1466bcceca4ce4d13bc833f7": {
+    "60da60fdf060d36c0f703bae135a5f4e0fd527c50a": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -30,7 +30,7 @@
       "exportedName": "addItemToRequisition",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "0091a92555f278240af27907405115155c98dadd58": {
+    "00532b8bde0172191f397aba09c1b4f1d37771b330": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -45,7 +45,7 @@
       "exportedName": "getCategoriesAction",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "40a4f25cab38431ee6c3e60b097dcb851512c82b59": {
+    "40161c741ddc97b3e0770b5425d42bd3f4de84d511": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -60,7 +60,7 @@
       "exportedName": "deleteVendor",
       "filename": "src/app/actions/vendors.ts"
     },
-    "40ca75e3957829e48693d042037e04f87f11b16372": {
+    "4052dc47dc3827e4d0e19919708ce40140bc4a7ebe": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -75,7 +75,7 @@
       "exportedName": "deleteCustomer",
       "filename": "src/app/actions/customers.ts"
     },
-    "40e14673047f6f15b55678ea0a5e7d0350fa0bce6c": {
+    "40a112ea445e5da19e300ba60d645db97dfc33bdac": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -90,7 +90,7 @@
       "exportedName": "deleteRequisition",
       "filename": "src/app/dashboard/requisitions/actions.ts"
     },
-    "407d5d23024c60e3ee87df67e27fa8b9babcdbb3a7": {
+    "40d36ba54c1e85fc0c3c27208011500121d3144889": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -105,7 +105,7 @@
       "exportedName": "trashVendor",
       "filename": "src/app/actions/vendors.ts"
     },
-    "40f480e46a3d78356b2d34c3ec945f8855a1ce5ce6": {
+    "40d576e2b04ea7d55d8f975c5b64a71e1bc6e77d3a": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -120,7 +120,7 @@
       "exportedName": "restoreVendor",
       "filename": "src/app/actions/vendors.ts"
     },
-    "4054f3fb890cd5d9dc0bfc313126889bc773ac888f": {
+    "40762a7e319a28e54cf056affe8a439b40f6a99365": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -135,7 +135,7 @@
       "exportedName": "trashCustomer",
       "filename": "src/app/actions/customers.ts"
     },
-    "40549c2a41b0eed1ffd0c210ca392ee2575bb956fd": {
+    "40c35c4bd67d7c3a5a745d7e9a9f97963ddf15b121": {
       "workers": {
         "app/dashboard/accounting/customers/page": {
           "moduleId": "[project]/.next-internal/server/app/dashboard/accounting/customers/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/dashboard/requisitions/new/multi-item-actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/actions/vendors.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/app/actions/customers.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/app/dashboard/requisitions/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",

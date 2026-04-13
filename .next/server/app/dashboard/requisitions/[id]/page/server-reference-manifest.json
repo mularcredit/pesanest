@@ -1,6 +1,6 @@
 {
   "node": {
-    "60817697f646166b13cf9c9bb4b75c265e137bce12": {
+    "6055fb0a7ef28c6beeec47be5e69ca4c39ed617a85": {
       "workers": {
         "app/dashboard/requisitions/[id]/page": {
           "moduleId": 468792,
@@ -15,7 +15,7 @@
       "exportedName": "addItemToRequisition",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "0098dd22c85579f7c377d7d0036859133a8fb7c186": {
+    "00992a9e0e7a8f284426540e0ae018965a5cdde94a": {
       "workers": {
         "app/dashboard/requisitions/[id]/page": {
           "moduleId": 468792,
@@ -30,7 +30,7 @@
       "exportedName": "getCategoriesAction",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "00979a73c642dfbc32a2b878c135add2eb92f1150b": {
+    "00e447cbe792f07f5dfe4778dc13e52f6a726fa17b": {
       "workers": {
         "app/dashboard/requisitions/[id]/page": {
           "moduleId": 468792,
@@ -45,7 +45,7 @@
       "exportedName": "getEligibleRequisitions",
       "filename": "src/app/dashboard/requisitions/new/multi-item-actions.ts"
     },
-    "40187dffe501889c792702f2b0238902eca2917733": {
+    "4018eecaef094f89a856affb011d13d5903321a02d": {
       "workers": {
         "app/dashboard/requisitions/[id]/page": {
           "moduleId": 468792,
@@ -60,7 +60,7 @@
       "exportedName": "default",
       "filename": "src/app/dashboard/requisitions/[id]/page.tsx"
     },
-    "4060f58e1cfd10196aaa5af69bf2a5f108db6f2159": {
+    "40b4aeb364c060a1aecfeb6c1726d581179eb4b147": {
       "workers": {
         "app/dashboard/requisitions/[id]/page": {
           "moduleId": 468792,

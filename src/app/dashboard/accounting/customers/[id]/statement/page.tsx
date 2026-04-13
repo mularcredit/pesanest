@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { StatementFilterForm } from "@/components/accounting/StatementFilterForm";
 import { RecordPaymentButton } from "@/components/accounting/RecordPaymentButton";
 import { CreateCreditNoteButton } from "@/components/accounting/CreateCreditNoteButton";
+import { ClickableReferenceCell } from "./ClickableReferenceCell";
 
 // Format currency
 const formatCurrency = (amount: number, currency = "USD") => {
@@ -92,7 +93,10 @@ export default async function CustomerStatementPage({
                     }
                 },
                 orderBy: { issueDate: 'asc' },
-                include: { items: true }
+                select: {
+                    id: true, invoiceNumber: true, issueDate: true,
+                    totalAmount: true, status: true, invoiceUrl: true, items: true
+                }
             },
             payments: {
                 where: {
@@ -101,7 +105,12 @@ export default async function CustomerStatementPage({
                         lte: endDateInclusive
                     }
                 },
-                orderBy: { paymentDate: 'asc' }
+                orderBy: { paymentDate: 'asc' },
+                select: {
+                    id: true, amount: true, currency: true,
+                    paymentDate: true, method: true,
+                    reference: true, saleId: true, invoiceUrl: true
+                }
             },
             creditNotes: {
                 where: {
@@ -111,7 +120,11 @@ export default async function CustomerStatementPage({
                     },
                     status: { not: 'VOIDED' }
                 },
-                orderBy: { createdAt: 'asc' }
+                orderBy: { createdAt: 'asc' },
+                select: {
+                    id: true, cnNumber: true, createdAt: true,
+                    amount: true, reason: true, status: true, invoiceUrl: true
+                }
             }
         }
     });
@@ -149,7 +162,8 @@ export default async function CustomerStatementPage({
             reference: s.invoiceNumber,
             description: 'Sales Invoice',
             debit: s.totalAmount,
-            credit: 0
+            credit: 0,
+            invoiceUrl: s.invoiceUrl || null
         })),
         ...customer.payments.map((p: any) => ({
             id: p.id,
@@ -158,7 +172,9 @@ export default async function CustomerStatementPage({
             reference: p.reference || 'PAYMENT',
             description: `Payment via ${p.method.replace('_', ' ')}`,
             debit: 0,
-            credit: p.amount
+            credit: p.amount,
+            saleId: p.saleId || null,
+            invoiceUrl: p.invoiceUrl || null
         })),
         ...customer.creditNotes.map((cn: any) => ({
             id: cn.id,
@@ -167,7 +183,8 @@ export default async function CustomerStatementPage({
             reference: cn.cnNumber,
             description: `Credit Note - ${cn.reason}`,
             debit: 0,
-            credit: cn.amount
+            credit: cn.amount,
+            invoiceUrl: cn.invoiceUrl || null
         }))
     ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -292,9 +309,17 @@ export default async function CustomerStatementPage({
                                             {format(new Date(row.date), "dd MMM yyyy")}
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className="px-2 py-1 bg-white border border-gray-100 rounded-md font-mono text-[10px] font-bold text-gray-500 group-hover:border-indigo-200 group-hover:text-indigo-600 transition-colors shadow-sm shadow-black/[0.02]">
-                                                {row.reference}
-                                            </span>
+                                            <ClickableReferenceCell
+                                                type={row.type as 'INVOICE' | 'PAYMENT' | 'CREDIT_NOTE'}
+                                                id={row.id}
+                                                reference={row.reference}
+                                                saleId={(row as any).saleId}
+                                                invoiceUrl={(row as any).invoiceUrl}
+                                                date={row.date}
+                                                description={row.description}
+                                                amount={row.debit > 0 ? row.debit : row.credit}
+                                                currency={customer.currency}
+                                            />
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 font-medium">
                                             {row.description}
