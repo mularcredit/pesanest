@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LayoutGrid, List, Download, Plus } from "lucide-react";
+import { PiSquaresFour as LayoutGrid, PiList as List, PiDownloadSimple as Download, PiPlus as Plus } from "react-icons/pi";
 import {
     PiTag, PiGear, PiPackage, PiUsers, PiMonitor, PiSpeakerHigh,
     PiAirplaneTilt, PiLightbulb, PiHardDrive, PiBriefcase, PiGlobe,

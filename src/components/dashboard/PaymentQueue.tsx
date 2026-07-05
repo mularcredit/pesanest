@@ -31,7 +31,7 @@ import {
     PiTag,
     PiStackSimple,
 } from "react-icons/pi";
-import { CheckSquare, Square } from "lucide-react";
+import { PiCheckSquare as CheckSquare, PiSquare as Square } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
