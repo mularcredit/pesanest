@@ -81,7 +81,7 @@ function LoginComponent() {
                         Where every<br />shilling finds<br />its nest.
                     </h2>
                     <p className="text-[14px] mt-5 leading-relaxed max-w-[280px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        Expenses, invoices, and books — all cozy in one place. No spreadsheet panic required.
+                        Expenses, invoices, and books. All cozy in one place. No spreadsheet panic required.
                     </p>
                 </div>
 
@@ -119,7 +119,7 @@ function LoginComponent() {
                             Where Every Shilling<br />Finds Its Nest.
                         </h2>
                         <p className="text-xs text-white/60 mt-2">
-                            Expenses, invoices, and books — all cozy in one place. No spreadsheet panic required.
+                            Expenses, invoices, and books. All cozy in one place. No spreadsheet panic required.
                         </p>
                     </div>
                 </div>
