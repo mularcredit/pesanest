@@ -76,17 +76,17 @@ function LoginComponent() {
                 </div>
 
                 {/* Headline text */}
-                <div className="absolute inset-0 z-20 flex flex-col justify-center px-10">
-                    <h2 className="text-[42px] font-[600] leading-[1.2] tracking-tight" style={{ color: '#ffffff' }}>
+                <div className="absolute left-0 right-0 z-20 px-10" style={{ top: '20%' }}>
+                    <h2 className="text-[44px] font-[700] leading-[1.15] tracking-tight" style={{ color: '#ffffff' }}>
                         Where every<br />shilling finds<br />its nest.
                     </h2>
-                    <p className="text-[14px] mt-4 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                    <p className="text-[14px] mt-5 leading-relaxed max-w-[280px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
                         Expenses, invoices, and books — all cozy in one place. No spreadsheet panic required.
                     </p>
                 </div>
 
                 {/* Person image */}
-                <div className="absolute bottom-0 left-0 right-0 z-10" style={{ height: '62%' }}>
+                <div className="absolute bottom-0 left-0 right-0 z-10" style={{ height: '52%' }}>
                     <Image
                         src="/bearded-man-denim-shirt-round-glasses.png"
                         alt="Platform user"
