@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     const userId = session.user.id;
     const now = new Date();
 
-    const currentUser = await prisma.user.findUnique({
+    const currentUser = await (prisma.user.findUnique as any)({
         where: { id: userId },
         select: { role: true, name: true, paystackCustomerCode: true }
     });
