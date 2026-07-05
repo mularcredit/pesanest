@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma-client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -26,10 +28,14 @@ model User {
   accountStatus         String              @default("PENDING")
   resetToken            String?
   resetTokenExpiry      DateTime?
-  stripeAccountId       String?
-  stripeConnectStatus   String?
+  paystackRecipientCode String?
+  paystackCustomerCode  String?
   regionId              String?
   branchId              String?
+  totpSecret            String?
+  totpEnabled           Boolean             @default(false)
+  failedLoginAttempts   Int                 @default(0)
+  lockedUntil           DateTime?
   approvals             Approval[]
   assets                Asset[]
   leadBranch            Branch?
@@ -41,18 +47,18 @@ model User {
   checkedPayments       Payment[]           @relation("PaymentChecker")
   madePayments          Payment[]           @relation("PaymentMaker")
   requisitions          Requisition[]
-  salaryBatchesApproved SalaryBatch[]       @relation("SalaryApprover")
-  salaryBatchesCreated  SalaryBatch[]       @relation("SalaryCreator")
+
   createdSchedules      Schedule[]          @relation("ScheduleCreator")
   customRole            Role?               @relation(fields: [customRoleId], references: [id])
   manager               User?               @relation("ManagerSubordinates", fields: [managerId], references: [id])
   subordinates          User[]              @relation("ManagerSubordinates")
   wallet                Wallet?
   walletTransactions    WalletTransaction[]
+  loginEvents           LoginEvent[]
 
   @@index([email])
   @@index([managerId])
-  @@index([stripeAccountId])
+  @@index([paystackRecipientCode])
   @@index([regionId])
 }
 
@@ -144,11 +150,13 @@ model Wallet {
   id           String              @id @default(cuid())
   userId       String              @unique
   balance      Float               @default(0)
-  currency     String              @default("USD")
+  currency     String              @default("KES")
+  glAccountId  String?             @unique
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   user         User                @relation(fields: [userId], references: [id])
   transactions WalletTransaction[]
+  glAccount    Account?            @relation("HQWalletGL", fields: [glAccountId], references: [id])
 }
 
 model WalletTransaction {
@@ -173,7 +181,7 @@ model Requisition {
   title                 String
   description           String
   amount                Float
-  currency              String            @default("USD")
+  currency              String            @default("KES")
   category              String
   businessJustification String
   expectedDate          DateTime?
@@ -188,6 +196,7 @@ model Requisition {
   accountId             String?
   paymentMethod         String?
   paymentReference      String?
+  receiptUrl            String?
   approvals             Approval[]
   expenses              Expense[]
   invoices              Invoice[]
@@ -296,7 +305,7 @@ model Expense {
   title          String
   description    String?
   amount         Float
-  currency       String         @default("USD")
+  currency       String         @default("KES")
   category       String
   expenseDate    DateTime
   merchant       String?
@@ -304,6 +313,9 @@ model Expense {
   isReimbursable Boolean        @default(true)
   isBillable     Boolean        @default(false)
   receiptUrl     String?
+  etrNumber      String?
+  etrVerified    Boolean        @default(false)
+  etrVerifiedAt  DateTime?
   status         String         @default("DRAFT")
   paidAt         DateTime?
   createdAt      DateTime       @default(now())
@@ -316,7 +328,7 @@ model Expense {
   requisition    Requisition?   @relation(fields: [requisitionId], references: [id])
   user           User           @relation(fields: [userId], references: [id])
   journalEntries JournalEntry[]
-  salaryBatch    SalaryBatch?
+
 
   @@index([userId])
   @@index([status])
@@ -388,11 +400,15 @@ model BranchWallet {
   id           String                    @id @default(cuid())
   branchId     String                    @unique
   balance      Float                     @default(0)
-  currency     String                    @default("USD")
+  currency     String                    @default("KES")
+  glAccountId  String?
   createdAt    DateTime                  @default(now())
   updatedAt    DateTime                  @updatedAt
   branch       Branch                    @relation(fields: [branchId], references: [id])
   transactions BranchWalletTransaction[]
+  glAccount    Account?                  @relation("BranchWalletGL", fields: [glAccountId], references: [id])
+
+  @@index([glAccountId])
 }
 
 model BranchWalletTransaction {
@@ -400,7 +416,7 @@ model BranchWalletTransaction {
   branchWalletId String
   type           String
   amount         Float
-  currency       String       @default("USD")
+  currency       String       @default("KES")
   description    String
   reference      String?
   requisitionId  String?
@@ -417,9 +433,14 @@ model Invoice {
   invoiceNumber  String            @unique
   invoiceDate    DateTime
   dueDate        DateTime
-  amount         Float
-  taxAmount      Float             @default(0)
-  currency       String            @default("USD")
+  subtotal       Decimal           @default(0) @db.Decimal(18, 2)
+  amount         Decimal           @db.Decimal(18, 2)
+  taxAmount      Decimal           @default(0) @db.Decimal(18, 2)
+  taxRateId      String?
+  whtRateId      String?
+  whtAmount      Decimal           @default(0) @db.Decimal(18, 2)
+  whtCertNumber  String?
+  currency       String            @default("KES")
   description    String?
   notes          String?
   status         String            @default("DRAFT")
@@ -439,18 +460,22 @@ model Invoice {
   vendor         Vendor            @relation(fields: [vendorId], references: [id])
   items          InvoiceLineItem[]
   journalEntries JournalEntry[]
+  taxRate        TaxRate?          @relation("InvoiceTaxRate", fields: [taxRateId], references: [id])
+  whtRate        TaxRate?          @relation("InvoiceWHT", fields: [whtRateId], references: [id])
 
   @@index([vendorId])
   @@index([status])
   @@index([invoiceNumber])
   @@index([dueDate])
   @@index([paymentId])
+  @@index([taxRateId])
+  @@index([whtRateId])
 }
 
 model Payment {
   id             String          @id @default(cuid())
   amount         Float
-  currency       String          @default("USD")
+  currency       String          @default("KES")
   status         String          @default("PENDING_AUTHORIZATION")
   makerId        String
   checkerId      String?
@@ -502,13 +527,13 @@ model Vendor {
   isActive               Boolean   @default(true)
   isTrashed              Boolean   @default(false)
   paymentTerms           String?
-  currency               String    @default("USD")
+  currency               String    @default("KES")
   bankName               String?
   bankAccount            String?
   bankRouting            String?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
-  stripeAccountId        String?
+  paystackRecipientCode  String?
   description            String?
   branchId               String?
   preferredPaymentMethod String?
@@ -516,7 +541,7 @@ model Vendor {
   branch                 Branch?   @relation(fields: [branchId], references: [id])
 
   @@index([name])
-  @@index([stripeAccountId])
+  @@index([paystackRecipientCode])
   @@index([branchId])
   @@index([isTrashed])
 }
@@ -531,7 +556,7 @@ model Customer {
   city          String?
   country       String?           @default("South Sudan")
   taxId         String?
-  currency      String            @default("USD")
+  currency      String            @default("KES")
   isActive      Boolean           @default(true)
   isTrashed     Boolean           @default(false)
   createdAt     DateTime          @default(now())
@@ -545,26 +570,33 @@ model Customer {
 }
 
 model Sale {
-  id            String            @id @default(cuid())
-  customerId    String
-  invoiceNumber String            @unique
-  issueDate     DateTime
-  dueDate       DateTime
-  totalAmount   Float
-  taxAmount     Float             @default(0)
-  currency      String            @default("USD")
-  status        String            @default("DRAFT")
-  notes         String?
-  invoiceUrl    String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  payments      CustomerPayment[]
-  customer      Customer          @relation(fields: [customerId], references: [id])
-  items         SaleItem[]
+  id                  String            @id @default(cuid())
+  customerId          String
+  invoiceNumber       String            @unique
+  issueDate           DateTime
+  dueDate             DateTime
+  subtotal            Decimal           @default(0) @db.Decimal(18, 2)
+  taxAmount           Decimal           @default(0) @db.Decimal(18, 2)
+  totalAmount         Decimal           @db.Decimal(18, 2)
+  taxRateId           String?
+  currency            String            @default("KES")
+  status              String            @default("DRAFT")
+  notes               String?
+  invoiceUrl          String?
+  etimsInvoiceNumber  String?
+  etimsControlUnit    String?
+  etimsStatus         String            @default("NOT_REQUIRED")
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  payments            CustomerPayment[]
+  customer            Customer          @relation(fields: [customerId], references: [id])
+  items               SaleItem[]
+  taxRate             TaxRate?          @relation("SaleTaxRate", fields: [taxRateId], references: [id])
 
   @@index([customerId])
   @@index([invoiceNumber])
   @@index([status])
+  @@index([taxRateId])
 }
 
 model SaleItem {
@@ -583,7 +615,7 @@ model CustomerPayment {
   id          String   @id @default(cuid())
   customerId  String
   amount      Float
-  currency    String   @default("USD")
+  currency    String   @default("KES")
   paymentDate DateTime
   method      String
   reference   String?
@@ -621,16 +653,33 @@ model Account {
   name         String
   type         String
   subtype      String?
-  currency     String        @default("USD")
+  currency     String        @default("KES")
   description  String?
   isActive     Boolean       @default(true)
+  isArchived   Boolean       @default(false)
+  parentId     String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  journalLines JournalLine[]
+  journalLines         JournalLine[]
+  bankAccount          BankAccount?
+  hqWallet             Wallet?                 @relation("HQWalletGL")
+  branchWallets        BranchWallet[]          @relation("BranchWalletGL")
+  accrualDebits        AccrualSchedule[]       @relation("AccrualDebit")
+  accrualCredits       AccrualSchedule[]       @relation("AccrualCredit")
+  recurringJournalLines RecurringJournalLine[]
+  parent               Account?                @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children             Account[]               @relation("AccountHierarchy")
+  periodBalances       PeriodBalance[]
+  qboId           String?
+  qboAccountType  String?
+
+  @@index([parentId])
+  @@index([isArchived])
 }
 
 model JournalEntry {
   id              String         @id @default(cuid())
+  entryNumber     String?        @unique
   date            DateTime
   description     String
   reference       String?
@@ -644,6 +693,10 @@ model JournalEntry {
   createdBy       String?
   monthlyBudgetId String?
   requisitionId   String?
+  reversalOfId    String?
+  isBackdated     Boolean        @default(false)
+  approvedBy      String?
+  approvedAt      DateTime?
   creditNote      CreditNote?    @relation(fields: [creditNoteId], references: [id])
   expense         Expense?       @relation(fields: [expenseId], references: [id])
   invoice         Invoice?       @relation(fields: [invoiceId], references: [id])
@@ -652,20 +705,26 @@ model JournalEntry {
   lines           JournalLine[]
 
   @@index([date])
+  @@index([reversalOfId])
+  @@index([status])
+  @@index([isBackdated])
 }
 
 model JournalLine {
-  id          String       @id @default(cuid())
-  entryId     String
-  accountId   String
-  description String?
-  debit       Float        @default(0)
-  credit      Float        @default(0)
-  account     Account      @relation(fields: [accountId], references: [id])
-  entry       JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  id           String       @id @default(cuid())
+  entryId      String
+  accountId    String
+  description  String?
+  debit        Float        @default(0)
+  credit       Float        @default(0)
+  costCentreId String?
+  account      Account      @relation(fields: [accountId], references: [id])
+  entry        JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  costCentre   CostCentre?  @relation(fields: [costCentreId], references: [id])
 
   @@index([entryId])
   @@index([accountId])
+  @@index([costCentreId])
 }
 
 model Category {
@@ -677,6 +736,7 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   glCode      String?
+  qboId       String?   // QuickBooks Category/Item ID
 }
 
 model Policy {
@@ -701,7 +761,7 @@ model Asset {
   category           String
   purchaseDate       DateTime
   purchasePrice      Float
-  currency           String    @default("USD")
+  currency           String    @default("KES")
   currentValue       Float?
   usefulLife         Int?
   salvageValue       Float?    @default(0)
@@ -739,18 +799,19 @@ model FiscalYear {
 }
 
 model AccountingPeriod {
-  id           String     @id @default(cuid())
-  fiscalYearId String
-  name         String
-  periodType   String
-  startDate    DateTime
-  endDate      DateTime
-  isClosed     Boolean    @default(false)
-  closedAt     DateTime?
-  closedBy     String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  fiscalYear   FiscalYear @relation(fields: [fiscalYearId], references: [id], onDelete: Cascade)
+  id             String          @id @default(cuid())
+  fiscalYearId   String
+  name           String
+  periodType     String
+  startDate      DateTime
+  endDate        DateTime
+  isClosed       Boolean         @default(false)
+  closedAt       DateTime?
+  closedBy       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  fiscalYear     FiscalYear      @relation(fields: [fiscalYearId], references: [id], onDelete: Cascade)
+  periodBalances PeriodBalance[]
 
   @@index([fiscalYearId])
   @@index([isClosed])
@@ -769,48 +830,15 @@ model TaxRate {
   effectiveTo   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  sales         Sale[]    @relation("SaleTaxRate")
+  invoices      Invoice[] @relation("InvoiceTaxRate")
+  whtInvoices   Invoice[] @relation("InvoiceWHT")
 
   @@index([code])
   @@index([isActive])
 }
 
-model SalaryBatch {
-  id           String         @id @default(cuid())
-  title        String
-  month        Int
-  year         Int
-  totalAmount  Float
-  currency     String         @default("USD")
-  status       String         @default("DRAFT")
-  notes        String?
-  createdById  String
-  approvedById String?
-  paidAt       DateTime?
-  expenseId    String?        @unique
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  approvedBy   User?          @relation("SalaryApprover", fields: [approvedById], references: [id])
-  createdBy    User           @relation("SalaryCreator", fields: [createdById], references: [id])
-  expense      Expense?       @relation(fields: [expenseId], references: [id])
-  records      SalaryRecord[]
 
-  @@index([month, year])
-  @@index([status])
-}
-
-model SalaryRecord {
-  id            String      @id @default(cuid())
-  batchId       String
-  employeeName  String
-  bankName      String?
-  accountNumber String?
-  amount        Float
-  notes         String?
-  batch         SalaryBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
-
-  @@index([batchId])
-  @@index([employeeName])
-}
 
 model SystemSetting {
   id          String   @id @default(cuid())
@@ -818,4 +846,222 @@ model SystemSetting {
   value       String
   description String?
   updatedAt   DateTime @updatedAt
+}
+
+model QuickBooksIntegration {
+  id                    String   @id @default(cuid())
+  realmId               String   @unique
+  accessToken           String
+  refreshToken          String
+  accessTokenExpiresAt  DateTime
+  refreshTokenExpiresAt DateTime
+  isEnabled             Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorEmail String?
+  action     String
+  entity     String
+  entityId   String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model DocumentSequence {
+  id         String   @id @default(cuid())
+  prefix     String   @unique
+  lastNumber Int      @default(0)
+  updatedAt  DateTime @updatedAt
+}
+
+model BankAccount {
+  id            String          @id @default(cuid())
+  name          String
+  accountNumber String?
+  bankName      String
+  currency      String          @default("KES")
+  glAccountId   String          @unique
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  glAccount     Account         @relation(fields: [glAccountId], references: [id])
+  statements    BankStatement[]
+
+  @@index([isActive])
+}
+
+model BankStatement {
+  id              String              @id @default(cuid())
+  bankAccountId   String
+  periodStart     DateTime
+  periodEnd       DateTime
+  openingBalance  Decimal             @db.Decimal(18, 2)
+  closingBalance  Decimal             @db.Decimal(18, 2)
+  importedAt      DateTime            @default(now())
+  importedBy      String?
+  bankAccount     BankAccount         @relation(fields: [bankAccountId], references: [id])
+  lines           BankStatementLine[]
+
+  @@index([bankAccountId])
+}
+
+model BankStatementLine {
+  id              String                @id @default(cuid())
+  statementId     String
+  transactionDate DateTime
+  description     String
+  reference       String?
+  debit           Decimal               @default(0) @db.Decimal(18, 2)
+  credit          Decimal               @default(0) @db.Decimal(18, 2)
+  balance         Decimal?              @db.Decimal(18, 2)
+  isMatched       Boolean               @default(false)
+  statement       BankStatement         @relation(fields: [statementId], references: [id], onDelete: Cascade)
+  matches         ReconciliationMatch[]
+
+  @@index([statementId])
+  @@index([isMatched])
+  @@index([transactionDate])
+}
+
+model ReconciliationMatch {
+  id              String            @id @default(cuid())
+  statementLineId String
+  journalEntryId  String
+  matchedAt       DateTime          @default(now())
+  matchedBy       String?
+  matchType       String
+  notes           String?
+  statementLine   BankStatementLine @relation(fields: [statementLineId], references: [id], onDelete: Cascade)
+
+  @@index([statementLineId])
+  @@index([journalEntryId])
+}
+
+// ─── Phase 3: Accrual Completeness ────────────────────────────────────────────
+
+model AccrualSchedule {
+  id              String               @id @default(cuid())
+  name            String
+  type            String               // ACCRUAL | PREPAYMENT | DEFERRED_INCOME
+  totalAmount     Decimal              @db.Decimal(18, 2)
+  debitAccountId  String
+  creditAccountId String
+  startDate       DateTime
+  endDate         DateTime
+  periods         Int
+  periodType      String               @default("MONTHLY")
+  status          String               @default("ACTIVE")
+  sourceRef       String?
+  createdBy       String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  debitAccount    Account              @relation("AccrualDebit", fields: [debitAccountId], references: [id])
+  creditAccount   Account              @relation("AccrualCredit", fields: [creditAccountId], references: [id])
+  recognitions    AccrualRecognition[]
+
+  @@index([status])
+  @@index([type])
+}
+
+model AccrualRecognition {
+  id             String          @id @default(cuid())
+  scheduleId     String
+  periodDate     DateTime
+  amount         Decimal         @db.Decimal(18, 2)
+  journalEntryId String?
+  status         String          @default("PENDING")
+  schedule       AccrualSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleId])
+  @@index([status])
+  @@index([periodDate])
+}
+
+model RecurringJournalTemplate {
+  id          String                 @id @default(cuid())
+  name        String
+  description String?
+  frequency   String
+  nextRunDate DateTime
+  endDate     DateTime?
+  isActive    Boolean                @default(true)
+  createdBy   String?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  lines       RecurringJournalLine[]
+
+  @@index([isActive])
+  @@index([nextRunDate])
+}
+
+model RecurringJournalLine {
+  id          String                   @id @default(cuid())
+  templateId  String
+  accountId   String
+  description String?
+  debit       Decimal                  @default(0) @db.Decimal(18, 2)
+  credit      Decimal                  @default(0) @db.Decimal(18, 2)
+  template    RecurringJournalTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  account     Account                  @relation(fields: [accountId], references: [id])
+
+  @@index([templateId])
+}
+
+// ─── Phase 4: Scale & Breadth ─────────────────────────────────────────────────
+
+model CostCentre {
+  id          String        @id @default(cuid())
+  code        String        @unique
+  name        String
+  description String?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  lines       JournalLine[]
+
+  @@index([isActive])
+}
+
+model PeriodBalance {
+  id           String           @id @default(cuid())
+  periodId     String
+  accountId    String
+  openingDebit Decimal          @default(0) @db.Decimal(18, 2)
+  openingCredit Decimal         @default(0) @db.Decimal(18, 2)
+  periodDebit  Decimal          @default(0) @db.Decimal(18, 2)
+  periodCredit Decimal          @default(0) @db.Decimal(18, 2)
+  closingDebit Decimal          @default(0) @db.Decimal(18, 2)
+  closingCredit Decimal         @default(0) @db.Decimal(18, 2)
+  snapshotAt   DateTime         @default(now())
+  account      Account          @relation(fields: [accountId], references: [id])
+  period       AccountingPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+
+  @@unique([periodId, accountId])
+  @@index([periodId])
+  @@index([accountId])
+}
+
+model LoginEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  success   Boolean
+  ipAddress String?
+  userAgent String?
+  reason    String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([email])
+  @@index([createdAt])
 }

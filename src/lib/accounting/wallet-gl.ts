@@ -7,7 +7,7 @@
  * Pattern: caller passes the Prisma transaction client (tx) and the relevant IDs/amounts.
  */
 
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma-client";
 
 type Tx = Prisma.TransactionClient;
 

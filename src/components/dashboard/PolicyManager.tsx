@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Policy } from "@prisma/client";
+import { Policy } from "@/generated/prisma-client";
 import {
     PiShieldCheck,
     PiShieldWarning,
