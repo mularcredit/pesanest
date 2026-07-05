@@ -32,16 +32,26 @@ export async function GET(req: Request) {
         if (searchParams.get('to')) where.createdAt.lte = new Date(searchParams.get('to')!);
     }
 
-    const [total, logs] = await Promise.all([
-        (prisma as any).auditLog.count({ where }),
-        (prisma as any).auditLog.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: limit })
-    ]);
+    // Build dynamic WHERE clause for raw SQL
+    const conditions: string[] = [];
+    const values: any[] = [];
+    let idx = 1;
+    if (where.entity) { conditions.push(`entity = $${idx++}`); values.push(where.entity); }
+    if (where.actorId) { conditions.push(`"actorId" = $${idx++}`); values.push(where.actorId); }
+    if (where.action?.contains) { conditions.push(`action ILIKE $${idx++}`); values.push(`%${where.action.contains}%`); }
+    if (where.createdAt?.gte) { conditions.push(`"createdAt" >= $${idx++}`); values.push(where.createdAt.gte); }
+    if (where.createdAt?.lte) { conditions.push(`"createdAt" <= $${idx++}`); values.push(where.createdAt.lte); }
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    // Distinct values for filters
-    const [entities, actions] = await Promise.all([
-        (prisma as any).auditLog.groupBy({ by: ['entity'], orderBy: { entity: 'asc' } }),
-        (prisma as any).auditLog.groupBy({ by: ['action'], orderBy: { action: 'asc' } }),
+    const [totalRows, logs, entityRows, actionRows] = await Promise.all([
+        prisma.$queryRawUnsafe<{ count: bigint }[]>(`SELECT COUNT(*) as count FROM "AuditLog" ${whereClause}`, ...values).catch(() => [{ count: BigInt(0) }]),
+        prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "AuditLog" ${whereClause} ORDER BY "createdAt" DESC LIMIT ${limit} OFFSET ${skip}`, ...values).catch(() => []),
+        prisma.$queryRaw<{ entity: string }[]>`SELECT DISTINCT entity FROM "AuditLog" ORDER BY entity ASC`.catch(() => []),
+        prisma.$queryRaw<{ action: string }[]>`SELECT DISTINCT action FROM "AuditLog" ORDER BY action ASC`.catch(() => []),
     ]);
+    const total = Number(totalRows[0]?.count ?? 0);
+    const entities = entityRows;
+    const actions = actionRows;
 
     return NextResponse.json({
         logs,

@@ -14,15 +14,13 @@ export default async function AuditPage() {
     const isFinance = role === 'FINANCE_APPROVER' || role === 'FINANCE_TEAM';
     if (!isAdmin && !isFinance) redirect("/dashboard");
 
-    const [logs, total, entityGroups, actionGroups] = await Promise.all([
-        (prisma as any).auditLog.findMany({
-            orderBy: { createdAt: 'desc' },
-            take: 50,
-        }),
-        (prisma as any).auditLog.count(),
-        (prisma as any).auditLog.groupBy({ by: ['entity'], orderBy: { entity: 'asc' } }),
-        (prisma as any).auditLog.groupBy({ by: ['action'], orderBy: { action: 'asc' } }),
+    const [logs, totalRows, entityGroups, actionGroups] = await Promise.all([
+        prisma.$queryRaw<any[]>`SELECT * FROM "AuditLog" ORDER BY "createdAt" DESC LIMIT 50`.catch(() => []),
+        prisma.$queryRaw<{ count: bigint }[]>`SELECT COUNT(*) as count FROM "AuditLog"`.catch(() => [{ count: BigInt(0) }]),
+        prisma.$queryRaw<{ entity: string }[]>`SELECT DISTINCT entity FROM "AuditLog" ORDER BY entity ASC`.catch(() => []),
+        prisma.$queryRaw<{ action: string }[]>`SELECT DISTINCT action FROM "AuditLog" ORDER BY action ASC`.catch(() => []),
     ]);
+    const total = Number(totalRows[0]?.count ?? 0);
 
     return (
         <div className="space-y-5 pb-24">
