@@ -42,7 +42,7 @@ export const SouthSudanReceiptTemplate = ({
     onSettingChange
 }: any) => {
     const formatCurrency = (val: number) =>
-        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'KES' }).format(val);
 
     const formatDate = (d: Date) =>
         d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '';

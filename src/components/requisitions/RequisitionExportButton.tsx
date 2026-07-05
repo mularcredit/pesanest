@@ -13,17 +13,18 @@ import { useToast } from "@/components/ui/ToastProvider";
 interface RequisitionExportButtonProps {
     requisitions: any[];
     monthlyBudgets?: any[];
+    iconOnly?: boolean;
 }
 
 const ALL_STATUSES = ["PENDING", "APPROVED", "REJECTED", "FULFILLED", "COMPLETED", "PAID"];
 const ALL_TYPES = ["STANDARD", "MONTHLY"];
 
-export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: RequisitionExportButtonProps) {
+export function RequisitionExportButton({ requisitions, monthlyBudgets = [], iconOnly = false }: RequisitionExportButtonProps) {
     const { showToast } = useToast();
     const [modalOpen, setModalOpen] = useState(false);
     const [loading, setLoading] = useState<"pdf" | "csv" | null>(null);
 
-    const formatCurrency = (amount: number, currencyCode: string = "USD") => {
+    const formatCurrency = (amount: number, currencyCode: string = 'KES') => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currencyCode,
@@ -130,7 +131,7 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
             const pending = filtered.filter(r => r.status === "PENDING").length;
 
             doc.setFontSize(10);
-            doc.setTextColor(41, 37, 141); doc.text(`Total Value: ${formatCurrency(total, filtered[0]?.currency || "USD")}`, 14, 39);
+            doc.setTextColor(41, 37, 141); doc.text(`Total Value: ${formatCurrency(total, filtered[0]?.currency || 'KES')}`, 14, 39);
             doc.setTextColor(16, 185, 129); doc.text(`Approved: ${approved}`, 110, 39);
             doc.setTextColor(245, 158, 11); doc.text(`Pending: ${pending}`, 155, 39);
 
@@ -210,12 +211,13 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
                 id="req-export-btn"
                 onClick={() => setModalOpen(true)}
                 disabled={!!loading}
-                className="relative flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all shadow-none disabled:opacity-60"
+                title="Export Report"
+                className={`relative flex items-center gap-2 text-xs font-semibold text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-all shadow-none disabled:opacity-60 ${iconOnly ? "w-9 h-9 justify-center" : "px-4 py-2.5"}`}
             >
                 {loading ? <PiSpinner className="text-base animate-spin" /> : <PiDownloadSimple className="text-base" />}
-                {loading ? "Exporting..." : "Export Report"}
+                {!iconOnly && (loading ? "Exporting..." : "Export Report")}
                 {activeFilterCount > 0 && !loading && (
-                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#29258D] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#6366F1] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
                         {activeFilterCount}
                     </span>
                 )}
@@ -229,8 +231,8 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
                             <div>
-                                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                                    <PiFunnel className="text-[#29258D]" /> Export Requisitions
+                                <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                                    <PiFunnel className="text-[#6366F1]" /> Export Requisitions
                                 </h2>
                                 <p className="text-[11px] text-gray-400 mt-0.5">Apply filters then choose your format</p>
                             </div>
@@ -244,7 +246,7 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
 
                             {/* Status */}
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Status</label>
+                                <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Status</label>
                                 <div className="flex flex-wrap gap-2">
                                     {ALL_STATUSES.map(s => {
                                         const on = selStatuses.includes(s);
@@ -252,8 +254,8 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
                                             <button
                                                 key={s}
                                                 onClick={() => toggle(selStatuses, setSelStatuses, s)}
-                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${on
-                                                    ? "bg-[#29258D] text-white border-[#29258D]"
+                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${on
+                                                    ? "bg-[#6366F1] text-white border-[#6366F1]"
                                                     : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-400"}`}
                                             >
                                                 {on ? <PiCheckSquare className="text-sm" /> : <PiSquare className="text-sm" />}
@@ -266,14 +268,14 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
 
                             {/* Type */}
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Type</label>
+                                <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Type</label>
                                 <div className="flex gap-2">
                                     {ALL_TYPES.map(t => {
                                         const on = selTypes.includes(t);
                                         return (
                                             <button key={t} onClick={() => toggle(selTypes, setSelTypes, t)}
-                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${on
-                                                    ? "bg-[#29258D] text-white border-[#29258D]"
+                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${on
+                                                    ? "bg-[#6366F1] text-white border-[#6366F1]"
                                                     : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-400"}`}>
                                                 {t === "STANDARD" ? "Operational (Standard)" : "Monthly Budget Plan"}
                                             </button>
@@ -285,23 +287,23 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
                             {/* Category / Dept / Branch */}
                             <div className="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Category</label>
+                                    <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Category</label>
                                     <select value={selCategory} onChange={e => setSelCategory(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#29258D]/30">
+                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30">
                                         {categories.map(c => <option key={c} value={c}>{c === "all" ? "All Categories" : c}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Department</label>
+                                    <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Department</label>
                                     <select value={selDept} onChange={e => setSelDept(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#29258D]/30">
+                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30">
                                         {departments.map(d => <option key={d} value={d}>{d === "all" ? "All Depts." : d}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Branch</label>
+                                    <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Branch</label>
                                     <select value={selBranch} onChange={e => setSelBranch(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#29258D]/30">
+                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30">
                                         {branches.map(b => <option key={b} value={b}>{b === "all" ? "All Branches" : b}</option>)}
                                     </select>
                                 </div>
@@ -309,17 +311,17 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
 
                             {/* Date range */}
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Date Range (Created At)</label>
+                                <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Date Range (Created At)</label>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <span className="text-[10px] text-gray-400 font-medium block mb-1">From</span>
                                         <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-                                            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#29258D]/30" />
+                                            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30" />
                                     </div>
                                     <div>
                                         <span className="text-[10px] text-gray-400 font-medium block mb-1">To</span>
                                         <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-                                            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#29258D]/30" />
+                                            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30" />
                                     </div>
                                 </div>
                             </div>
@@ -328,12 +330,12 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
                         {/* Footer */}
                         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
-                                <div className="text-sm font-bold text-gray-900">
-                                    <span className="text-[#29258D] text-lg">{filtered.length}</span>
+                                <div className="text-sm font-semibold text-gray-900">
+                                    <span className="text-[#6366F1] text-lg">{filtered.length}</span>
                                     <span className="text-gray-400 text-xs font-medium ml-1">/ {allItems.length} records</span>
                                 </div>
                                 {activeFilterCount > 0 && (
-                                    <button onClick={resetFilters} className="text-[10px] font-bold text-gray-400 hover:text-gray-700 underline underline-offset-2 transition-colors">
+                                    <button onClick={resetFilters} className="text-[10px] font-semibold text-gray-400 hover:text-gray-700 underline underline-offset-2 transition-colors">
                                         Reset filters
                                     </button>
                                 )}
@@ -341,11 +343,11 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [] }: R
 
                             <div className="flex items-center gap-2">
                                 <button onClick={handleCSV} disabled={!filtered.length}
-                                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-40">
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-40">
                                     <PiFileCsv className="text-base text-emerald-500" /> CSV
                                 </button>
                                 <button onClick={handlePDF} disabled={!filtered.length}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-[#29258D] hover:bg-[#29258D]/90 transition-all shadow-sm shadow-[#29258D]/20 disabled:opacity-40">
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold text-white bg-[#6366F1] hover:bg-[#6366F1]/90 transition-all shadow-sm shadow-[#6366F1]/20 disabled:opacity-40">
                                     <PiFilePdf className="text-base" /> Download PDF
                                 </button>
                             </div>

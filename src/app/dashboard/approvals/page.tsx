@@ -133,30 +133,12 @@ export default async function ApprovalsPage() {
     });
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-end justify-between">
-                <div>
-                    <p className="text-gds-text-muted text-sm font-medium tracking-wide">
-                        Review and approve pending requests
-                    </p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="text-right">
-                        <p className="text-xs text-gds-text-muted uppercase tracking-wider font-bold">Pending Items</p>
-                        <p className="text-3xl font-heading font-bold text-emerald-500">
-                            {pendingExpenses.length + pendingRequisitions.length + pendingBudgets.length + pendingInvoices.length}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <ApprovalQueue
-                expenses={JSON.parse(JSON.stringify(pendingExpenses))}
-                requisitions={JSON.parse(JSON.stringify(pendingRequisitions))}
-                budgets={JSON.parse(JSON.stringify(pendingBudgets))}
-                invoices={JSON.parse(JSON.stringify(pendingInvoices))}
-                history={JSON.parse(JSON.stringify(approvalHistory))}
-            />
-        </div>
+        <ApprovalQueue
+            expenses={JSON.parse(JSON.stringify(pendingExpenses))}
+            requisitions={JSON.parse(JSON.stringify(pendingRequisitions))}
+            budgets={JSON.parse(JSON.stringify(pendingBudgets))}
+            invoices={JSON.parse(JSON.stringify(pendingInvoices))}
+            history={JSON.parse(JSON.stringify(approvalHistory))}
+        />
     );
 }

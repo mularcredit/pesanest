@@ -57,7 +57,7 @@ export async function getStatementData(customerId: string, fromDate: string, toD
             _sum: { amount: true }
         });
 
-        const openingBalance = (prevSales._sum.totalAmount || 0) - (prevPayments._sum.amount || 0) - (prevCreditNotes._sum.amount || 0);
+        const openingBalance = Number(prevSales._sum.totalAmount || 0) - Number(prevPayments._sum.amount || 0) - Number(prevCreditNotes._sum.amount || 0);
 
         // 2. Fetch Customer and Transactions
         const customer = await prisma.customer.findUnique({
@@ -169,7 +169,7 @@ export async function getStatementData(customerId: string, fromDate: string, toD
             };
         });
 
-        const periodInvoiced = customer.sales.reduce((sum, s) => sum + s.totalAmount, 0);
+        const periodInvoiced = customer.sales.reduce((sum, s) => sum + Number(s.totalAmount), 0);
         const periodPaid = customer.payments.reduce((sum, p) => sum + p.amount, 0);
         const periodCreditNotes = customer.creditNotes.reduce((sum: number, cn: any) => sum + cn.amount, 0);
         const endingBalance = openingBalance + periodInvoiced - periodPaid - periodCreditNotes;
@@ -205,131 +205,6 @@ export async function checkCreditNoteNumberUniqueness(cnNumber: string) {
     } catch (error) {
         console.error("Error checking credit note uniqueness:", error);
         return { error: "Failed to verify uniqueness" };
-    }
-}
-
-export async function getSSCAAStatementData(fromDate?: string, toDate?: string) {
-    try {
-        const dateFilter: any = {};
-        if (fromDate && toDate) {
-            const startDate = new Date(fromDate);
-            const endDateInclusive = new Date(toDate);
-            endDateInclusive.setHours(23, 59, 59, 999);
-            dateFilter.gte = startDate;
-            dateFilter.lte = endDateInclusive;
-        }
-
-        // --- QUERY 1: Requisitions tagged as SSCAA ---
-        const reqWhereClause: any = {
-            OR: [
-                { type: 'SOUTH_SUDAN' },
-                { type: 'SOUTH_SUDAN_STRICT' },
-                { branch: 'SSCAA' },
-                { category: { contains: 'SSCAA', mode: 'insensitive' } }
-            ]
-        };
-        if (fromDate && toDate) reqWhereClause.createdAt = dateFilter;
-
-        const requisitions = await prisma.requisition.findMany({
-            where: reqWhereClause,
-            orderBy: { createdAt: 'asc' }
-        });
-
-        // --- QUERY 2: Expenses converted to SSCAA via ledger (costCenter = 'SSCAA') ---
-        const expWhereClause: any = { costCenter: 'SSCAA' };
-        if (fromDate && toDate) expWhereClause.expenseDate = dateFilter;
-
-        const expenses = await prisma.expense.findMany({
-            where: expWhereClause,
-            orderBy: { expenseDate: 'asc' }
-        });
-
-        // --- MERGE into unified transaction list ---
-        type RawTx = { date: Date; description: string; ref: string; amount: number; sourceId: string };
-
-        const reqTxs: RawTx[] = requisitions.map(req => ({
-            date: req.createdAt,
-            description: req.description || req.title,
-            ref: `REQ-${req.id.substring(0, 8)}`,
-            amount: req.amount,
-            sourceId: req.id
-        }));
-
-        const expTxs: RawTx[] = expenses.map(exp => ({
-            date: exp.expenseDate,
-            description: exp.title || exp.description || 'SSCAA Expense',
-            ref: `EXP-${exp.id.substring(0, 8)}`,
-            amount: exp.amount,
-            sourceId: exp.id
-        }));
-
-        // --- QUERY 3: Manual Journal Entries converted to SSCAA (GL account 6001)
-        //     Exclude entries already linked to an expense or requisition (covered by Q1/Q2)
-        const sscaaAccount = await prisma.account.findUnique({ where: { code: '6001' } });
-
-        let journalTxs: RawTx[] = [];
-        if (sscaaAccount) {
-            const journalWhereClause: any = {
-                expenseId: null,      // Not already an expense record
-                requisitionId: null,  // Not already a requisition record
-                lines: {
-                    some: { accountId: sscaaAccount.id, debit: { gt: 0 } }
-                }
-            };
-            if (fromDate && toDate) journalWhereClause.date = dateFilter;
-
-            const manualEntries = await prisma.journalEntry.findMany({
-                where: journalWhereClause,
-                include: { lines: { where: { accountId: sscaaAccount.id, debit: { gt: 0 } } } },
-                orderBy: { date: 'asc' }
-            });
-
-            journalTxs = manualEntries.map(entry => ({
-                date: entry.date,
-                description: entry.description || 'Manual SSCAA Entry',
-                ref: `JNL-${entry.id.substring(0, 8)}`,
-                amount: entry.lines.reduce((sum, l) => sum + l.debit, 0),
-                sourceId: entry.id
-            }));
-        }
-
-        // Sort all records chronologically
-        const allTxs = [...reqTxs, ...expTxs, ...journalTxs].sort((a, b) => a.date.getTime() - b.date.getTime());
-
-        let runningBalance = 0;
-        const formattedTransactions = allTxs.map((tx, idx) => {
-            runningBalance += tx.amount;
-            return {
-                id: tx.sourceId,
-                operator: tx.description,
-                invoiceRef: tx.ref,
-                period: tx.date.toLocaleDateString('en-GB'),
-                amount: tx.amount,
-                balance: runningBalance
-            };
-        });
-
-        const totalRemitted = runningBalance;
-
-        return {
-            customer: {
-                name: 'South Sudanese Civil Aviation Authority',
-                group: 'Government Agency',
-                country: 'South Sudan',
-                accountType: 'Treasury Beneficiary'
-            },
-            summary: {
-                openingBalance: 0,
-                totalCharges: totalRemitted,
-                totalPayments: totalRemitted,
-                outstandingBalance: totalRemitted
-            },
-            transactions: formattedTransactions
-        };
-
-    } catch (error) {
-        console.error("Error generating SSCAA statement data:", error);
-        return null;
     }
 }
 

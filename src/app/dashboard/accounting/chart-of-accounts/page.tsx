@@ -1,116 +1,136 @@
-
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AccountingActions } from "@/components/accounting/AccountingActions";
+import { AccountRow } from "./AccountRow";
 import {
-    PiList,
-    PiPlus,
-    PiBank,
-    PiFiles,
-    PiTrendUp,
-    PiTrendDown,
-    PiWallet,
-    PiCreditCard,
-    PiArchive
+    PiFiles, PiTrendUp, PiTrendDown, PiWallet, PiCreditCard, PiBank,
 } from "react-icons/pi";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/Badge";
 
-// Helper to map account types to colors/icons
-const getTypeConfig = (type: string) => {
-    switch (type) {
-        case 'ASSET': return { color: 'text-emerald-600', bg: 'bg-emerald-50', icon: PiWallet };
-        case 'LIABILITY': return { color: 'text-rose-600', bg: 'bg-rose-50', icon: PiCreditCard };
-        case 'EQUITY': return { color: 'text-blue-600', bg: 'bg-blue-50', icon: PiBank };
-        case 'REVENUE': return { color: 'text-indigo-600', bg: 'bg-indigo-50', icon: PiTrendUp };
-        case 'EXPENSE': return { color: 'text-amber-600', bg: 'bg-amber-50', icon: PiTrendDown };
-        default: return { color: 'text-gray-600', bg: 'bg-gray-50', icon: PiFiles };
-    }
+const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
+
+const TYPE_META: Record<string, {
+    label: string; description: string;
+    accent: string; bg: string; icon: any;
+}> = {
+    ASSET:     { label: 'Assets',      description: 'Resources owned or controlled',     accent: '#059669', bg: 'rgba(5,150,105,0.06)',   icon: PiWallet     },
+    LIABILITY: { label: 'Liabilities', description: 'Obligations owed to others',         accent: '#e11d48', bg: 'rgba(225,29,72,0.06)',   icon: PiCreditCard },
+    EQUITY:    { label: 'Equity',      description: "Owner's interest in the business",   accent: '#6366F1', bg: 'rgba(99,102,241,0.06)',  icon: PiBank       },
+    REVENUE:   { label: 'Revenue',     description: 'Income from business operations',    accent: '#0284c7', bg: 'rgba(2,132,199,0.06)',   icon: PiTrendUp    },
+    EXPENSE:   { label: 'Expenses',    description: 'Costs incurred in operations',       accent: '#d97706', bg: 'rgba(217,119,6,0.06)',   icon: PiTrendDown  },
+    DEFAULT:   { label: 'Other',       description: 'Miscellaneous accounts',             accent: '#6b7280', bg: 'rgba(107,114,128,0.06)', icon: PiFiles      },
 };
+
+const TYPE_ORDER = ['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'];
 
 export default async function ChartOfAccountsPage() {
     const session = await auth();
     if (!session?.user) return redirect("/login");
 
     const accounts = await prisma.account.findMany({
-        orderBy: { code: 'asc' }
+        where: { isArchived: false } as any,
+        orderBy: { code: 'asc' },
     });
 
-    // Group by type for a better view
-    const grouped = accounts.reduce((acc: any, account: any) => {
+    const grouped = accounts.reduce((acc: Record<string, any[]>, account: any) => {
         if (!acc[account.type]) acc[account.type] = [];
         acc[account.type].push(account);
         return acc;
-    }, {} as Record<string, typeof accounts>);
+    }, {});
 
-    const typeOrder = ['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'];
+    const totalAccounts = accounts.length;
+    const activeCount   = accounts.filter((a: any) => a.isActive).length;
 
     return (
-        <div className="space-y-8 animate-fade-in-up font-sans pb-12">
-            <div className="flex items-end justify-between">
+        <div className="pb-20 space-y-5">
+
+            {/* ── Header ── */}
+            <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1">Chart of Accounts</h1>
-                    <p className="text-gray-500 text-sm">
-                        Manage your general ledger accounts and GL codes
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="w-[30px] h-[30px] rounded-[7px] bg-[#6366F1] flex items-center justify-center shrink-0">
+                            <PiFiles className="text-white text-[15px]" />
+                        </div>
+                        <h1 className="text-[19px] font-[600] text-gray-900 tracking-tight">Chart of Accounts</h1>
+                    </div>
+                    <p className="text-[12px] text-gray-400 pl-[38px]">
+                        {totalAccounts} account{totalAccounts !== 1 ? 's' : ''} · {activeCount} active · general ledger codes
                     </p>
                 </div>
                 <AccountingActions type="NEW_ACCOUNT" />
             </div>
 
-            <div className="space-y-6">
-                {typeOrder.map(type => {
+            {/* ── KPI strip ── */}
+            <div className="grid grid-cols-5 gap-3">
+                {TYPE_ORDER.map(type => {
+                    const meta  = TYPE_META[type];
+                    const count = (grouped[type] || []).length;
+                    const Icon  = meta.icon;
+                    return (
+                        <div key={type} className="bg-white rounded-[8px] px-4 py-3.5" style={{ border: HAIRLINE }}>
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <Icon className="text-[13px] shrink-0" style={{ color: meta.accent }} />
+                                <p className="text-[10px] font-[600] uppercase tracking-[0.09em] text-gray-400">{meta.label}</p>
+                            </div>
+                            <p className="text-[22px] font-[700] tabular-nums leading-none" style={{ color: count > 0 ? meta.accent : '#d1d5db' }}>
+                                {count}
+                            </p>
+                            <p className="text-[10.5px] text-gray-400 mt-1">account{count !== 1 ? 's' : ''}</p>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* ── Account groups ── */}
+            <div className="space-y-4">
+                {TYPE_ORDER.map(type => {
                     const typeAccounts = grouped[type] || [];
                     if (typeAccounts.length === 0) return null;
-                    const config = getTypeConfig(type);
+                    const meta = TYPE_META[type];
+                    const Icon = meta.icon;
 
                     return (
-                        <div key={type} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-200 flex items-center gap-3">
-                                <div className={cn("p-2 rounded-lg", config.bg, config.color)}>
-                                    <config.icon className="text-xl" />
+                        <div key={type} className="bg-white rounded-[8px] overflow-hidden" style={{ border: HAIRLINE }}>
+
+                            {/* Section header */}
+                            <div className="flex items-center gap-3 px-5 py-3"
+                                style={{ background: meta.bg, borderBottom: HAIRLINE }}>
+                                <div className="w-[26px] h-[26px] rounded-[6px] flex items-center justify-center shrink-0"
+                                    style={{ background: meta.accent }}>
+                                    <Icon className="text-white text-[13px]" />
                                 </div>
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500">{type}</h3>
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-white border border-gray-200 text-gray-400 font-mono font-bold shadow-sm">
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[12.5px] font-[600]" style={{ color: meta.accent }}>{meta.label}</p>
+                                    <p className="text-[10.5px] text-gray-400">{meta.description}</p>
+                                </div>
+                                <span className="text-[10px] font-[700] tabular-nums px-2.5 py-0.5 rounded-full"
+                                    style={{ background: meta.accent, color: 'white' }}>
                                     {typeAccounts.length}
                                 </span>
                             </div>
-                            <table className="w-full text-left">
-                                <thead className="bg-white border-b border-gray-100/50">
-                                    <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                                        <th className="px-6 py-3 w-32 font-medium">Code</th>
-                                        <th className="px-6 py-3 font-medium">Account Name</th>
-                                        <th className="px-6 py-3 font-medium">Subtype</th>
-                                        <th className="px-6 py-3 font-medium text-right">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {typeAccounts.map((account: any) => (
-                                        <tr key={account.id} className="text-sm hover:bg-gray-50 transition-colors group">
-                                            <td className="px-6 py-3.5 px-6 font-mono font-bold text-gray-500 group-hover:text-[#29258D] transition-colors">
-                                                {account.code}
-                                            </td>
-                                            <td className="px-6 py-3.5 font-bold text-gray-900">
-                                                {account.name}
-                                            </td>
-                                            <td className="px-6 py-3.5 text-xs text-gray-500 font-medium uppercase tracking-wide">
-                                                {account.subtype?.replace('_', ' ')}
-                                            </td>
-                                            <td className="px-6 py-3.5 text-right">
-                                                {account.isActive ? (
-                                                    <Badge variant="success" className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase border border-emerald-100">
-                                                        Active
-                                                    </Badge>
-                                                ) : (
-                                                    <Badge variant="secondary" className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-gray-100 text-gray-500 border border-gray-200">
-                                                        Archived
-                                                    </Badge>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+
+                            {/* Column headers */}
+                            <div className="grid px-5 py-2.5"
+                                style={{
+                                    gridTemplateColumns: '80px 1fr 140px 90px 72px',
+                                    borderBottom: HAIRLINE,
+                                    background: 'rgba(0,0,0,0.01)',
+                                }}>
+                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Code</p>
+                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Account Name</p>
+                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Subtype</p>
+                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400 text-center">Status</p>
+                                <p />
+                            </div>
+
+                            {/* Rows */}
+                            {typeAccounts.map((account: any, idx: number) => (
+                                <AccountRow
+                                    key={account.id}
+                                    account={account}
+                                    isLast={idx === typeAccounts.length - 1}
+                                />
+                            ))}
                         </div>
                     );
                 })}

@@ -29,12 +29,14 @@ import {
     PiListBullets,
     PiGridFour,
     PiTag,
-    PiStackSimple
+    PiStackSimple,
 } from "react-icons/pi";
+import { CheckSquare, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { estimatePaystackPayoutFee } from "@/lib/payments/paymentFees";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 
 // Types
@@ -49,6 +51,7 @@ interface Expense {
     id: string;
     title: string;
     amount: number;
+    currency: string;
     category: string;
     merchant: string | null;
     receiptUrl: string | null;
@@ -61,6 +64,7 @@ interface Invoice {
     invoiceNumber: string;
     vendor: { name: string };
     amount: number;
+    currency: string;
     dueDate: Date;
     description: string | null;
     createdBy: UserBasic;
@@ -70,6 +74,7 @@ interface Requisition {
     id: string;
     title: string;
     amount: number;
+    currency: string;
     category: string;
     updatedAt: Date;
     user: UserBasic;
@@ -80,6 +85,7 @@ interface Budget {
     month: number;
     year: number;
     totalAmount: number;
+    currency?: string;
     branch: string;
     department: string;
     user: UserBasic;
@@ -89,6 +95,7 @@ interface PaymentBatch {
     id: string;
     amount: number;
     currency: string;
+// ...
     status: string;
     method: string;
     notes: string | null;
@@ -112,7 +119,7 @@ interface PaymentQueueProps {
     paidPayments?: PaymentBatch[];
     history: any[];
     userRole: string;
-    stripeStatus?: string;
+    paystackStatus?: string;
     isSystemAdmin?: boolean;
 }
 
@@ -126,11 +133,16 @@ export function PaymentQueue({
     paidPayments = [],
     history = [],
     userRole,
-    stripeStatus = 'NOT_CONNECTED',
+    paystackStatus = 'NOT_CONNECTED',
     isSystemAdmin = false
 }: PaymentQueueProps) {
     const { showToast } = useToast();
     const router = useRouter();
+
+    const formatAmount = (amount: number, currency: string = 'KES') => {
+        const symbol = currency === 'USD' ? '$' : (currency === 'KES' ? 'KSh' : currency);
+        return `${symbol} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
 
     const getDefaultTab = () => {
         const isFinance = ['FINANCE_TEAM', 'FINANCE_APPROVER', 'SYSTEM_ADMIN'].includes(userRole);
@@ -149,10 +161,12 @@ export function PaymentQueue({
     const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set());
     const [selectedRequisitions, setSelectedRequisitions] = useState<Set<string>>(new Set());
     const [selectedBudgets, setSelectedBudgets] = useState<Set<string>>(new Set());
+    const [failureDetails, setFailureDetails] = useState<{ details: any[], summary: any } | null>(null);
+    const [isFailureModalOpen, setIsFailureModalOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [showBypassModal, setShowBypassModal] = useState(false);
     const [showHelp, setShowHelp] = useState(true);
-    const [paymentMethod, setPaymentMethod] = useState<'VIRTUAL' | 'WALLET'>('VIRTUAL');
+    const [paymentMethod, setPaymentMethod] = useState<'WALLET' | 'BRANCH_WALLET'>('WALLET');
     const [mounted, setMounted] = useState(false);
     // Default to list view for compact readability
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
@@ -160,11 +174,15 @@ export function PaymentQueue({
     useEffect(() => {
         setMounted(true);
     }, []);
+
     const [confirmationModal, setConfirmationModal] = useState<{
         isOpen: boolean;
         paymentId: string;
         action: 'AUTHORIZE' | 'REJECT' | 'DISBURSE' | 'CLOSE';
-        paymentMethod?: 'VIRTUAL' | 'WALLET';
+        paymentMethod?: 'WALLET' | 'BRANCH_WALLET';
+        amount?: number;
+        currency?: string;
+        itemCount?: number;
     } | null>(null);
 
     // Pagination State
@@ -268,7 +286,16 @@ export function PaymentQueue({
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleAuthorization = (paymentId: string, action: 'AUTHORIZE' | 'REJECT' | 'DISBURSE' | 'CLOSE') => {
-        setConfirmationModal({ isOpen: true, paymentId, action, paymentMethod: paymentMethod });
+        const batch = [...pendingPayments, ...authorizedPayments, ...paidPayments].find(p => p.id === paymentId);
+        setConfirmationModal({ 
+            isOpen: true, 
+            paymentId, 
+            action, 
+            paymentMethod: paymentMethod,
+            amount: batch?.amount || 0,
+            currency: batch?.currency || 'KES',
+            itemCount: (batch?._count?.requisitions || 0) + (batch?._count?.expenses || 0) + (batch?._count?.invoices || 0) || 1
+        });
         setSelectedFile(null); // Reset file selection
     };
 
@@ -301,7 +328,7 @@ export function PaymentQueue({
                 body: JSON.stringify({
                     paymentId,
                     action,
-                    paymentMethod: confirmationModal.paymentMethod || 'VIRTUAL',
+                    paymentMethod: paymentMethod || 'WALLET',
                     proofUrl: noteAttachment ? noteAttachment.replace(' [Proof: ', '').replace(']', '') : undefined
                 })
             });
@@ -312,22 +339,50 @@ export function PaymentQueue({
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
 
-            const successMessage = action === 'AUTHORIZE'
-                ? 'Payment Authorized & ready for payout'
-                : action === 'DISBURSE'
-                    ? 'Payment disbursed successfully'
+            let successMessage = '';
+            let toastType: 'success' | 'warning' | 'error' = 'success';
+
+            if (action === 'DISBURSE' && data.summary) {
+                const { success, failed, details } = data.summary;
+                
+                if (failed > 0) {
+                    setFailureDetails({ details, summary: data.summary });
+                    setIsFailureModalOpen(true);
+                    
+                    if (success > 0) {
+                        successMessage = `Partial Payout: ${success} successful, ${failed} failed.`;
+                        toastType = 'warning';
+                    } else {
+                        successMessage = `Payout Failed: All ${failed} transfers failed.`;
+                        toastType = 'error';
+                    }
+                } else {
+                    successMessage = `Payout Successful: ${success} transfers completed.`;
+                    toastType = 'success';
+                    setIsFailureModalOpen(false);
+                }
+            } else {
+                successMessage = action === 'AUTHORIZE'
+                    ? 'Payment Authorized & ready for payout'
                     : action === 'CLOSE'
                         ? 'Payment closed successfully'
                         : 'Payment Rejected';
+            }
 
-            showToast(successMessage, 'success');
+            if (toastType !== 'error' || !data.summary) {
+                showToast(successMessage, toastType);
+            }
+            
             setConfirmationModal(null);
             router.refresh();
 
             if (action === 'AUTHORIZE') {
                 setActiveTab('disbursements');
             } else if (action === 'DISBURSE') {
-                setActiveTab('closing');
+                // If it failed completely, stay here; otherwise move to closing
+                if (data.summary && data.summary.success > 0) {
+                    setActiveTab('closing');
+                }
             }
         } catch (error: any) {
             showToast(error.message, 'error');
@@ -345,96 +400,53 @@ export function PaymentQueue({
     };
 
     return (
-        <div className="space-y-6">
-            {/* ── NEW LAYOUT: HORIZONTAL TABS + CONTENT ── */}
-            <div className="flex flex-col gap-6 items-start w-full">
+        <div className="flex -mt-[22px] -mx-[26px] -mb-[52px] min-h-[calc(100vh-64px)] animate-fade-in-up">
 
-                {/* ── MODERN HORIZONTAL TABS ── */}
-                <div className="w-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden shrink-0 transition-all duration-200">
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-                                <PiTrendUp className="text-xl text-indigo-600" />
-                            </div>
-                            <div>
-                                <h3 className="text-slate-900 font-bold text-[15px] tracking-wide flex items-center gap-2">
-                                    Payment Center
-                                </h3>
-                                <p className="text-slate-500 text-[11px] mt-0.5">Manage and execute financial workflows</p>
-                            </div>
-                        </div>
-                        <div className="text-right flex flex-col items-end gap-1">
-                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 rounded-md border border-emerald-100">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span className="text-[10px] font-medium text-emerald-700 tracking-wide">System Connected</span>
-                            </div>
-                        </div>
+            {/* Left Sidebar */}
+            <aside className="w-[210px] shrink-0 border-r border-gray-100 bg-white flex flex-col sticky top-0 h-[calc(100vh-64px)] overflow-y-auto">
+                <div className="px-5 pt-6 pb-4 border-b border-gray-100">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-[10px] font-medium text-emerald-700 tracking-wide">System Connected</span>
                     </div>
-                    
-                    <div className="flex overflow-x-auto divide-x divide-slate-300 scrollbar-hide">
-                        {[
-                            {
-                                id: 'payables',
-                                label: 'Payables Ledger',
-                                sub: 'Initiate Remittance',
-                                badge: expenses.length + invoices.length + requisitions.length + budgets.length
-                            },
-                            {
-                                id: 'approvals',
-                                label: 'Pending Auth',
-                                sub: 'Review & Authorize',
-                                badge: pendingPayments.length
-                            },
-                            {
-                                id: 'disbursements',
-                                label: 'Remittance',
-                                sub: 'Execute Transfers',
-                                badge: authorizedPayments.length
-                            },
-                            {
-                                id: 'closing',
-                                label: 'Reconciliation',
-                                sub: 'Finalize Records',
-                                badge: paidPayments.length
-                            },
-                            {
-                                id: 'history',
-                                label: 'Ledger History',
-                                sub: 'Archived TXNs',
-                                badge: history.length
-                            }
-                        ].map((step, idx) => {
-                            const isActive = activeTab === step.id;
-
-                            return (
-                                <button
-                                    key={step.id}
-                                    onClick={() => setActiveTab(step.id as any)}
-                                    className={cn(
-                                        "flex-1 min-w-[180px] flex items-center justify-between p-4 group transition-all duration-200 relative",
-                                        isActive ? "bg-white text-indigo-600 border-b-2 border-indigo-600" : "bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-b-2 border-transparent"
-                                    )}
-                                >
-                                    <div className="flex flex-col text-left">
-                                         <p className="font-semibold text-[13px] tracking-tight">{step.label}</p>
-                                         <p className={cn("text-[10px] mt-0.5", isActive ? "text-indigo-400" : "text-slate-400")}>{step.sub}</p>
-                                    </div>
-                                    {step.badge > 0 && (
-                                        <span className={cn(
-                                            "ml-4 px-2 py-0.5 text-[10px] min-w-[24px] text-center rounded-full font-semibold shrink-0 transition-colors",
-                                            isActive ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
-                                        )}>
-                                            {step.badge}
-                                        </span>
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
+                    <h1 className="text-sm font-semibold text-slate-900">Payment Center</h1>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Financial workflows</p>
                 </div>
+                <nav className="flex-1 divide-y divide-gray-100 px-2 py-1">
+                    {([
+                        { id: 'payables' as const, label: 'Payables Ledger', badge: expenses.length + invoices.length + requisitions.length + budgets.length, icon: PiReceipt },
+                        { id: 'approvals' as const, label: 'Pending Auth', badge: pendingPayments.length, icon: PiCheckCircle },
+                        { id: 'disbursements' as const, label: 'Remittance', badge: authorizedPayments.length, icon: PiHandCoins },
+                        { id: 'closing' as const, label: 'Reconciliation', badge: paidPayments.length, icon: PiFileText },
+                        { id: 'history' as const, label: 'History', badge: history.length, icon: PiListBullets },
+                    ]).map((step) => {
+                        const isActive = activeTab === step.id;
+                        const Icon = step.icon;
+                        return (
+                            <button
+                                key={step.id}
+                                onClick={() => setActiveTab(step.id)}
+                                className={cn(
+                                    "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all text-left my-0.5",
+                                    isActive ? "bg-indigo-50 text-[#6366F1]" : "text-slate-500 hover:bg-gray-50 hover:text-slate-800"
+                                )}
+                            >
+                                <Icon className="shrink-0 text-base" />
+                                <span className="flex-1 truncate">{step.label}</span>
+                                {step.badge > 0 && (
+                                    <span className={cn(
+                                        "text-[10px] font-semibold px-1.5 py-0.5 rounded-full min-w-[20px] text-center",
+                                        isActive ? "bg-[#6366F1]/15 text-[#6366F1]" : "bg-gray-100 text-slate-500"
+                                    )}>{step.badge}</span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </nav>
+            </aside>
 
-                {/* ── MAIN CONTENT AREA ── */}
-                <div className="w-full min-w-0">
+            {/* Main Content */}
+            <div className="flex-1 min-w-0 p-6">
 
 
                     {/* TAB: PAYABLES */}
@@ -442,30 +454,48 @@ export function PaymentQueue({
                         <div className="space-y-4 animate-fade-in">
                             {/* Selection Summary */}
                             {(selectedExpenses.size > 0 || selectedInvoices.size > 0 || selectedRequisitions.size > 0 || selectedBudgets.size > 0) && (
-                                <div className="p-3 pl-5 pr-3 bg-slate-900/95 backdrop-blur-md border border-slate-700/50 text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] flex items-center justify-between sticky top-6 z-[60] mb-8 mx-auto w-full transition-all duration-300">
+                                <div className="sticky top-4 z-[60] bg-white rounded-[10px] px-5 py-3.5 flex items-center justify-between transition-all duration-200"
+                                    style={{ border: '1px solid rgba(99,102,241,0.25)', boxShadow: '0 4px 24px rgba(99,102,241,0.13)' }}>
+
+                                    {/* Left: icon + amount + breakdown */}
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center">
-                                            <PiListBullets className="text-xl text-indigo-300" />
+                                        <div className="w-9 h-9 rounded-[8px] bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                                            <CheckSquare size={16} strokeWidth={2} className="text-[#6366F1]" />
                                         </div>
                                         <div>
-                                            <p className="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Total Selected</p>
-                                            <div className="flex items-baseline gap-2">
-                                                <p className="text-xl font-mono font-bold tracking-tight text-white drop-shadow-sm">
-                                                    ${totalSelectedAmount.toFixed(2)}
-                                                </p>
-                                                <span className="text-[10px] text-slate-300 font-medium hidden sm:inline-block px-2.5 py-0.5 bg-slate-800 rounded-full border border-slate-700 uppercase tracking-widest ml-2">
-                                                    {[
-                                                        selectedExpenses.size > 0 && `${selectedExpenses.size} EXP`,
-                                                        selectedInvoices.size > 0 && `${selectedInvoices.size} INV`,
-                                                        selectedRequisitions.size > 0 && `${selectedRequisitions.size} REQ`,
-                                                        selectedBudgets.size > 0 && `${selectedBudgets.size} BUD`
-                                                    ].filter(Boolean).join(', ')}
+                                            <p className="text-[11px] font-[500] text-gray-400 uppercase tracking-[0.07em]">
+                                                {selectedExpenses.size + selectedInvoices.size + selectedRequisitions.size + selectedBudgets.size} item{(selectedExpenses.size + selectedInvoices.size + selectedRequisitions.size + selectedBudgets.size) !== 1 ? 's' : ''} selected
+                                            </p>
+                                            <p className="text-[16px] font-[700] text-gray-900 font-mono tabular-nums leading-tight">
+                                                {formatAmount(totalSelectedAmount, 'KES')}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 ml-1">
+                                            {selectedRequisitions.size > 0 && (
+                                                <span className="px-2 py-0.5 rounded-[5px] bg-indigo-50 text-indigo-700 text-[10.5px] font-[600]">
+                                                    {selectedRequisitions.size} REQ
                                                 </span>
-                                            </div>
+                                            )}
+                                            {selectedBudgets.size > 0 && (
+                                                <span className="px-2 py-0.5 rounded-[5px] bg-violet-50 text-violet-700 text-[10.5px] font-[600]">
+                                                    {selectedBudgets.size} BUD
+                                                </span>
+                                            )}
+                                            {selectedInvoices.size > 0 && (
+                                                <span className="px-2 py-0.5 rounded-[5px] bg-sky-50 text-sky-700 text-[10.5px] font-[600]">
+                                                    {selectedInvoices.size} INV
+                                                </span>
+                                            )}
+                                            {selectedExpenses.size > 0 && (
+                                                <span className="px-2 py-0.5 rounded-[5px] bg-emerald-50 text-emerald-700 text-[10.5px] font-[600]">
+                                                    {selectedExpenses.size} EXP
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
+                                    {/* Right: clear + process */}
+                                    <div className="flex items-center gap-3">
                                         <button
                                             onClick={() => {
                                                 setSelectedExpenses(new Set());
@@ -473,17 +503,17 @@ export function PaymentQueue({
                                                 setSelectedRequisitions(new Set());
                                                 setSelectedBudgets(new Set());
                                             }}
-                                            className="px-3 py-1.5 text-[11px] tracking-wide font-semibold text-slate-400 hover:text-slate-200 transition-colors"
+                                            className="text-[12px] font-[500] text-gray-400 hover:text-gray-700 transition-colors px-2 py-1.5"
                                         >
                                             Clear
                                         </button>
                                         <button
                                             onClick={() => isSystemAdmin ? setShowBypassModal(true) : handleCreateBatch(false)}
                                             disabled={isProcessing}
-                                            className="px-6 py-2.5 min-w-[180px] bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-900 rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-white/10"
+                                            className="flex items-center gap-2 px-5 py-2 bg-[#6366F1] hover:bg-indigo-700 text-white rounded-[7px] text-[12.5px] font-[600] transition-colors disabled:opacity-50"
                                         >
-                                            {isProcessing ? <PiClock className="animate-spin text-lg" /> : null}
-                                            PROCESS SELECTION
+                                            {isProcessing && <PiClock className="animate-spin text-sm" />}
+                                            Process Selection
                                         </button>
                                     </div>
                                 </div>
@@ -491,14 +521,14 @@ export function PaymentQueue({
 
                             <div className="space-y-6">
                                 {expenses.length === 0 && invoices.length === 0 && requisitions.length === 0 && budgets.length === 0 ? (
-                                    <div className="p-12 text-center bg-white border border-slate-300 rounded-none">
-                                        <p className="font-mono text-[11px] font-bold text-slate-900 tracking-widest uppercase">No Payables Pending</p>
+ <div className="p-12 text-center border border-slate-300 rounded-none">
+                                        <p className="font-mono text-[11px] font-semibold text-slate-900 tracking-widest uppercase">No Payables Pending</p>
                                     </div>
                                 ) : (
                                     <>
                                         {/* Select All Action */}
                                         <div className="flex items-center justify-between px-2">
-                                            <h3 className="text-sm font-semibold text-slate-800 tracking-wide border-l-4 border-indigo-500 pl-3">Available Payables</h3>
+                                            <h3 className="text-sm font-semibold text-slate-800 tracking-wide">Available Payables</h3>
                                             <button
                                                 onClick={() => {
                                                     const totalItems = expenses.length + invoices.length + requisitions.length + budgets.length;
@@ -525,12 +555,10 @@ export function PaymentQueue({
                                                     const isAllSelected = totalItems > 0 && totalItems === totalSelected;
                                                     return (
                                                         <>
-                                                            <div className={cn(
-                                                                "w-4 h-4 flex items-center justify-center border rounded transition-all shadow-sm shrink-0",
-                                                                isAllSelected ? "bg-indigo-600 border-indigo-600" : "border-slate-300 bg-white"
-                                                            )}>
-                                                                {isAllSelected && <div className="w-2 h-2 rounded-sm bg-white" />}
-                                                            </div>
+                                                            {isAllSelected
+                                                                ? <CheckSquare size={15} strokeWidth={2} className="text-[#6366F1] flex-shrink-0" />
+                                                                : <Square size={15} strokeWidth={1.5} className="text-gray-400 flex-shrink-0" />
+                                                            }
                                                             {isAllSelected ? 'Deselect All' : 'Select All Items'}
                                                         </>
                                                     );
@@ -540,11 +568,11 @@ export function PaymentQueue({
 
                                         {/* Requisitions Section */}
                                         {requisitions.length > 0 && (
-                                            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+ <div className="bg-white rounded-[8px] overflow-hidden mb-6" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                                                     <div className="flex items-center gap-3">
                                                         <h3 className="text-[13px] font-semibold text-slate-800 tracking-wide">Purchase Requisitions</h3>
-                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-bold border border-indigo-100">{requisitions.length} Items</span>
+                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-semibold border border-indigo-100">{requisitions.length} Items</span>
                                                     </div>
                                                     <button
                                                         onClick={() => {
@@ -559,7 +587,7 @@ export function PaymentQueue({
                                                 </div>
                                                 <div className="overflow-x-auto">
                                                     <table className="w-full text-left text-[12px] whitespace-nowrap">
-                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                                             <tr>
                                                                 <th className="px-4 py-3 w-10 text-center">Sel</th>
                                                                 <th className="px-4 py-3">Ref ID</th>
@@ -573,30 +601,26 @@ export function PaymentQueue({
                                                                 <tr
                                                                     key={req.id}
                                                                     className={cn(
-                                                                        "cursor-pointer hover:bg-slate-50 transition-colors",
+                                                                        "group cursor-pointer hover:bg-slate-50 transition-colors",
                                                                         selectedRequisitions.has(req.id) ? "bg-indigo-50/30" : ""
                                                                     )}
                                                                     onClick={() => toggleRequisition(req.id)}
                                                                 >
                                                                     <td className="px-4 py-3 flex items-center justify-center">
-                                                                        <div className={cn(
-                                                                            "w-4 h-4 mx-auto flex items-center justify-center border rounded transition-all shadow-sm shrink-0",
-                                                                            selectedRequisitions.has(req.id)
-                                                                                ? "bg-indigo-600 border-indigo-600"
-                                                                                : "border-slate-300 bg-white"
-                                                                        )}>
-                                                                            {selectedRequisitions.has(req.id) && <div className="w-2 h-2 rounded-sm bg-white" />}
-                                                                        </div>
+                                                                        {selectedRequisitions.has(req.id)
+                                                                            ? <CheckSquare size={15} strokeWidth={2} className="text-[#6366F1] flex-shrink-0" />
+                                                                            : <Square size={15} strokeWidth={1.5} className="text-gray-300 flex-shrink-0 group-hover:text-gray-500" />
+                                                                        }
                                                                     </td>
                                                                     <td className="px-4 py-3 font-mono text-[11px] text-slate-500">REQ-{req.id.substring(0, 8).toUpperCase()}</td>
                                                                     <td className="px-4 py-3 font-medium text-slate-800">{req.title}</td>
                                                                     <td className="px-4 py-3">
                                                                         <div className="flex items-center gap-2">
-                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-500">USR</span>
+                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-semibold text-slate-500">USR</span>
                                                                             <p className="font-medium text-slate-700">{req.user.name}</p>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">${req.amount.toFixed(2)}</td>
+                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(req.amount, req.currency)}</td>
                                                                 </tr>
                                                             ))}
                                                         </tbody>
@@ -607,11 +631,11 @@ export function PaymentQueue({
 
                                         {/* Budgets Section */}
                                         {budgets.length > 0 && (
-                                            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+ <div className="bg-white rounded-[8px] overflow-hidden mb-6" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                                                     <div className="flex items-center gap-3">
                                                         <h3 className="text-[13px] font-semibold text-slate-800 tracking-wide">Monthly Budgets</h3>
-                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-bold border border-indigo-100">{budgets.length} Items</span>
+                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-semibold border border-indigo-100">{budgets.length} Items</span>
                                                     </div>
                                                     <button
                                                         onClick={() => {
@@ -626,7 +650,7 @@ export function PaymentQueue({
                                                 </div>
                                                 <div className="overflow-x-auto">
                                                     <table className="w-full text-left text-[12px] whitespace-nowrap">
-                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                                             <tr>
                                                                 <th className="px-4 py-3 w-10 text-center">Sel</th>
                                                                 <th className="px-4 py-3">Ref ID</th>
@@ -640,30 +664,26 @@ export function PaymentQueue({
                                                                 <tr
                                                                     key={bud.id}
                                                                     className={cn(
-                                                                        "cursor-pointer hover:bg-slate-50 transition-colors",
+                                                                        "group cursor-pointer hover:bg-slate-50 transition-colors",
                                                                         selectedBudgets.has(bud.id) ? "bg-indigo-50/30" : ""
                                                                     )}
                                                                     onClick={() => toggleBudget(bud.id)}
                                                                 >
                                                                     <td className="px-4 py-3 flex items-center justify-center">
-                                                                        <div className={cn(
-                                                                            "w-4 h-4 mx-auto flex items-center justify-center border rounded transition-all shadow-sm shrink-0",
-                                                                            selectedBudgets.has(bud.id)
-                                                                                ? "bg-indigo-600 border-indigo-600"
-                                                                                : "border-slate-300 bg-white"
-                                                                        )}>
-                                                                            {selectedBudgets.has(bud.id) && <div className="w-2 h-2 rounded-sm bg-white" />}
-                                                                        </div>
+                                                                        {selectedBudgets.has(bud.id)
+                                                                            ? <CheckSquare size={15} strokeWidth={2} className="text-[#6366F1] flex-shrink-0" />
+                                                                            : <Square size={15} strokeWidth={1.5} className="text-gray-300 flex-shrink-0 group-hover:text-gray-500" />
+                                                                        }
                                                                     </td>
                                                                     <td className="px-4 py-3 font-mono text-[11px] text-slate-500">BUD-{bud.id.substring(0, 8).toUpperCase()}</td>
                                                                     <td className="px-4 py-3 font-medium text-slate-800">{bud.month}/{bud.year}</td>
                                                                     <td className="px-4 py-3">
                                                                         <div className="flex items-center gap-2">
-                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-500">DPT</span>
+                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-semibold text-slate-500">DPT</span>
                                                                             <p className="font-medium text-slate-700 tracking-wide">{bud.department}</p>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">${bud.totalAmount.toFixed(2)}</td>
+                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(bud.totalAmount, bud.currency || 'KES')}</td>
                                                                 </tr>
                                                             ))}
                                                         </tbody>
@@ -674,11 +694,11 @@ export function PaymentQueue({
 
                                         {/* Invoices Section */}
                                         {invoices.length > 0 && (
-                                            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+ <div className="bg-white rounded-[8px] overflow-hidden mb-6" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                                                     <div className="flex items-center gap-3">
                                                         <h3 className="text-[13px] font-semibold text-slate-800 tracking-wide">Vendor Invoices</h3>
-                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-bold border border-indigo-100">{invoices.length} Items</span>
+                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-semibold border border-indigo-100">{invoices.length} Items</span>
                                                     </div>
                                                     <button
                                                         onClick={() => {
@@ -693,7 +713,7 @@ export function PaymentQueue({
                                                 </div>
                                                 <div className="overflow-x-auto">
                                                     <table className="w-full text-left text-[12px] whitespace-nowrap">
-                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                                             <tr>
                                                                 <th className="px-4 py-3 w-10 text-center">Sel</th>
                                                                 <th className="px-4 py-3">Ref ID</th>
@@ -707,30 +727,26 @@ export function PaymentQueue({
                                                                 <tr
                                                                     key={invoice.id}
                                                                     className={cn(
-                                                                        "cursor-pointer hover:bg-slate-50 transition-colors",
+                                                                        "group cursor-pointer hover:bg-slate-50 transition-colors",
                                                                         selectedInvoices.has(invoice.id) ? "bg-indigo-50/30" : ""
                                                                     )}
                                                                     onClick={() => toggleInvoice(invoice.id)}
                                                                 >
                                                                     <td className="px-4 py-3 flex items-center justify-center">
-                                                                        <div className={cn(
-                                                                            "w-4 h-4 mx-auto flex items-center justify-center border rounded transition-all shadow-sm shrink-0",
-                                                                            selectedInvoices.has(invoice.id)
-                                                                                ? "bg-indigo-600 border-indigo-600"
-                                                                                : "border-slate-300 bg-white"
-                                                                        )}>
-                                                                            {selectedInvoices.has(invoice.id) && <div className="w-2 h-2 rounded-sm bg-white" />}
-                                                                        </div>
+                                                                        {selectedInvoices.has(invoice.id)
+                                                                            ? <CheckSquare size={15} strokeWidth={2} className="text-[#6366F1] flex-shrink-0" />
+                                                                            : <Square size={15} strokeWidth={1.5} className="text-gray-300 flex-shrink-0 group-hover:text-gray-500" />
+                                                                        }
                                                                     </td>
                                                                     <td className="px-4 py-3 font-mono text-[11px] text-slate-500">INV-{invoice.id.substring(0, 8).toUpperCase()}</td>
                                                                     <td className="px-4 py-3 font-mono font-medium text-slate-700 tracking-wider">#{invoice.invoiceNumber}</td>
                                                                     <td className="px-4 py-3">
                                                                         <div className="flex items-center gap-2">
-                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-500">VND</span>
+                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-semibold text-slate-500">VND</span>
                                                                             <p className="font-medium text-slate-800">{invoice.vendor.name}</p>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">${invoice.amount.toFixed(2)}</td>
+                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(invoice.amount, invoice.currency)}</td>
                                                                 </tr>
                                                             ))}
                                                         </tbody>
@@ -741,11 +757,11 @@ export function PaymentQueue({
 
                                         {/* Expenses Section */}
                                         {expenses.length > 0 && (
-                                            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+ <div className="bg-white rounded-[8px] overflow-hidden mb-6" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                                                     <div className="flex items-center gap-3">
                                                         <h3 className="text-[13px] font-semibold text-slate-800 tracking-wide">Employee Reimbursements</h3>
-                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-bold border border-indigo-100">{expenses.length} Items</span>
+                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-semibold border border-indigo-100">{expenses.length} Items</span>
                                                     </div>
                                                     <button
                                                         onClick={() => {
@@ -760,7 +776,7 @@ export function PaymentQueue({
                                                 </div>
                                                 <div className="overflow-x-auto">
                                                     <table className="w-full text-left text-[12px] whitespace-nowrap">
-                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                                             <tr>
                                                                 <th className="px-4 py-3 w-10 text-center">Sel</th>
                                                                 <th className="px-4 py-3">Ref ID</th>
@@ -774,30 +790,26 @@ export function PaymentQueue({
                                                                 <tr
                                                                     key={expense.id}
                                                                     className={cn(
-                                                                        "cursor-pointer hover:bg-slate-50 transition-colors",
+                                                                        "group cursor-pointer hover:bg-slate-50 transition-colors",
                                                                         selectedExpenses.has(expense.id) ? "bg-indigo-50/30" : ""
                                                                     )}
                                                                     onClick={() => toggleExpense(expense.id)}
                                                                 >
                                                                     <td className="px-4 py-3 flex items-center justify-center">
-                                                                        <div className={cn(
-                                                                            "w-4 h-4 mx-auto flex items-center justify-center border rounded transition-all shadow-sm shrink-0",
-                                                                            selectedExpenses.has(expense.id)
-                                                                                ? "bg-indigo-600 border-indigo-600"
-                                                                                : "border-slate-300 bg-white"
-                                                                        )}>
-                                                                            {selectedExpenses.has(expense.id) && <div className="w-2 h-2 rounded-sm bg-white" />}
-                                                                        </div>
+                                                                        {selectedExpenses.has(expense.id)
+                                                                            ? <CheckSquare size={15} strokeWidth={2} className="text-[#6366F1] flex-shrink-0" />
+                                                                            : <Square size={15} strokeWidth={1.5} className="text-gray-300 flex-shrink-0 group-hover:text-gray-500" />
+                                                                        }
                                                                     </td>
                                                                     <td className="px-4 py-3 font-mono text-[11px] text-slate-500">EXP-{expense.id.substring(0, 8).toUpperCase()}</td>
                                                                     <td className="px-4 py-3 font-medium text-slate-800">{expense.title}</td>
                                                                     <td className="px-4 py-3">
                                                                         <div className="flex items-center gap-2">
-                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-500">EMP</span>
+                                                                            <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[8px] font-semibold text-slate-500">EMP</span>
                                                                             <p className="font-medium text-slate-700">{expense.user.name}</p>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">${expense.amount.toFixed(2)}</td>
+                                                                    <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(expense.amount, expense.currency)}</td>
                                                                 </tr>
                                                             ))}
                                                         </tbody>
@@ -808,7 +820,7 @@ export function PaymentQueue({
 
                                         {/* Batch composition preview */}
                                         {(selectedExpenses.size > 0 || selectedInvoices.size > 0 || selectedRequisitions.size > 0 || selectedBudgets.size > 0) && (
-                                            <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm">
+ <div className="bg-white rounded-[8px] p-5" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                                 <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
                                                     <div className="w-1.5 h-4 bg-indigo-500 rounded-full"></div>
                                                     <p className="text-[12px] font-semibold text-slate-700 tracking-wide">Batch Composition Preview</p>
@@ -816,22 +828,22 @@ export function PaymentQueue({
                                                 <div className="flex flex-wrap gap-2">
                                                     {selectedRequisitions.size > 0 && (
                                                         <span className="px-3 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg text-[11px] font-semibold">
-                                                            REQ · {selectedRequisitions.size} items · ${requisitions.filter(r => selectedRequisitions.has(r.id)).reduce((s,r) => s+r.amount, 0).toFixed(2)}
+                                                            REQ · {selectedRequisitions.size} items · KSh {requisitions.filter(r => selectedRequisitions.has(r.id)).reduce((s,r) => s+r.amount, 0).toFixed(2)}
                                                         </span>
                                                     )}
                                                     {selectedBudgets.size > 0 && (
                                                         <span className="px-3 py-1.5 bg-violet-50 border border-violet-100 text-violet-700 rounded-lg text-[11px] font-semibold">
-                                                            BUD · {selectedBudgets.size} items · ${budgets.filter(b => selectedBudgets.has(b.id)).reduce((s,b) => s+b.totalAmount, 0).toFixed(2)}
+                                                            BUD · {selectedBudgets.size} items · KSh {budgets.filter(b => selectedBudgets.has(b.id)).reduce((s,b) => s+b.totalAmount, 0).toFixed(2)}
                                                         </span>
                                                     )}
                                                     {selectedInvoices.size > 0 && (
                                                         <span className="px-3 py-1.5 bg-sky-50 border border-sky-100 text-sky-700 rounded-lg text-[11px] font-semibold">
-                                                            INV · {selectedInvoices.size} items · ${invoices.filter(i => selectedInvoices.has(i.id)).reduce((s,i) => s+i.amount, 0).toFixed(2)}
+                                                            INV · {selectedInvoices.size} items · KSh {invoices.filter(i => selectedInvoices.has(i.id)).reduce((s,i) => s+i.amount, 0).toFixed(2)}
                                                         </span>
                                                     )}
                                                     {selectedExpenses.size > 0 && (
                                                         <span className="px-3 py-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-lg text-[11px] font-semibold">
-                                                            EXP · {selectedExpenses.size} items · ${expenses.filter(e => selectedExpenses.has(e.id)).reduce((s,e) => s+e.amount, 0).toFixed(2)}
+                                                            EXP · {selectedExpenses.size} items · KSh {expenses.filter(e => selectedExpenses.has(e.id)).reduce((s,e) => s+e.amount, 0).toFixed(2)}
                                                         </span>
                                                     )}
                                                 </div>
@@ -850,7 +862,7 @@ export function PaymentQueue({
                             {/* Tab Header */}
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h3 className="text-sm font-bold text-slate-900 tracking-wide">Pending Authorization</h3>
+                                    <h3 className="text-sm font-semibold text-slate-900 tracking-wide">Pending Authorization</h3>
                                     <p className="text-[11px] font-medium text-slate-500 mt-0.5">{pendingPayments.length} Batches awaiting review</p>
                                 </div>
                                 <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200 shadow-inner">
@@ -878,11 +890,11 @@ export function PaymentQueue({
                             </div>
 
                             {pendingPayments.length === 0 ? (
-                                <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl shadow-sm">
+ <div className="bg-white rounded-[8px] p-12 text-center" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                     <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-4">
                                         <PiCheckCircle className="text-2xl text-slate-300" />
                                     </div>
-                                    <h3 className="text-[13px] font-bold text-slate-900 tracking-wide">All Caught Up</h3>
+                                    <h3 className="text-[13px] font-semibold text-slate-900 tracking-wide">All Caught Up</h3>
                                     <p className="text-[12px] text-slate-500 font-medium mt-1">No payments pending authorization right now.</p>
                                 </div>
                             ) : viewMode === 'grid' ? (
@@ -893,12 +905,12 @@ export function PaymentQueue({
                                                 <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm">
                                                     <PiStackSimple className="text-xl text-slate-400" />
                                                 </div>
-                                                <span className="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-md text-[10px] font-bold uppercase tracking-wider border border-amber-100">
+                                                <span className="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-md text-[10px] font-semibold uppercase tracking-wider border border-amber-100">
                                                     Pending Auth
                                                 </span>
                                             </div>
 
-                                            <h4 className="text-xl font-mono font-bold text-slate-900 tracking-tight">${batch.amount.toFixed(2)}</h4>
+                                            <h4 className="text-xl font-mono font-semibold text-slate-900 tracking-tight">{formatAmount(batch.amount, batch.currency)}</h4>
                                             <p className="text-[11px] font-mono text-slate-400 uppercase tracking-widest mt-1 mb-4 flex items-center justify-between">
                                                 BTH-{batch.id.substring(0, 8).toUpperCase()}
                                                 <span className="font-sans normal-case tracking-normal">{formatDate(batch.createdAt)}</span>
@@ -906,7 +918,7 @@ export function PaymentQueue({
 
                                             <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 mb-6">
                                                 <div className="flex items-center gap-2 mb-3">
-                                                    <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-600 shadow-inner">MKR</span>
+                                                    <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-semibold text-slate-600 shadow-inner">MKR</span>
                                                     <p className="text-[12px] font-semibold text-slate-700 tracking-wide">{batch.maker.name}</p>
                                                 </div>
                                                 <div className="flex flex-wrap gap-1.5 mt-2 pt-3 border-t border-slate-200/60">
@@ -917,7 +929,7 @@ export function PaymentQueue({
                                                         batch._count?.monthlyBudgets && { t: 'BUD', c: batch._count.monthlyBudgets, color: 'text-violet-700 bg-violet-50 border-violet-100' }
                                                     ].filter(Boolean).map((item: any, i) => (
                                                         <span key={i} className={`px-2 py-0.5 rounded flex items-center gap-1 border ${item.color}`}>
-                                                            <span className="text-[10px] font-bold">{item.c}</span>
+                                                            <span className="text-[10px] font-semibold">{item.c}</span>
                                                             <span className="text-[9px] font-medium tracking-wide">{item.t}</span>
                                                         </span>
                                                     ))}
@@ -925,7 +937,7 @@ export function PaymentQueue({
                                             </div>
 
                                             <div className="mt-auto grid grid-cols-3 gap-2">
-                                                <Link href={`/receipt-studio?paymentId=${batch.id}`} className="py-2 bg-[#29258D] text-white rounded-md font-medium text-[11px] hover:bg-[#29258D]/90 transition-all flex justify-center items-center shadow-none" title="View Detail">
+                                                <Link href={`/receipt-studio?paymentId=${batch.id}`} className="py-2 bg-[#6366F1] text-white rounded-md font-medium text-[11px] hover:bg-[#6366F1]/90 transition-all flex justify-center items-center shadow-none" title="View Detail">
                                                     View
                                                 </Link>
                                                 <button onClick={() => handleAuthorization(batch.id, 'REJECT')} disabled={isProcessing} className="py-2 bg-orange-500 text-white rounded-md font-medium text-[11px] hover:bg-orange-600 transition-all flex justify-center items-center shadow-none disabled:opacity-50">
@@ -939,10 +951,10 @@ export function PaymentQueue({
                                     ))}
                                 </div>
                             ) : (
-                                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+ <div className="bg-white rounded-[8px] overflow-hidden" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left text-[12px] whitespace-nowrap min-w-[800px]">
-                                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                                 <tr>
                                                     <th className="px-4 py-3 w-28">Date</th>
                                                     <th className="px-4 py-3">Ref ID</th>
@@ -958,17 +970,17 @@ export function PaymentQueue({
                                                         <td className="px-4 py-3 font-mono text-[11px] text-slate-500">BTH-{batch.id.substring(0, 8).toUpperCase()}</td>
                                                         <td className="px-4 py-3">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-500">MKR</span>
+                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-semibold text-slate-500">MKR</span>
                                                                 <p className="font-medium text-slate-800 tracking-wide">{batch.maker.name}</p>
                                                             </div>
                                                             <p className="text-[10px] text-slate-400 tracking-wider mt-1 ml-8">
                                                                 {[batch._count?.invoices && `${batch._count.invoices} INV`, batch._count?.expenses && `${batch._count.expenses} EXP`, batch._count?.requisitions && `${batch._count.requisitions} REQ`, batch._count?.monthlyBudgets && `${batch._count.monthlyBudgets} BUD`].filter(Boolean).join(' · ')}
                                                             </p>
                                                         </td>
-                                                        <td className="px-4 py-3 text-right font-mono font-bold text-slate-900">${batch.amount.toFixed(2)}</td>
+                                                        <td className="px-4 py-3 text-right font-mono font-semibold text-slate-900">{formatAmount(batch.amount, batch.currency)}</td>
                                                         <td className="sticky right-0 bg-white pl-4 pr-4 py-3 align-middle shadow-[-8px_0_8px_-6px_rgba(0,0,0,0.04)] z-10">
                                                             <div className="flex items-center justify-end gap-1.5 h-full">
-                                                                <Link href={`/receipt-studio?paymentId=${batch.id}`} className="px-3 py-2 bg-[#29258D] text-white rounded-md font-medium text-xs hover:bg-[#29258D]/90 transition-all flex flex-1 items-center justify-center shadow-none" title="View Detail">View</Link>
+                                                                <Link href={`/receipt-studio?paymentId=${batch.id}`} className="px-3 py-2 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all flex flex-1 items-center justify-center shadow-none" title="View Detail">View</Link>
                                                                 <button onClick={() => handleAuthorization(batch.id, 'REJECT')} disabled={isProcessing} className="px-3 py-2 bg-orange-500 text-white rounded-md font-medium text-xs hover:bg-orange-600 transition-all flex flex-1 items-center justify-center shadow-none disabled:opacity-50">Reject</button>
                                                                 <button onClick={() => handleAuthorization(batch.id, 'AUTHORIZE')} disabled={isProcessing} className="px-3 py-2 bg-emerald-600 text-white rounded-md font-medium text-xs hover:bg-emerald-700 transition-all flex flex-1 items-center justify-center shadow-none disabled:opacity-50">Authorize</button>
                                                             </div>
@@ -988,21 +1000,21 @@ export function PaymentQueue({
                         <div className="animate-fade-in space-y-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest">Ready for Disbursement</h3>
+                                    <h3 className="text-[11px] font-semibold text-slate-900 uppercase tracking-widest">Ready for Disbursement</h3>
                                     <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1">[{authorizedPayments.length}] BATCHES AUTHORIZED</p>
                                 </div>
                             </div>
 
                             {authorizedPayments.length === 0 ? (
-                                <div className="p-8 text-center bg-white border border-slate-300">
-                                    <p className="font-mono text-xs font-bold text-slate-900 tracking-widest uppercase">No Payments Ready for Payout</p>
+ <div className="p-8 text-center border border-slate-300">
+                                    <p className="font-mono text-xs font-semibold text-slate-900 tracking-widest uppercase">No Payments Ready for Payout</p>
                                 </div>
                             ) : (
                                 /* BANKY TABLE */
-                                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+ <div className="bg-white rounded-[8px] overflow-hidden" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left text-[12px] whitespace-nowrap">
-                                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                                 <tr>
                                                     <th className="px-4 py-3">Date</th>
                                                     <th className="px-4 py-3">Ref ID</th>
@@ -1018,18 +1030,35 @@ export function PaymentQueue({
                                                         <td className="px-4 py-3 font-mono text-[11px] text-slate-500">BTH-{batch.id.substring(0, 8).toUpperCase()}</td>
                                                         <td className="px-4 py-3">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-500">MKR</span>
+                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-semibold text-slate-500">MKR</span>
                                                                 <p className="font-medium text-slate-800 tracking-wide">{batch.maker.name}</p>
                                                             </div>
                                                             <p className="text-[10px] text-slate-400 tracking-wider mt-1 ml-8">
                                                                 {[batch._count?.invoices && `${batch._count.invoices} INV`, batch._count?.expenses && `${batch._count.expenses} EXP`, batch._count?.requisitions && `${batch._count.requisitions} REQ`, batch._count?.monthlyBudgets && `${batch._count.monthlyBudgets} BUD`].filter(Boolean).join(' · ')}
                                                             </p>
                                                         </td>
-                                                        <td className="px-4 py-3 text-right font-semibold text-slate-900">${batch.amount.toFixed(2)}</td>
+                                                        <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(batch.amount, batch.currency)}</td>
                                                         <td className="px-4 py-3 text-right">
                                                             <div className="flex items-center justify-end gap-1.5 h-full">
-                                                                <Link href={`/receipt-studio?paymentId=${batch.id}`} className="px-3 py-2 bg-[#29258D] text-white rounded-md font-medium text-xs hover:bg-[#29258D]/90 transition-all flex flex-1 items-center justify-center shadow-none" title="Source Voucher">View</Link>
-                                                                <button onClick={() => handleAuthorization(batch.id, 'DISBURSE')} disabled={isProcessing} className="px-3 py-2 bg-emerald-600 text-white rounded-md font-medium text-xs hover:bg-emerald-700 transition-all flex flex-1 items-center justify-center shadow-none disabled:opacity-50">Transfer</button>
+                                                                {batch.status === 'FAILED' && (
+                                                                    <button 
+                                                                        onClick={() => {
+                                                                            const lines = batch.notes?.split('\n') || [];
+                                                                            const lastErrorLine = lines.find(l => l.startsWith('Errors: '));
+                                                                            const errorMsg = lastErrorLine?.replace('Errors: ', '') || "Unknown disbursement error";
+                                                                            setFailureDetails({ 
+                                                                                details: [{ title: 'Batch Details', error: errorMsg }], 
+                                                                                summary: { success: 0, failed: 1 } 
+                                                                            });
+                                                                            setIsFailureModalOpen(true);
+                                                                        }}
+                                                                        className="px-3 py-2 bg-rose-100 text-rose-700 rounded-md font-medium text-xs hover:bg-rose-200 transition-all flex items-center justify-center border border-rose-200"
+                                                                    >
+                                                                        Error Info
+                                                                    </button>
+                                                                )}
+                                                                <Link href={`/receipt-studio?paymentId=${batch.id}`} className="px-3 py-2 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all flex flex-1 items-center justify-center shadow-none" title="Source Voucher">View</Link>
+                                                                <button onClick={() => handleAuthorization(batch.id, 'DISBURSE')} disabled={isProcessing} className="px-3 py-2 bg-emerald-600 text-white rounded-md font-medium text-xs hover:bg-emerald-700 transition-all flex flex-1 items-center justify-center shadow-none disabled:opacity-50">Pay</button>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -1047,23 +1076,23 @@ export function PaymentQueue({
                         <div className="animate-fade-in space-y-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest">Pending Reconciliation</h3>
+                                    <h3 className="text-[11px] font-semibold text-slate-900 uppercase tracking-widest">Pending Reconciliation</h3>
                                     <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1">[{paidPayments.length}] BATCHES AWAITING CLOSURE</p>
                                 </div>
                             </div>
 
                             {paidPayments.length === 0 ? (
-                                <div className="p-8 text-center bg-white border border-slate-300">
-                                    <p className="font-mono text-xs font-bold text-slate-900 tracking-widest uppercase">No Payments Pending Closure</p>
+ <div className="p-8 text-center border border-slate-300">
+                                    <p className="font-mono text-xs font-semibold text-slate-900 tracking-widest uppercase">No Payments Pending Closure</p>
                                 </div>
                             ) : (
                                 /* BANKY TABLE */
-                                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+ <div className="bg-white rounded-[8px] overflow-hidden" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                      <div className="overflow-x-auto">
                                         <table className="w-full text-left text-[12px] whitespace-nowrap">
-                                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                                 <tr>
-                                                    <th className="px-4 py-3">Transfer Date</th>
+                                                    <th className="px-4 py-3">Payment Date</th>
                                                     <th className="px-4 py-3">Ref ID</th>
                                                     <th className="px-4 py-3">Beneficiary</th>
                                                     <th className="px-4 py-3 text-right">Amount</th>
@@ -1077,14 +1106,21 @@ export function PaymentQueue({
                                                         <td className="px-4 py-3 font-mono text-[11px] text-slate-500">BTH-{batch.id.substring(0, 8).toUpperCase()}</td>
                                                         <td className="px-4 py-3">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-500">MKR</span>
+                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-semibold text-slate-500">MKR</span>
                                                                 <p className="font-medium text-slate-800 tracking-wide">{batch.maker.name}</p>
                                                             </div>
-                                                            <p className="text-[10px] text-emerald-600 tracking-wider mt-1 ml-8 font-semibold">Bank Transfer Complete</p>
+                                                            {batch.status === 'PARTIALLY_PAID' ? (
+                                                                <p className="text-[10px] text-amber-600 tracking-wider mt-1 ml-8 font-semibold flex items-center gap-1">
+                                                                    <PiInfo className="text-[12px]" />
+                                                                    Partial Disbursement - Action Required
+                                                                </p>
+                                                            ) : (
+                                                                <p className="text-[10px] text-emerald-600 tracking-wider mt-1 ml-8 font-semibold">Processed Successfully</p>
+                                                            )}
                                                         </td>
-                                                        <td className="px-4 py-3 text-right font-semibold text-slate-900">${batch.amount.toFixed(2)}</td>
+                                                        <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(batch.amount, batch.currency)}</td>
                                                         <td className="px-4 py-3 text-right">
-                                                            <button onClick={() => handleAuthorization(batch.id, 'CLOSE')} disabled={isProcessing} className="px-3 py-2 bg-[#29258D] text-white rounded-md font-medium text-xs hover:bg-[#29258D]/90 transition-all flex items-center justify-center shadow-none disabled:opacity-50 w-full">
+                                                            <button onClick={() => handleAuthorization(batch.id, 'CLOSE')} disabled={isProcessing} className="px-3 py-2 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all flex items-center justify-center shadow-none disabled:opacity-50 w-full">
                                                                 Reconcile
                                                             </button>
                                                         </td>
@@ -1103,15 +1139,15 @@ export function PaymentQueue({
                         <div className="animate-fade-in space-y-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest">Transaction History</h3>
+                                    <h3 className="text-[11px] font-semibold text-slate-900 uppercase tracking-widest">Transaction History</h3>
                                     <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1">[{history.length}] TOTAL RECORDS ARCHIVED</p>
                                 </div>
                             </div>
 
-                            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+ <div className="bg-white rounded-[8px] overflow-hidden" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left text-[12px] whitespace-nowrap">
-                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
                                             <tr>
                                                 <th className="px-4 py-3">Initiator</th>
                                                 <th className="px-4 py-3">Authorizer</th>
@@ -1124,7 +1160,7 @@ export function PaymentQueue({
                                         <tbody className="divide-y divide-slate-200">
                                             {history.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={6} className="px-3 py-8 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                    <td colSpan={6} className="px-3 py-8 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
                                                         No transaction history found
                                                     </td>
                                                 </tr>
@@ -1133,7 +1169,7 @@ export function PaymentQueue({
                                                     <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
                                                         <td className="px-4 py-3">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-500">REQ</span>
+                                                                <span className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[9px] font-semibold text-slate-500">REQ</span>
                                                                 <p className="font-medium text-slate-800 tracking-wide">{item.maker?.name || 'UNKNOWN'}</p>
                                                             </div>
                                                         </td>
@@ -1151,7 +1187,7 @@ export function PaymentQueue({
                                                             </span>
                                                         </td>
                                                         <td className="px-4 py-3 text-right">
-                                                            <p className="font-semibold text-slate-900">${item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                                            <p className="font-semibold text-slate-900">{formatAmount(item.amount, item.currency)}</p>
                                                         </td>
                                                         <td className="px-4 py-3 text-right text-slate-500">
                                                             {formatDate(item.createdAt)}
@@ -1159,7 +1195,7 @@ export function PaymentQueue({
                                                         <td className="px-4 py-3 text-right">
                                                             <Link
                                                                 href={`/receipt-studio?paymentId=${item.id}`}
-                                                                className="py-2 bg-[#29258D] text-white rounded-md font-medium text-xs hover:bg-[#29258D]/90 transition-all shadow-none flex justify-center items-center"
+                                                                className="py-2 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all shadow-none flex justify-center items-center"
                                                             >
                                                                 View Log
                                                             </Link>
@@ -1178,14 +1214,14 @@ export function PaymentQueue({
                                                                 <button
                                                                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                                                     disabled={currentPage === 1}
-                                                                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 disabled:opacity-30 transition-colors shadow-sm bg-slate-50"
+                                                                    className="px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 disabled:opacity-30 transition-colors shadow-sm bg-slate-50"
                                                                 >
                                                                     PREV
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                                                     disabled={currentPage === totalPages}
-                                                                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 disabled:opacity-30 transition-colors shadow-sm bg-slate-50"
+                                                                    className="px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 disabled:opacity-30 transition-colors shadow-sm bg-slate-50"
                                                                 >
                                                                     NEXT
                                                                 </button>
@@ -1200,115 +1236,130 @@ export function PaymentQueue({
                             </div>
                         </div>
                     )}
-                </div>
             </div>
 
-            {/* Custom Confirmation Modal */}
+            {/* Confirmation Modal */}
             {mounted && confirmationModal && confirmationModal.isOpen && createPortal(
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !isProcessing && setConfirmationModal(null)}></div>
-                    <div className="relative bg-white border border-slate-200 shadow-[0_20px_50px_rgb(0,0,0,0.15)] p-6 w-full max-w-sm rounded-2xl animate-scale-in z-[10000]">
-                        <div className="mb-6 flex flex-col items-center text-center">
-                            <div className={cn(
-                                "w-14 h-14 rounded-2xl shadow-sm flex items-center justify-center mb-4 relative",
-                                confirmationModal.action === 'AUTHORIZE' ? "bg-indigo-50 border border-indigo-100" :
-                                confirmationModal.action === 'DISBURSE' ? "bg-emerald-50 border border-emerald-100" :
-                                confirmationModal.action === 'CLOSE' ? "bg-slate-50 border border-slate-200" :
-                                "bg-red-50 border border-red-100"
-                            )}>
-                                {confirmationModal.action === 'AUTHORIZE' ? <PiCheckCircle className="text-3xl text-indigo-600 relative z-10" /> :
-                                 confirmationModal.action === 'DISBURSE' ? <PiMoney className="text-3xl text-emerald-600 relative z-10" /> :
-                                 confirmationModal.action === 'CLOSE' ? <PiFileText className="text-3xl text-slate-600 relative z-10" /> :
-                                 <PiX className="text-3xl text-red-600 relative z-10" />}
+                    <div className="absolute inset-0 bg-black/30" onClick={() => !isProcessing && setConfirmationModal(null)} />
+                    <div className="relative bg-white rounded-[12px] w-full max-w-[420px] overflow-hidden z-[10000]"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <div className="flex items-center gap-3">
+                                <div className={cn(
+                                    "w-8 h-8 rounded-[7px] flex items-center justify-center flex-shrink-0",
+                                    confirmationModal.action === 'AUTHORIZE' ? "bg-indigo-50" :
+                                    confirmationModal.action === 'DISBURSE' ? "bg-emerald-50" :
+                                    confirmationModal.action === 'CLOSE' ? "bg-gray-50" : "bg-red-50"
+                                )}>
+                                    {confirmationModal.action === 'AUTHORIZE' && <PiCheckCircle className="text-[#6366F1] text-[15px]" />}
+                                    {confirmationModal.action === 'DISBURSE' && <PiHandCoins className="text-emerald-600 text-[15px]" />}
+                                    {confirmationModal.action === 'CLOSE' && <PiFileText className="text-gray-500 text-[15px]" />}
+                                    {confirmationModal.action === 'REJECT' && <PiX className="text-red-500 text-[15px]" />}
+                                </div>
+                                <div>
+                                    <h3 className="text-[14px] font-[600] text-gray-900">
+                                        {confirmationModal.action === 'AUTHORIZE' ? 'Approve Payment' :
+                                         confirmationModal.action === 'DISBURSE' ? 'Execute Payment' :
+                                         confirmationModal.action === 'CLOSE' ? 'Close & Reconcile' : 'Reject Payment'}
+                                    </h3>
+                                    <p className="text-[11.5px] text-gray-400">
+                                        {confirmationModal.action === 'CLOSE' ? 'Mark lifecycle as complete' : 'This action cannot be undone'}
+                                    </p>
+                                </div>
                             </div>
-                            <h2 className="text-xl font-bold text-slate-900 tracking-wide">
-                                {confirmationModal.action === 'AUTHORIZE' ? 'Approve Payment' :
-                                 confirmationModal.action === 'DISBURSE' ? 'Execute Transfer' :
-                                 confirmationModal.action === 'CLOSE' ? 'Close Lifecycle' : 'Reject Payment'}
-                            </h2>
-                            <p className="text-[13px] text-slate-500 tracking-wide mt-2 px-2 leading-relaxed">
-                                {confirmationModal.action === 'CLOSE' ?
-                                    "Closing this batch marks the lifecycle as complete. Make sure all proofs have been verified." :
-                                    `Are you sure you want to ${confirmationModal.action === 'DISBURSE' ? 'confirm payout for' : confirmationModal.action.toLowerCase()} this item?`
-                                }
-                                <br/>
-                                <span className="font-semibold text-slate-700 mt-1 block">This action cannot be undone.</span>
-                            </p>
+                            <button onClick={() => setConfirmationModal(null)} disabled={isProcessing}
+                                className="p-1.5 rounded-[5px] hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                                <PiX className="text-[15px]" />
+                            </button>
                         </div>
 
-                        {confirmationModal.action === 'DISBURSE' && (
-                            <div className="mb-6 space-y-4 text-left bg-slate-50 border border-slate-100 rounded-xl p-4">
-                                <div>
-                                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-widest mb-2">
-                                        Payment Method
-                                    </label>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => setPaymentMethod('VIRTUAL')}
-                                            className={cn(
-                                                "relative p-3 border rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5",
-                                                paymentMethod === 'VIRTUAL'
-                                                    ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-sm"
-                                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
-                                            )}
-                                        >
-                                            <PiGlobe className={cn("text-xl", paymentMethod === 'VIRTUAL' ? "text-emerald-600" : "text-slate-400")} />
-                                            <span className="text-[12px] font-bold">Virtual</span>
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => setPaymentMethod('WALLET')}
-                                            className={cn(
-                                                "relative p-3 border rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5",
-                                                paymentMethod === 'WALLET'
-                                                    ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-sm"
-                                                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
-                                            )}
-                                        >
-                                            <PiWallet className={cn("text-xl", paymentMethod === 'WALLET' ? "text-emerald-600" : "text-slate-400")} />
-                                            <span className="text-[12px] font-bold">Wallet</span>
-                                        </button>
+                        {/* Content */}
+                        <div className="px-6 py-5 space-y-4">
+                            {confirmationModal.action === 'DISBURSE' ? (
+                                <>
+                                    {/* Fee breakdown */}
+                                    <div>
+                                        <label className="block text-[11px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-2">Estimated Breakdown</label>
+                                        <div className="rounded-[8px] overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                            <div className="flex justify-between items-center px-4 py-2.5 text-[12px] text-gray-500" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                                <span>Subtotal</span>
+                                                <span className="font-mono font-[500] text-gray-900">{formatAmount(confirmationModal.amount || 0, confirmationModal.currency)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center px-4 py-2.5 text-[12px] text-gray-500" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                                <span>Fees ({confirmationModal.itemCount} items)</span>
+                                                <span className="font-mono text-emerald-600 font-[500]">+{formatAmount((confirmationModal.itemCount || 1) * estimatePaystackPayoutFee(confirmationModal.amount || 0, confirmationModal.currency), confirmationModal.currency)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center px-4 py-3 bg-gray-50/60">
+                                                <span className="text-[12px] font-[600] text-gray-700">Total</span>
+                                                <span className="font-mono text-[14px] font-[700] text-emerald-700">{formatAmount((confirmationModal.amount || 0) + ((confirmationModal.itemCount || 1) * estimatePaystackPayoutFee(confirmationModal.amount || 0, confirmationModal.currency)), confirmationModal.currency)}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="pt-2">
-                                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-widest mb-2">
-                                        Proof of Payment
-                                    </label>
-                                    <input
-                                        type="file"
-                                        title="Proof of Payment"
-                                        placeholder="Proof of Payment"
-                                        onChange={(e) => setSelectedFile(e.target.files ? e.target.files[0] : null)}
-                                        className="block w-full text-[12px] text-slate-500 file:cursor-pointer file:mr-3 file:py-2 file:px-4 file:rounded-lg file:text-[12px] file:font-semibold file:bg-white file:border file:border-slate-200 file:text-slate-700 hover:file:bg-slate-50 border border-slate-200 rounded-lg p-1 bg-white transition-colors"
-                                    />
-                                </div>
-                            </div>
-                        )}
+                                    {/* Payment method */}
+                                    <div>
+                                        <label className="block text-[11px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-2">Payment Route</label>
+                                        <div className="flex p-0.5 rounded-[7px] bg-gray-100" style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
+                                            <button onClick={() => setPaymentMethod('WALLET')}
+                                                className={cn("flex-1 py-2 text-[11.5px] font-[600] rounded-[6px] transition-all",
+                                                    paymentMethod === 'WALLET' ? "bg-white text-[#6366F1] shadow-sm" : "text-gray-500 hover:text-gray-700")}>
+                                                Direct (Paystack)
+                                            </button>
+                                            <button onClick={() => setPaymentMethod('BRANCH_WALLET')}
+                                                className={cn("flex-1 py-2 text-[11.5px] font-[600] rounded-[6px] transition-all",
+                                                    paymentMethod === 'BRANCH_WALLET' ? "bg-white text-emerald-600 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
+                                                Branch Internal
+                                            </button>
+                                        </div>
+                                        <p className="text-[11px] text-gray-400 mt-1.5">
+                                            {paymentMethod === 'WALLET' ? "Sends funds directly to the recipient's personal account." : "Funds the branch's local digital wallet."}
+                                        </p>
+                                    </div>
 
-                        <div className="grid grid-cols-2 gap-3 mt-2">
-                            <button
-                                onClick={() => setConfirmationModal(null)}
-                                disabled={isProcessing}
-                                className="py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
-                            >
+                                    {/* Proof of payment */}
+                                    <div>
+                                        <label className="block text-[11px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-2">Proof of Payment <span className="normal-case tracking-normal text-gray-300">(optional)</span></label>
+                                        <input type="file" title="Proof of Payment"
+                                            onChange={(e) => setSelectedFile(e.target.files ? e.target.files[0] : null)}
+                                            className="block w-full text-[12px] text-gray-500 file:cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-[6px] file:text-[11.5px] file:font-[500] file:bg-gray-50 file:border file:text-gray-700 hover:file:bg-gray-100 rounded-[7px] p-1 bg-white transition-colors"
+                                            style={{ border: '1px solid rgba(0,0,0,0.09)' }} />
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="text-[13px] text-gray-500 leading-relaxed">
+                                    {confirmationModal.action === 'CLOSE'
+                                        ? "This will mark the payment batch as fully reconciled. Ensure all proofs of payment have been verified."
+                                        : confirmationModal.action === 'REJECT'
+                                        ? "The batch will be returned to the originator. They will need to resubmit for processing."
+                                        : "The payment batch will be cleared for disbursement. The originator will be notified."
+                                    }
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-end gap-3 px-6 py-4" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                            <button onClick={() => setConfirmationModal(null)} disabled={isProcessing}
+                                className="px-4 py-2 text-[13px] font-[500] text-gray-500 rounded-[6px] hover:bg-gray-50 hover:text-gray-800 transition-colors"
+                                style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
                                 Cancel
                             </button>
-                            <button
-                                onClick={proceedAuthorization}
-                                disabled={isProcessing}
+                            <button onClick={proceedAuthorization} disabled={isProcessing}
                                 className={cn(
-                                    "py-2.5 rounded-xl text-[13px] font-bold text-white transition-all shadow-sm flex items-center justify-center gap-2",
-                                    confirmationModal.action === 'REJECT' ? "bg-red-600 hover:bg-red-700" : 
+                                    "px-5 py-2 text-[13px] font-[600] text-white rounded-[6px] transition-colors flex items-center gap-2 disabled:opacity-50",
+                                    confirmationModal.action === 'REJECT' ? "bg-red-600 hover:bg-red-700" :
                                     confirmationModal.action === 'DISBURSE' ? "bg-emerald-600 hover:bg-emerald-700" :
-                                    confirmationModal.action === 'AUTHORIZE' ? "bg-indigo-600 hover:bg-indigo-700" :
-                                    "bg-slate-900 hover:bg-slate-800"
-                                )}
-                            >
-                                {isProcessing ? <PiClock className="animate-spin text-lg" /> : null}
-                                {isProcessing ? 'Processing' : 'Confirm Action'}
+                                    confirmationModal.action === 'AUTHORIZE' ? "bg-[#6366F1] hover:bg-indigo-700" :
+                                    "bg-gray-900 hover:bg-gray-800"
+                                )}>
+                                {isProcessing && <PiClock className="animate-spin text-sm" />}
+                                {isProcessing ? 'Processing…' :
+                                    confirmationModal.action === 'AUTHORIZE' ? 'Approve' :
+                                    confirmationModal.action === 'DISBURSE' ? 'Pay Now' :
+                                    confirmationModal.action === 'CLOSE' ? 'Reconcile' : 'Reject'}
                             </button>
                         </div>
                     </div>
@@ -1318,62 +1369,148 @@ export function PaymentQueue({
 
             {/* EXPEDITED BYPASS MODAL */}
             {mounted && showBypassModal && createPortal(
-                <div className="fixed inset-0 z-[100] flex items-center justify-center">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !isProcessing && setShowBypassModal(false)}></div>
-                    <div className="relative bg-white border border-slate-200 shadow-[0_20px_50px_rgb(0,0,0,0.15)] p-6 w-[400px] rounded-2xl animate-fade-in-up">
-                        <div className="absolute top-0 right-0 p-3">
-                            <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-300">SEC.CLR_9X</span>
-                        </div>
-                        <div className="mb-6 flex flex-col items-center">
-                            <div className="w-14 h-14 bg-indigo-50 border border-indigo-100 rounded-2xl shadow-sm flex items-center justify-center mb-5 relative">
-                                <span className="absolute inset-0 rounded-2xl bg-indigo-400 opacity-20 blur-md"></span>
-                                <PiListBullets className="text-3xl text-indigo-600 relative z-10" />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/30" onClick={() => !isProcessing && setShowBypassModal(false)} />
+                    <div className="relative bg-white rounded-[12px] w-[400px] overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-[7px] bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                                    <PiHandCoins className="text-[#6366F1] text-[15px]" />
+                                </div>
+                                <div>
+                                    <h3 className="text-[14px] font-[600] text-gray-900">Process Batch</h3>
+                                    <p className="text-[11.5px] text-gray-400">Choose how to route this payment</p>
+                                </div>
                             </div>
-                            <h2 className="text-xl font-bold text-slate-900 tracking-wide text-center">Batch Execution Protocol</h2>
-                            <p className="text-[12px] text-slate-500 text-center tracking-wide mt-2 px-4 leading-relaxed">
-                                Select authorization paradigm. Direct remittance circumvents pending authorization workflows.
-                            </p>
+                            <button
+                                onClick={() => setShowBypassModal(false)}
+                                disabled={isProcessing}
+                                className="p-1.5 rounded-[5px] hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                            >
+                                <PiX className="text-[15px]" />
+                            </button>
                         </div>
-                        
-                        <div className="flex flex-col gap-3">
+
+                        {/* Options */}
+                        <div className="px-6 py-5 space-y-3">
                             <button
                                 onClick={() => handleCreateBatch(false)}
                                 disabled={isProcessing}
-                                className="w-full relative group border border-slate-200 rounded-xl bg-white hover:bg-slate-50 px-4 py-4 min-h-[72px] transition-all duration-200 text-left disabled:opacity-50 overflow-hidden shadow-sm hover:shadow"
+                                className="w-full group text-left px-4 py-4 rounded-[8px] bg-white hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                style={{ border: '1px solid rgba(0,0,0,0.09)' }}
                             >
-                                <span className="absolute top-0 left-0 w-1.5 h-full bg-slate-300 group-hover:bg-indigo-400 transition-colors"></span>
-                                <div className="ml-3 flex items-center justify-between">
+                                <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="text-[12px] font-semibold text-slate-900 tracking-wide mb-1 transition-colors group-hover:text-indigo-900">STANDARD WORKFLOW</div>
-                                        <div className="text-[11px] text-slate-500">Review Required</div>
+                                        <p className="text-[13px] font-[600] text-gray-900">Standard Workflow</p>
+                                        <p className="text-[11.5px] text-gray-400 mt-0.5">Routes to authorization queue for review before payment.</p>
                                     </div>
-                                    {isProcessing ? <PiClock className="animate-spin text-slate-400 text-xl" /> : <div className="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center group-hover:border-indigo-400 transition-colors"><div className="w-2.5 h-2.5 rounded-full bg-transparent group-hover:bg-indigo-400 transition-colors"></div></div>}
+                                    {isProcessing
+                                        ? <PiClock className="animate-spin text-gray-300 text-lg flex-shrink-0" />
+                                        : <div className="w-[18px] h-[18px] rounded-full flex-shrink-0 ml-4" style={{ border: '1.5px solid rgba(0,0,0,0.2)' }} />
+                                    }
                                 </div>
                             </button>
-                            
+
                             <button
                                 onClick={() => handleCreateBatch(true)}
                                 disabled={isProcessing}
-                                className="w-full relative group border border-emerald-200 rounded-xl bg-emerald-50/50 hover:bg-emerald-50 px-4 py-4 min-h-[72px] transition-all duration-200 text-left disabled:opacity-50 overflow-hidden shadow-sm hover:shadow"
+                                className="w-full group text-left px-4 py-4 rounded-[8px] bg-emerald-50 hover:bg-emerald-100/60 transition-colors disabled:opacity-50"
+                                style={{ border: '1px solid rgba(16,185,129,0.25)' }}
                             >
-                                <span className="absolute top-0 left-0 w-1.5 h-full bg-emerald-400 group-hover:bg-emerald-500 transition-colors"></span>
-                                <div className="ml-3 flex items-center justify-between">
+                                <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="text-[12px] font-semibold text-emerald-900 tracking-wide mb-1">EXPEDITED BYPASS</div>
-                                        <div className="text-[11px] text-emerald-600/80">Direct Remittance</div>
+                                        <p className="text-[13px] font-[600] text-emerald-900">Expedited Bypass</p>
+                                        <p className="text-[11.5px] text-emerald-700/70 mt-0.5">Skips authorization. Routes directly to remittance.</p>
                                     </div>
-                                    {isProcessing ? <PiClock className="animate-spin text-emerald-500 text-xl" /> : <div className="w-5 h-5 rounded-full border border-emerald-300 flex items-center justify-center group-hover:border-emerald-500 transition-colors"><div className="w-2.5 h-2.5 rounded-full bg-emerald-200 group-hover:bg-emerald-500 transition-colors"></div></div>}
+                                    {isProcessing
+                                        ? <PiClock className="animate-spin text-emerald-400 text-lg flex-shrink-0" />
+                                        : <div className="w-[18px] h-[18px] rounded-full flex-shrink-0 ml-4 bg-emerald-500 flex items-center justify-center">
+                                            <div className="w-[7px] h-[7px] rounded-full bg-white" />
+                                          </div>
+                                    }
                                 </div>
                             </button>
                         </div>
 
-                        <div className="mt-6 pt-4">
+                        {/* Footer */}
+                        <div className="px-6 py-4 flex justify-end" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
                             <button
                                 onClick={() => setShowBypassModal(false)}
                                 disabled={isProcessing}
-                                className="w-full py-2.5 rounded-xl text-[12px] font-semibold text-slate-500 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                                className="px-4 py-2 text-[13px] font-[500] text-gray-500 rounded-[6px] hover:bg-gray-50 hover:text-gray-800 transition-colors"
+                                style={{ border: '1px solid rgba(0,0,0,0.09)' }}
                             >
                                 Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+            {/* FAILURE DETAILS MODAL */}
+            {mounted && isFailureModalOpen && failureDetails && createPortal(
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/30" onClick={() => setIsFailureModalOpen(false)} />
+                    <div className="relative bg-white rounded-[12px] w-full max-w-[480px] overflow-hidden z-[10001]"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-[7px] bg-red-50 flex items-center justify-center flex-shrink-0">
+                                    <PiX className="text-red-500 text-[15px]" />
+                                </div>
+                                <div>
+                                    <h3 className="text-[14px] font-[600] text-gray-900">Disbursement Failed</h3>
+                                    <p className="text-[11.5px] text-gray-400">
+                                        {failureDetails.summary.failed} item{failureDetails.summary.failed !== 1 ? 's' : ''} could not be processed
+                                    </p>
+                                </div>
+                            </div>
+                            <button onClick={() => setIsFailureModalOpen(false)}
+                                className="p-1.5 rounded-[5px] hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                                <PiX className="text-[15px]" />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="px-6 py-4 max-h-[55vh] overflow-y-auto space-y-2">
+                            {failureDetails.details && failureDetails.details.length > 0 ? (
+                                failureDetails.details.map((detail, i) => (
+                                    <div key={i} className="rounded-[8px] overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                        <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50/60" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                            <span className="text-[12px] font-[600] text-gray-800">{detail.title}</span>
+                                            {detail.type && (
+                                                <span className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.06em] px-2 py-0.5 bg-white rounded-[4px]"
+                                                    style={{ border: '1px solid rgba(0,0,0,0.08)' }}>
+                                                    {detail.type}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="px-4 py-3">
+                                            <p className="text-[12px] text-red-600 leading-relaxed">{detail.error}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="py-10 text-center">
+                                    <p className="text-[13px] text-gray-400">No granular details available for this batch error.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between px-6 py-4" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                            <p className="text-[11.5px] text-gray-400 max-w-[260px]">
+                                Resolve recipient or balance issues before retrying disbursement.
+                            </p>
+                            <button onClick={() => setIsFailureModalOpen(false)}
+                                className="px-4 py-2 text-[13px] font-[500] text-gray-500 rounded-[6px] hover:bg-gray-50 hover:text-gray-800 transition-colors"
+                                style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                Close
                             </button>
                         </div>
                     </div>

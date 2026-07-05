@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
                 const totalPaid = sale.payments.reduce((sum, p) => sum + p.amount, 0);
                 let newStatus = sale.status;
 
-                if (totalPaid >= sale.totalAmount) {
+                if (totalPaid >= Number(sale.totalAmount)) {
                     newStatus = "PAID";
                 } else if (totalPaid > 0) {
                     newStatus = "PARTIAL";
@@ -242,7 +242,7 @@ export async function PATCH(req: NextRequest) {
                 const totalPaid = sale.payments.reduce((sum, p) => sum + p.amount, 0);
                 let newStatus = "SENT";
 
-                if (totalPaid >= sale.totalAmount) {
+                if (totalPaid >= Number(sale.totalAmount)) {
                     newStatus = "PAID";
                 } else if (totalPaid > 0) {
                     newStatus = "PARTIAL";
@@ -467,7 +467,7 @@ export async function DELETE(req: NextRequest) {
                 const totalPaid = sale.payments.reduce((sum, p) => sum + p.amount, 0); // payments are already refreshed after delete
                 let newStatus = "PENDING";
 
-                if (totalPaid >= sale.totalAmount) {
+                if (totalPaid >= Number(sale.totalAmount)) {
                     newStatus = "PAID";
                 } else if (totalPaid > 0) {
                     newStatus = "PARTIAL";

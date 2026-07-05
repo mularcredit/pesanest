@@ -45,12 +45,22 @@ export async function POST(req: NextRequest) {
         // process payment via external gateways
         let gatewayResponse: any = null;
 
-        if (paymentMethod === 'STRIPE') {
-            const { stripeService } = await import('@/lib/payments/stripe');
-            gatewayResponse = await stripeService.processReimbursement(
-                expense.userId,
+        if (paymentMethod === 'PAYSTACK' || paymentMethod === 'STRIPE') {
+            const { paystackService } = await import('@/lib/payments/paystack');
+            
+            // For now, if there's no recipient code, it will fail gracefully.
+            // A recipient code is expected from the updated User schema on Paystack connect.
+            const recipientCode = expense.user.paystackRecipientCode;
+
+            if (!recipientCode) {
+                return NextResponse.json({ error: 'User has no connected Paystack Wallet/Account' }, { status: 400 });
+            }
+
+            gatewayResponse = await paystackService.processPayout(
                 expense.amount,
-                expense.currency.toLowerCase()
+                expense.currency.toUpperCase() || 'KES',
+                recipientCode,
+                `Reimbursement for: ${expense.title}`
             );
         } else if (paymentMethod === 'PESALINK') {
             const { pesalink } = await import('@/lib/payments/pesalink');

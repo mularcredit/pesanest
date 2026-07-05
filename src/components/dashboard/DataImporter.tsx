@@ -28,7 +28,7 @@ export function DataImporter() {
                 address: "123 Main St",
                 city: "Nairobi",
                 country: "Kenya",
-                currency: "USD"
+                currency: 'KES'
             }]
             filename = "customers_template.xlsx"
         } else {
@@ -106,19 +106,19 @@ export function DataImporter() {
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+ <div className="glass-card glass-frost overflow-hidden">
             {/* Header Tabs */}
             <div className="flex border-b border-gray-100">
                 <button
                     onClick={() => { setMode('CUSTOMERS'); setPreviewData([]); setFile(null); setImportResult(null); }}
-                    className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-colors ${mode === 'CUSTOMERS' ? 'text-indigo-600 bg-indigo-50/50 border-b-2 border-indigo-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                    className={`flex-1 py-4 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${mode === 'CUSTOMERS' ? 'text-indigo-600 bg-indigo-50/50 border-b-2 border-indigo-600' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
                     <PiUsers className="text-lg" />
                     Import Customers
                 </button>
                 <button
                     onClick={() => { setMode('SALES'); setPreviewData([]); setFile(null); setImportResult(null); }}
-                    className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-colors ${mode === 'SALES' ? 'text-cyan-600 bg-cyan-50/50 border-b-2 border-cyan-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                    className={`flex-1 py-4 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${mode === 'SALES' ? 'text-cyan-600 bg-cyan-50/50 border-b-2 border-cyan-600' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
                     <PiInvoice className="text-lg" />
                     Import Sales
@@ -128,7 +128,7 @@ export function DataImporter() {
             <div className="p-8">
                 {/* Mode Description */}
                 <div className="mb-8 text-center max-w-lg mx-auto">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         Bulk Import {mode === 'CUSTOMERS' ? 'Customers' : 'Sales Invoices'}
                     </h3>
                     <p className="text-sm text-gray-500 mb-6">
@@ -139,7 +139,7 @@ export function DataImporter() {
 
                     <button
                         onClick={downloadTemplate}
-                        className="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-full transition-colors"
+                        className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-full transition-colors"
                     >
                         <PiDownloadSimple />
                         Download {mode === 'CUSTOMERS' ? 'Customer' : 'Sales'} Template
@@ -153,7 +153,7 @@ export function DataImporter() {
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-indigo-100 transition-colors">
                             <PiUploadSimple className="text-2xl text-gray-400 group-hover:text-indigo-600" />
                         </div>
-                        <p className="text-sm font-bold text-gray-700">Click to upload or drag and drop</p>
+                        <p className="text-sm font-semibold text-gray-700">Click to upload or drag and drop</p>
                         <p className="text-xs text-gray-400 mt-1">Excel (.xlsx) or CSV files supported</p>
                     </label>
                 ) : (
@@ -165,13 +165,13 @@ export function DataImporter() {
                                     <PiCheckCircle className="text-xl" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-gray-900">{file?.name}</p>
+                                    <p className="text-sm font-semibold text-gray-900">{file?.name}</p>
                                     <p className="text-xs text-gray-500">{previewData.length} rows found</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => { setFile(null); setPreviewData([]); setImportResult(null); }}
-                                className="text-xs font-bold text-red-500 hover:text-red-700 px-3 py-1"
+                                className="text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1"
                             >
                                 Remove
                             </button>
@@ -179,19 +179,19 @@ export function DataImporter() {
 
                         {/* Preview Table (First 5 rows) */}
                         <div className="border border-gray-200 rounded-lg overflow-hidden">
-                            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                 Preview (First 5 Rows)
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-xs text-left">
-                                    <thead className="text-gray-500 font-medium border-b border-gray-100 bg-white">
+ <thead className="text-gray-500 font-medium border-b border-gray-100">
                                         <tr className="bg-gray-50/50">
                                             {Object.keys(previewData[0] || {}).slice(0, 5).map(key => (
                                                 <th key={key} className="px-4 py-3">{key}</th>
                                             ))}
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 bg-white">
+ <tbody className="divide-y divide-gray-100">
                                         {previewData.slice(0, 5).map((row, i) => (
                                             <tr key={i}>
                                                 {Object.values(row).slice(0, 5).map((val: any, j) => (
@@ -239,7 +239,7 @@ export function DataImporter() {
                         animate={{ opacity: 1, y: 0 }}
                         className={`mt-6 p-4 rounded-xl border ${importResult.success ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-red-50 border-red-100 text-red-800'}`}
                     >
-                        <h4 className="text-sm font-bold flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-semibold flex items-center gap-2 mb-1">
                             {importResult.success ? <PiCheckCircle className="text-lg" /> : <PiWarning className="text-lg" />}
                             {importResult.success ? "Import Successful" : "Import Failed"}
                         </h4>

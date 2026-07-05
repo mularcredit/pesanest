@@ -1,240 +1,331 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { PiDownloadSimple, PiPrinter, PiArrowsLeftRight } from 'react-icons/pi';
+import {
+    PiDownloadSimple, PiPrinter, PiArrowUp, PiArrowDown,
+    PiFactory, PiChartLine, PiBank, PiCurrencyDollar,
+} from 'react-icons/pi';
+
+const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
+
+function fmt(n: number) {
+    return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(n));
+}
+
+function SignedAmount({ value, size = 'md' }: { value: number; size?: 'sm' | 'md' | 'lg' }) {
+    const positive = value >= 0;
+    const sizeClass = size === 'lg' ? 'text-[18px]' : size === 'sm' ? 'text-[11.5px]' : 'text-[12.5px]';
+    const color = positive ? 'text-emerald-600' : 'text-rose-600';
+    return (
+        <span className={`${sizeClass} font-[600] font-mono tabular-nums ${color}`}>
+            {positive ? '' : '('}{fmt(value)}{!positive ? ')' : ''}
+        </span>
+    );
+}
 
 export default async function CashFlowPage() {
     const session = await auth();
-    if (!session?.user) return redirect("/login");
+    if (!session?.user) return redirect('/login');
 
     const accounts = await prisma.account.findMany({
         where: { isActive: true },
         include: {
             journalLines: {
-                where: {
-                    entry: { status: 'POSTED' }
-                },
-                include: { entry: true }
-            }
+                where: { entry: { status: 'POSTED' } },
+                include: { entry: true },
+            },
         },
-        orderBy: { code: 'asc' }
+        orderBy: { code: 'asc' },
     });
 
-    const accountBalances = accounts.map(account => {
-        const totalDebit = account.journalLines.reduce((sum, line) => sum + line.debit, 0);
-        const totalCredit = account.journalLines.reduce((sum, line) => sum + line.credit, 0);
-
-        // ASSET and EXPENSE accounts are Debit-normal (D-C)
-        // LIABILITY, EQUITY, and REVENUE accounts are Credit-normal (C-D)
-        const isDebitNormal = account.type === 'ASSET' || account.type === 'EXPENSE';
-        const balance = isDebitNormal ? totalDebit - totalCredit : totalCredit - totalDebit;
-
+    const accountBalances = accounts.map(acc => {
+        const dr = acc.journalLines.reduce((s, l) => s + l.debit, 0);
+        const cr = acc.journalLines.reduce((s, l) => s + l.credit, 0);
+        const isDebitNormal = acc.type === 'ASSET' || acc.type === 'EXPENSE';
         return {
-            id: account.id,
-            code: account.code,
-            name: account.name,
-            type: account.type,
-            subtype: account.subtype,
-            balance: balance
+            id: acc.id, code: acc.code, name: acc.name,
+            type: acc.type, subtype: acc.subtype,
+            balance: isDebitNormal ? dr - cr : cr - dr,
         };
     });
 
-    // Helper to identify Cash accounts
-    const isCashAccount = (acc: typeof accountBalances[0]) => {
-        if (acc.type !== 'ASSET') return false;
-        const name = acc.name.toLowerCase();
-        return name.includes('bank') || name.includes('cash') || name.includes('wallet') || name.includes('pesa') || name.includes('stripe');
+    const isCash = (a: typeof accountBalances[0]) => {
+        if (a.type !== 'ASSET') return false;
+        const n = a.name.toLowerCase();
+        return n.includes('bank') || n.includes('cash') || n.includes('wallet') || n.includes('pesa') || n.includes('stripe');
     };
 
-    const cashAccounts = accountBalances.filter(a => isCashAccount(a));
-    const totalCash = cashAccounts.reduce((sum, a) => sum + a.balance, 0);
+    const cashAccounts = accountBalances.filter(isCash);
+    const totalCash = cashAccounts.reduce((s, a) => s + a.balance, 0);
 
-    // 1. Operating Activities
-    const revenues = accountBalances.filter(acc => acc.type === 'REVENUE' || acc.type === 'CONTRA_REVENUE');
-    const expenses = accountBalances.filter(acc => acc.type === 'EXPENSE');
+    // ── Operating ──
+    const revenues   = accountBalances.filter(a => a.type === 'REVENUE');
+    const expenses   = accountBalances.filter(a => a.type === 'EXPENSE');
+    const totalRevenue  = revenues.reduce((s, a) => s + a.balance, 0);
+    const totalExpenses = expenses.reduce((s, a) => s + a.balance, 0);
+    const netIncome     = totalRevenue - totalExpenses;
 
-    // Net Income
-    const totalRevenue = revenues.filter(acc => acc.type === 'REVENUE').reduce((sum, acc) => sum + acc.balance, 0);
-    const totalReturns = revenues.filter(acc => acc.type === 'CONTRA_REVENUE').reduce((sum, acc) => sum + acc.balance, 0);
-    const totalExpenses = expenses.reduce((sum, acc) => sum + acc.balance, 0);
-    const netIncome = totalRevenue - totalReturns - totalExpenses;
+    const depreciation        = expenses.filter(a => a.name.toLowerCase().includes('depreciation'));
+    const depreciationAddBack = depreciation.reduce((s, a) => s + a.balance, 0);
 
-    // Adjustments
-    const depreciation = expenses.filter(a => a.name.toLowerCase().includes('depreciation'));
-    const depreciationAddBack = depreciation.reduce((sum, a) => sum + a.balance, 0);
+    const receivables       = accountBalances.filter(a => a.type === 'ASSET' && !isCash(a) &&
+        (a.subtype?.toUpperCase() === 'RECEIVABLE' || a.name.toLowerCase().includes('receivable')));
+    const changeReceivables = receivables.reduce((s, a) => s + a.balance, 0);
 
-    // Working Capital Changes
-    // Receivables (Asset) -> Increase is Cash Out (Subtract)
-    const receivables = accountBalances.filter(a => a.type === 'ASSET' && !isCashAccount(a) && (
-        (a.subtype && a.subtype.toUpperCase() === 'RECEIVABLE') ||
-        a.name.toLowerCase().includes('receivable')
-    ));
-    const changeReceivables = receivables.reduce((sum, a) => sum + a.balance, 0);
-
-    // Payables (Liability) -> Increase is Cash In (Add)
-    const payables = accountBalances.filter(a => a.type === 'LIABILITY' && (
-        (a.subtype && a.subtype.toUpperCase() === 'PAYABLE') ||
-        a.name.toLowerCase().includes('payable')
-    ));
-    const changePayables = payables.reduce((sum, a) => sum + a.balance, 0);
+    const payables       = accountBalances.filter(a => a.type === 'LIABILITY' &&
+        (a.subtype?.toUpperCase() === 'PAYABLE' || a.name.toLowerCase().includes('payable')));
+    const changePayables = payables.reduce((s, a) => s + a.balance, 0);
 
     const operatingCashFlow = netIncome + depreciationAddBack + changePayables - changeReceivables;
 
-    // 2. Investing Activities
-    // Fixed Assets (Asset) -> Purchase is Cash Out (Subtract)
-    const fixedAssets = accountBalances.filter(a => a.type === 'ASSET' && !isCashAccount(a) && !receivables.includes(a));
-    const investingCashFlow = -1 * fixedAssets.reduce((sum, a) => sum + a.balance, 0);
+    // ── Investing ──
+    const fixedAssets       = accountBalances.filter(a => a.type === 'ASSET' && !isCash(a) && !receivables.includes(a));
+    const investingCashFlow = -1 * fixedAssets.reduce((s, a) => s + a.balance, 0);
 
-    // 3. Financing Activities
-    // Loans & Equity
-    const loans = accountBalances.filter(a => a.type === 'LIABILITY' && !payables.includes(a));
-    const equity = accountBalances.filter(a => a.type === 'EQUITY');
-
-    const changeLoans = loans.reduce((sum, a) => sum + a.balance, 0);
-    const changeEquity = equity.reduce((sum, a) => sum + a.balance, 0);
-
+    // ── Financing ──
+    const loans             = accountBalances.filter(a => a.type === 'LIABILITY' && !payables.includes(a));
+    const equity            = accountBalances.filter(a => a.type === 'EQUITY');
+    const changeLoans       = loans.reduce((s, a) => s + a.balance, 0);
+    const changeEquity      = equity.reduce((s, a) => s + a.balance, 0);
     const financingCashFlow = changeLoans + changeEquity;
 
     const netCashFlow = operatingCashFlow + investingCashFlow + financingCashFlow;
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(amount);
-    };
+    const asOf = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const sections = [
+        {
+            key: 'operating',
+            label: 'Operating Activities',
+            description: 'Cash from core business operations',
+            icon: <PiFactory className="text-[15px]" />,
+            accent: '#6366F1',
+            bg: 'rgba(99,102,241,0.07)',
+            total: operatingCashFlow,
+            lines: [
+                { label: 'Net Income / (Loss)', value: netIncome, indent: false },
+                ...(depreciationAddBack !== 0 ? [{ label: 'Add back: Depreciation', value: depreciationAddBack, indent: true }] : []),
+                ...(changeReceivables !== 0 ? [{ label: 'Change in Accounts Receivable', value: -changeReceivables, indent: true }] : []),
+                ...(changePayables !== 0 ? [{ label: 'Change in Accounts Payable', value: changePayables, indent: true }] : []),
+            ],
+        },
+        {
+            key: 'investing',
+            label: 'Investing Activities',
+            description: 'Cash from asset purchases and disposals',
+            icon: <PiChartLine className="text-[15px]" />,
+            accent: '#0284c7',
+            bg: 'rgba(2,132,199,0.07)',
+            total: investingCashFlow,
+            lines: [
+                ...(fixedAssets.length > 0 ? [{ label: 'Net Purchases of Fixed Assets', value: investingCashFlow, indent: false }] : []),
+            ],
+        },
+        {
+            key: 'financing',
+            label: 'Financing Activities',
+            description: 'Cash from borrowings and equity',
+            icon: <PiBank className="text-[15px]" />,
+            accent: '#7c3aed',
+            bg: 'rgba(124,58,237,0.07)',
+            total: financingCashFlow,
+            lines: [
+                ...(changeLoans !== 0 ? [{ label: 'Change in Loans & Liabilities', value: changeLoans, indent: false }] : []),
+                ...(changeEquity !== 0 ? [{ label: 'Change in Equity & Capital', value: changeEquity, indent: false }] : []),
+            ],
+        },
+    ];
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-fade-in-up pb-12 font-sans text-gray-900">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="pb-20 space-y-5">
+
+            {/* ── Header ── */}
+            <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight flex items-center gap-3">
-                        <PiArrowsLeftRight className="text-indigo-600" />
-                        Cash Flow Statement
-                    </h1>
-                    <p className="text-gray-500 text-sm mt-1">
-                        Cash Flow for All Time
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="w-[30px] h-[30px] rounded-[7px] bg-[#6366F1] flex items-center justify-center">
+                            <PiCurrencyDollar className="text-white text-[15px]" />
+                        </div>
+                        <h1 className="text-[19px] font-[600] text-gray-900 tracking-tight">Cash Flow Statement</h1>
+                    </div>
+                    <p className="text-[12px] text-gray-400 pl-[38px]">For the period ended {asOf} · Indirect method</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" className="bg-white hover:bg-gray-50 text-gray-700 border-gray-200 flex items-center gap-2 h-9 text-sm px-4 shadow-none">
-                        <PiPrinter className="text-lg" />
-                        Print
-                    </Button>
-                    <Button variant="outline" className="bg-white hover:bg-gray-50 text-gray-700 border-gray-200 flex items-center gap-2 h-9 text-sm px-4 shadow-none">
-                        <PiDownloadSimple className="text-lg" />
-                        Export
-                    </Button>
+                <div className="flex items-center gap-2">
+                    <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-[12px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                        style={{ border: HAIRLINE }}>
+                        <PiPrinter className="text-[14px]" /> Print
+                    </button>
+                    <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-[12px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                        style={{ border: HAIRLINE }}>
+                        <PiDownloadSimple className="text-[14px]" /> Export
+                    </button>
                 </div>
             </div>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="p-4 border border-gray-100 shadow-sm bg-indigo-50/50">
-                    <p className="text-xs font-semibold text-gray-500 uppercase">Operating Activities</p>
-                    <p className={`text-xl font-bold font-mono mt-1 ${operatingCashFlow >= 0 ? 'text-indigo-700' : 'text-red-600'}`}>
-                        {formatCurrency(operatingCashFlow)}
-                    </p>
-                </Card>
-                <Card className="p-4 border border-gray-100 shadow-sm bg-blue-50/50">
-                    <p className="text-xs font-semibold text-gray-500 uppercase">Investing Activities</p>
-                    <p className={`text-xl font-bold font-mono mt-1 ${investingCashFlow >= 0 ? 'text-blue-700' : 'text-red-600'}`}>
-                        {formatCurrency(investingCashFlow)}
-                    </p>
-                </Card>
-                <Card className="p-4 border border-gray-100 shadow-sm bg-purple-50/50">
-                    <p className="text-xs font-semibold text-gray-500 uppercase">Financing Activities</p>
-                    <p className={`text-xl font-bold font-mono mt-1 ${financingCashFlow >= 0 ? 'text-purple-700' : 'text-red-600'}`}>
-                        {formatCurrency(financingCashFlow)}
-                    </p>
-                </Card>
-                <Card className="p-4 border border-indigo-200 shadow-sm bg-white ring-1 ring-indigo-100">
-                    <p className="text-xs font-semibold text-gray-500 uppercase">Net Cash Increase</p>
-                    <p className={`text-xl font-bold font-mono mt-1 ${netCashFlow >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {formatCurrency(netCashFlow)}
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-1">Calculated vs Actual: {formatCurrency(totalCash)}</p>
-                </Card>
+            {/* ── KPI strip ── */}
+            <div className="grid grid-cols-4 gap-3">
+                {sections.map(s => (
+                    <div key={s.key} className="bg-white rounded-[8px] px-4 py-4" style={{ border: HAIRLINE }}>
+                        <div className="flex items-center gap-1.5 mb-2">
+                            <span style={{ color: s.accent }}>{s.icon}</span>
+                            <p className="text-[10px] font-[600] uppercase tracking-[0.09em] text-gray-400">{s.label.split(' ')[0]}</p>
+                        </div>
+                        <p className={`text-[18px] font-[700] font-mono tabular-nums leading-none ${s.total >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {s.total >= 0 ? '' : '('}{fmt(s.total)}{s.total < 0 ? ')' : ''}
+                        </p>
+                        <div className="flex items-center gap-1 mt-1.5">
+                            {s.total >= 0
+                                ? <PiArrowUp className="text-[11px] text-emerald-400" />
+                                : <PiArrowDown className="text-[11px] text-rose-400" />
+                            }
+                            <p className="text-[10.5px] text-gray-400">KES</p>
+                        </div>
+                    </div>
+                ))}
+                {/* Intentionally removed: net cash replaces the 4th card */}
             </div>
 
-            {/* Detailed Statement */}
-            <Card className="shadow-none border border-gray-200 rounded-xl overflow-hidden bg-white">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50/50 border-b border-gray-100">
-                        <tr>
-                            <th className="px-6 py-3 font-medium text-gray-500 text-xs text-left">Description</th>
-                            <th className="px-6 py-3 font-medium text-gray-500 text-xs text-right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                        {/* Operating */}
-                        <tr className="bg-gray-50/30">
-                            <td colSpan={2} className="px-6 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Operating Activities</td>
-                        </tr>
-                        <tr>
-                            <td className="px-6 py-3 text-gray-900 font-medium pl-8">Net Income</td>
-                            <td className="px-6 py-3 text-right font-mono text-gray-900">{formatCurrency(netIncome)}</td>
-                        </tr>
-                        {depreciationAddBack !== 0 && (
-                            <tr>
-                                <td className="px-6 py-3 text-gray-600 pl-8">Adjustments: Depreciation</td>
-                                <td className="px-6 py-3 text-right font-mono text-gray-600">{formatCurrency(depreciationAddBack)}</td>
-                            </tr>
+            {/* Net change summary bar */}
+            <div className="bg-white rounded-[8px] px-5 py-4 flex items-center justify-between"
+                style={{ border: netCashFlow >= 0 ? '1px solid rgba(5,150,105,0.25)' : '1px solid rgba(225,29,72,0.25)' }}>
+                <div>
+                    <p className="text-[10px] font-[600] uppercase tracking-[0.09em] text-gray-400 mb-0.5">Net Change in Cash</p>
+                    <p className="text-[11.5px] text-gray-500">
+                        Operating {operatingCashFlow >= 0 ? '+' : ''}{fmt(operatingCashFlow)} &nbsp;·&nbsp;
+                        Investing {investingCashFlow >= 0 ? '+' : ''}{fmt(investingCashFlow)} &nbsp;·&nbsp;
+                        Financing {financingCashFlow >= 0 ? '+' : ''}{fmt(financingCashFlow)}
+                    </p>
+                </div>
+                <div className="text-right">
+                    <p className={`text-[24px] font-[800] font-mono tabular-nums leading-none ${netCashFlow >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {netCashFlow >= 0 ? '' : '('}{fmt(netCashFlow)}{netCashFlow < 0 ? ')' : ''}
+                    </p>
+                    <p className="text-[10.5px] text-gray-400 mt-0.5">KES · All-time</p>
+                </div>
+            </div>
+
+            {/* ── Statement sections ── */}
+            <div className="bg-white rounded-[8px] overflow-hidden" style={{ border: HAIRLINE }}>
+                {sections.map((section, si) => (
+                    <div key={section.key} style={si > 0 ? { borderTop: '1px solid rgba(0,0,0,0.06)' } : {}}>
+
+                        {/* Section header */}
+                        <div className="flex items-center justify-between px-5 py-3"
+                            style={{ background: section.bg }}>
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-[26px] h-[26px] rounded-[6px] flex items-center justify-center"
+                                    style={{ background: section.accent }}>
+                                    <span className="text-white">{section.icon}</span>
+                                </div>
+                                <div>
+                                    <p className="text-[12.5px] font-[600]" style={{ color: section.accent }}>{section.label}</p>
+                                    <p className="text-[10.5px] text-gray-400">{section.description}</p>
+                                </div>
+                            </div>
+                            <SignedAmount value={section.total} size="md" />
+                        </div>
+
+                        {/* Line items */}
+                        {section.lines.length === 0 ? (
+                            <div className="px-5 py-4" style={{ borderTop: '1px solid rgba(0,0,0,0.04)' }}>
+                                <p className="text-[12px] text-gray-400 italic">No activity recorded</p>
+                            </div>
+                        ) : (
+                            <table className="w-full">
+                                <tbody>
+                                    {section.lines.map((line, li) => (
+                                        <tr key={li}
+                                            className="hover:bg-gray-50/40 transition-colors"
+                                            style={{ borderTop: '1px solid rgba(0,0,0,0.04)' }}>
+                                            <td className="px-5 py-3">
+                                                <div className="flex items-center gap-2">
+                                                    {line.indent && (
+                                                        <span className="w-3 h-px shrink-0"
+                                                            style={{ background: 'rgba(0,0,0,0.15)', display: 'inline-block' }} />
+                                                    )}
+                                                    <span className={`text-[12.5px] ${line.indent ? 'text-gray-500' : 'text-gray-800 font-[500]'}`}>
+                                                        {line.label}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-5 py-3 text-right w-[160px]">
+                                                <SignedAmount value={line.value} size="sm" />
+                                            </td>
+                                        </tr>
+                                    ))}
+
+                                    {/* Section subtotal */}
+                                    <tr style={{ borderTop: HAIRLINE, background: 'rgba(0,0,0,0.012)' }}>
+                                        <td className="px-5 py-3">
+                                            <span className="text-[11px] font-[600] uppercase tracking-[0.07em]"
+                                                style={{ color: section.accent }}>
+                                                Net cash {section.total >= 0 ? 'provided by' : 'used in'} {section.label}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-3 text-right w-[160px]">
+                                            <span className={`text-[13px] font-[700] font-mono tabular-nums ${section.total >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                {section.total >= 0 ? '' : '('}{fmt(section.total)}{section.total < 0 ? ')' : ''}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         )}
-                        <tr>
-                            <td className="px-6 py-3 text-gray-600 pl-8">Change in Accounts Receivable</td>
-                            <td className="px-6 py-3 text-right font-mono text-gray-600">({formatCurrency(changeReceivables)})</td>
-                        </tr>
-                        <tr>
-                            <td className="px-6 py-3 text-gray-600 pl-8">Change in Accounts Payable</td>
-                            <td className="px-6 py-3 text-right font-mono text-gray-600">{formatCurrency(changePayables)}</td>
-                        </tr>
-                        <tr className="bg-indigo-50/10 font-bold">
-                            <td className="px-6 py-3 text-indigo-900 pl-8">Net Cash provided by Operating Activities</td>
-                            <td className="px-6 py-3 text-right font-mono text-indigo-900 border-t border-indigo-100">{formatCurrency(operatingCashFlow)}</td>
-                        </tr>
+                    </div>
+                ))}
 
-                        {/* Investing */}
-                        <tr className="bg-gray-50/30">
-                            <td colSpan={2} className="px-6 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider mt-4">Investing Activities</td>
-                        </tr>
-                        <tr>
-                            <td className="px-6 py-3 text-gray-600 pl-8">Net Purchases of Fixed Assets</td>
-                            <td className="px-6 py-3 text-right font-mono text-gray-600">({formatCurrency(Math.abs(investingCashFlow))})</td>
-                        </tr>
-                        <tr className="bg-blue-50/10 font-bold">
-                            <td className="px-6 py-3 text-blue-900 pl-8">Net Cash used in Investing Activities</td>
-                            <td className="px-6 py-3 text-right font-mono text-blue-900 border-t border-blue-100">{formatCurrency(investingCashFlow)}</td>
-                        </tr>
+                {/* Grand total */}
+                <div className="flex items-center justify-between px-5 py-4"
+                    style={{ borderTop: HAIRLINE, background: 'rgba(0,0,0,0.018)' }}>
+                    <div>
+                        <p className="text-[11px] font-[700] uppercase tracking-[0.09em] text-gray-500">
+                            Net Increase / (Decrease) in Cash
+                        </p>
+                        <p className="text-[10.5px] text-gray-400 mt-0.5">
+                            Cash balance on books: KES {fmt(totalCash)}
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <p className={`text-[18px] font-[800] font-mono tabular-nums ${netCashFlow >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {netCashFlow >= 0 ? '' : '('}{fmt(netCashFlow)}{netCashFlow < 0 ? ')' : ''}
+                        </p>
+                        <p className="text-[10px] font-[600] uppercase tracking-[0.07em] text-gray-400 mt-0.5">KES</p>
+                    </div>
+                </div>
+            </div>
 
-                        {/* Financing */}
-                        <tr className="bg-gray-50/30">
-                            <td colSpan={2} className="px-6 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider mt-4">Financing Activities</td>
-                        </tr>
-                        <tr>
-                            <td className="px-6 py-3 text-gray-600 pl-8">Change in Loans & Liabilities</td>
-                            <td className="px-6 py-3 text-right font-mono text-gray-600">{formatCurrency(changeLoans)}</td>
-                        </tr>
-                        <tr>
-                            <td className="px-6 py-3 text-gray-600 pl-8">Change in Equity & Capital</td>
-                            <td className="px-6 py-3 text-right font-mono text-gray-600">{formatCurrency(changeEquity)}</td>
-                        </tr>
-                        <tr className="bg-purple-50/10 font-bold">
-                            <td className="px-6 py-3 text-purple-900 pl-8">Net Cash provided by Financing Activities</td>
-                            <td className="px-6 py-3 text-right font-mono text-purple-900 border-t border-purple-100">{formatCurrency(financingCashFlow)}</td>
-                        </tr>
-                    </tbody>
-                    <tfoot className="bg-gray-50 border-t border-gray-200">
-                        <tr>
-                            <td className="px-6 py-4 text-left font-bold text-gray-900 uppercase text-sm">Net Change in Cash</td>
-                            <td className="px-6 py-4 text-right font-mono font-bold text-xl text-gray-900">{formatCurrency(netCashFlow)}</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </Card>
+            {/* ── Cash position reconciliation ── */}
+            <div className="bg-white rounded-[8px] overflow-hidden" style={{ border: HAIRLINE }}>
+                <div className="px-5 py-3" style={{ borderBottom: HAIRLINE, background: 'rgba(0,0,0,0.015)' }}>
+                    <p className="text-[10px] font-[600] uppercase tracking-[0.09em] text-gray-400">Cash Position</p>
+                </div>
+                <div>
+                    {cashAccounts.length === 0 ? (
+                        <div className="px-5 py-4">
+                            <p className="text-[12px] text-gray-400 italic">No cash accounts found</p>
+                        </div>
+                    ) : (
+                        cashAccounts.map((acc, i) => (
+                            <div key={acc.id}
+                                className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/40 transition-colors"
+                                style={i > 0 ? { borderTop: HAIRLINE } : {}}>
+                                <div>
+                                    <p className="text-[12.5px] font-[500] text-gray-900">{acc.name}</p>
+                                    <p className="text-[10.5px] text-gray-400 font-mono">{acc.code}</p>
+                                </div>
+                                <SignedAmount value={acc.balance} size="sm" />
+                            </div>
+                        ))
+                    )}
+                    <div className="flex items-center justify-between px-5 py-3"
+                        style={{ background: 'rgba(0,0,0,0.018)', borderTop: HAIRLINE }}>
+                        <p className="text-[11px] font-[700] uppercase tracking-[0.07em] text-gray-500">Total Cash Balance</p>
+                        <span className={`text-[13px] font-[700] font-mono tabular-nums ${totalCash >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {totalCash >= 0 ? '' : '('}{fmt(totalCash)}{totalCash < 0 ? ')' : ''}
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

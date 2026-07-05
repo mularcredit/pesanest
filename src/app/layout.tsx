@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Lexend, Montserrat } from "next/font/google";
+import { Lexend, Outfit } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
@@ -9,10 +9,10 @@ const lexend = Lexend({
   variable: "--font-lexend",
 });
 
-const montserrat = Montserrat({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-montserrat",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-outfit",
+  display: "swap",
 });
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME || "CapitalPay";
@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light">
-      <body className={`antialiased min-h-screen ${lexend.variable} ${GeistSans.variable} ${montserrat.variable} font-sans`} style={{ backgroundColor: 'var(--gds-bg)', color: 'var(--gds-text-main)' }} suppressHydrationWarning>
+      <body className={`antialiased min-h-screen ${lexend.variable} ${GeistSans.variable} ${outfit.variable} font-sans`} style={{ backgroundColor: 'var(--page)', color: 'var(--t1)' }} suppressHydrationWarning>
         <Providers>
           {children}
         </Providers>

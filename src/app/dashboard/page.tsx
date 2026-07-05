@@ -1,34 +1,30 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
+import { paystackService } from "@/lib/payments/paystack";
 import { redirect } from "next/navigation";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { OverviewChart } from "@/components/dashboard/OverviewChart";
-import { DistributionCharts } from "@/components/dashboard/DistributionCharts";
 import { TransactionTable } from "@/components/dashboard/TransactionTable";
-import { Card } from "@/components/ui/Card";
+import { BudgetUtilization } from "@/components/dashboard/BudgetUtilization";
+import { WeeklyExpenseChart } from "@/components/dashboard/WeeklyExpenseChart";
+import { CategoryBreakdown } from "@/components/dashboard/CategoryBreakdown";
+import { ExpenseStatusSummary } from "@/components/dashboard/ExpenseStatusSummary";
+import { MonthComparisonChart } from "@/components/dashboard/MonthComparisonChart";
+import { ApprovalGauge } from "@/components/dashboard/ApprovalGauge";
+import { ExpenseFunnel, FunnelStage } from "@/components/dashboard/ExpenseFunnel";
 import Link from "next/link";
 import {
-    PiCheckCircle,
-    PiCurrencyDollar,
     PiReceipt,
-    PiShieldCheck,
-    PiWallet,
-    PiDownloadSimple,
-    PiTrendUp,
     PiClock,
-    PiBank,
-    PiInvoice,
-    PiHandCoins,
-    PiGear,
-    PiInfo,
-    PiHandshake,
-    PiUsers,
-    PiBriefcase
+    PiCoins,
+    PiDownloadSimple,
+    PiChartBar,
+    PiWarning,
 } from "react-icons/pi";
-import { cn } from "@/lib/utils";
 import { WalletCard } from "@/components/dashboard/WalletCard";
 import { DashboardQuickActions } from "@/components/dashboard/DashboardQuickActions";
-import { stripe } from "@/lib/stripe";
+
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -39,308 +35,423 @@ export default async function DashboardPage() {
 
     const currentUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { role: true, name: true }
+        select: { role: true, name: true, paystackCustomerCode: true }
     });
 
-    // If user no longer exists (e.g. after DB reset), force logout
     if (!currentUser) return redirect("/api/auth/signout?callbackUrl=/login");
 
     const isPrivileged = ['SYSTEM_ADMIN', 'FINANCE_APPROVER', 'MANAGER'].includes(currentUser?.role || '');
     const isSystemAdmin = currentUser?.role === 'SYSTEM_ADMIN';
     const expenseFilter = isPrivileged ? {} : { userId };
 
-    const firstDayThisMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Last 30 days
-    const firstDayLastMonth = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000); // 30-60 days ago
-    const lastDayLastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const firstDayThisMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const firstDayLastMonth = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+    const lastDayLastMonth  = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const currentMonthNum   = now.getMonth() + 1;
+    const currentYear       = now.getFullYear();
+    const oneYearAgo        = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
-    // Fetch comprehensive data
-    // Execute database queries sequentially to prevent exhausting Neon connection pool limits
-    const currentMonthNum = now.getMonth() + 1;
-    const currentYear = now.getFullYear();
-    const activeBudgets = await prisma.monthlyBudget.findMany({ where: { month: currentMonthNum, year: currentYear } });
-    
-    const thisMonthExpenses = await prisma.expense.findMany({ where: { ...expenseFilter, createdAt: { gte: firstDayThisMonth } }, orderBy: { createdAt: 'desc' } });
-    const lastMonthExpenses = await prisma.expense.findMany({ where: { ...expenseFilter, createdAt: { gte: firstDayLastMonth, lte: lastDayLastMonth } } });
-    const pendingApprovals = await prisma.expense.findMany({ where: { ...expenseFilter, status: { in: ['PENDING_APPROVAL', 'SUBMITTED'] } }, orderBy: { createdAt: 'desc' }, take: 10 });
-    const draftExpenses = await prisma.expense.findMany({ where: { ...expenseFilter, status: 'DRAFT' } });
-    
-    // Fetch last year of expenses and requisitions for the area chart and pie charts
-    const oneYearAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-    const allExpenses = await prisma.expense.findMany({ where: { ...expenseFilter, expenseDate: { gte: oneYearAgo } }, orderBy: { expenseDate: 'desc' } });
-    const allRequisitions = await prisma.requisition.findMany({ where: { ...expenseFilter, createdAt: { gte: oneYearAgo } }, orderBy: { createdAt: 'desc' } });
+    const [
+        activeBudgets,
+        thisMonthExpenses,
+        lastMonthExpenses,
+        pendingApprovals,
+        draftExpenses,
+        allExpenses,
+        allRequisitions,
+        wallet,
+        paystackBalances,
+        requisitions,
+        categories,
+        branchesData,
+        thisMonthSales,
+    ] = await Promise.all([
+        prisma.monthlyBudget.findMany({ where: { month: currentMonthNum, year: currentYear } }),
+        prisma.expense.findMany({ where: { ...expenseFilter, createdAt: { gte: firstDayThisMonth } }, orderBy: { createdAt: 'desc' } }),
+        prisma.expense.findMany({ where: { ...expenseFilter, createdAt: { gte: firstDayLastMonth, lte: lastDayLastMonth } } }),
+        prisma.expense.findMany({ where: { ...expenseFilter, status: { in: ['PENDING_APPROVAL', 'SUBMITTED'] } }, orderBy: { createdAt: 'desc' }, take: 10 }),
+        prisma.expense.findMany({ where: { ...expenseFilter, status: 'DRAFT' } }),
+        prisma.expense.findMany({ where: { ...expenseFilter, expenseDate: { gte: oneYearAgo } }, orderBy: { expenseDate: 'desc' } }),
+        prisma.requisition.findMany({ where: { ...expenseFilter, createdAt: { gte: oneYearAgo } }, orderBy: { createdAt: 'desc' } }),
+        prisma.wallet.findUnique({ where: { userId }, include: { transactions: { take: 5, orderBy: { createdAt: 'desc' } } } }),
+        paystackService.getBalance().catch(() => []),
+        prisma.requisition.findMany({ where: { userId, status: 'PENDING' } }),
+        prisma.category.findMany({ where: { isActive: true }, select: { name: true } }),
+        prisma.branch.findMany({ where: { isActive: true }, select: { id: true, name: true } }),
+        isSystemAdmin
+            ? prisma.sale.aggregate({ where: { issueDate: { gte: firstDayThisMonth }, status: { not: 'DRAFT' } }, _sum: { totalAmount: true } })
+            : Promise.resolve({ _sum: { totalAmount: 0 } }),
+    ]);
 
-    // Batch 2
-    const wallet = await prisma.wallet.findUnique({ where: { userId }, include: { transactions: { take: 5, orderBy: { createdAt: 'desc' } } } });
-    const requisitions = await prisma.requisition.findMany({ where: { userId, status: 'PENDING' } });
-    const categories = await prisma.category.findMany({ where: { isActive: true }, select: { name: true } });
-    const branchesData = await prisma.branch.findMany({ where: { isActive: true }, select: { name: true } });
+    // ── Wallet balance ──
+    let liveBalance = wallet?.balance ?? 0;
+    const targetCurrency = wallet?.currency || 'KES';
+    const balanceData = (paystackBalances as any[]).find((b: any) =>
+        b.currency?.toUpperCase() === targetCurrency.toUpperCase()
+    );
+    if (balanceData) liveBalance = balanceData.balance / 100;
+    const paystackConnected = !!currentUser?.paystackCustomerCode;
 
-    // Batch 3
-    const stripeAccount = (currentUser as any)?.stripeAccountId ? await prisma.user.findUnique({ where: { id: userId }, select: { stripeAccountId: true, stripeConnectStatus: true } as any }) : null;
-    const thisMonthSales = isSystemAdmin ? await prisma.sale.aggregate({ where: { issueDate: { gte: firstDayThisMonth }, status: { not: 'DRAFT' } }, _sum: { totalAmount: true } }) : { _sum: { totalAmount: 0 } };
-    const lastMonthSales = isSystemAdmin ? await prisma.sale.aggregate({ where: { issueDate: { gte: firstDayLastMonth, lte: lastDayLastMonth }, status: { not: 'DRAFT' } }, _sum: { totalAmount: true } }) : { _sum: { totalAmount: 0 } };
+    // ── Requisitions are the single source of truth for all financial data ──
+    const thisMonthReqs  = allRequisitions.filter((r: any) => new Date(r.createdAt) >= firstDayThisMonth);
+    const lastMonthReqs  = allRequisitions.filter((r: any) => {
+        const d = new Date(r.createdAt);
+        return d >= firstDayLastMonth && d <= lastDayLastMonth;
+    });
 
+    // ── KPIs ──
+    const submittedThisMonth   = thisMonthReqs.filter((r: any) => r.status !== 'DRAFT');
+    const submittedTotal       = submittedThisMonth.reduce((s: number, r: any) => s + r.amount, 0);
+    const submittedCount       = submittedThisMonth.length;
+    const lastMonthTotal       = lastMonthReqs.filter((r: any) => r.status !== 'DRAFT').reduce((s: number, r: any) => s + r.amount, 0);
+    const monthOverMonthChange = lastMonthTotal > 0 ? ((submittedTotal - lastMonthTotal) / lastMonthTotal) * 100 : 0;
+    const pendingReqs          = allRequisitions.filter((r: any) => r.status === 'PENDING');
+    const pendingTotal         = pendingReqs.reduce((s: number, r: any) => s + r.amount, 0);
+    const pendingCount         = pendingReqs.length;
+    const disbursedThisMonth   = thisMonthReqs.filter((r: any) => ['APPROVED', 'PAID'].includes(r.status));
+    const disbursedTotal       = disbursedThisMonth.reduce((s: number, r: any) => s + r.amount, 0);
+    const approvedAllTime      = allRequisitions.filter((r: any) => ['APPROVED', 'PAID'].includes(r.status)).length;
+    const submittedAllTime     = allRequisitions.filter((r: any) => r.status !== 'DRAFT').length;
+    const approvalRate         = submittedAllTime > 0 ? (approvedAllTime / submittedAllTime) * 100 : 0;
+    const rejectedCount        = allRequisitions.filter((r: any) => r.status === 'REJECTED').length;
 
-    // Batch 4
-    const activeCustomersCount = await prisma.customer.count({ where: { isActive: true } });
-    const teamCount = await prisma.user.count({ where: { isActive: true, role: { not: 'SYSTEM_ADMIN' } } });
-
-    let stripeBalance = 0;
-    let isStripeConnected = false;
-    if ((stripeAccount as any)?.stripeAccountId && (stripeAccount as any)?.stripeConnectStatus === 'COMPLETED') {
-        try {
-            const balance = await stripe.balance.retrieve({ stripeAccount: (stripeAccount as any).stripeAccountId });
-            stripeBalance = balance.available.reduce((sum: number, b: any) => sum + b.amount, 0) / 100;
-            isStripeConnected = true;
-        } catch (e) { console.error('Stripe balance fetch failed:', e); }
-    }
-
-    // Metrics Calculation
-    const thisMonthTotal = thisMonthExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
-    const lastMonthTotal = lastMonthExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
-    const monthOverMonthChange = lastMonthTotal > 0 ? ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100 : 0;
-
-    const revenueCurrent = thisMonthSales._sum.totalAmount || 0;
-    const revenueLast = lastMonthSales._sum.totalAmount || 0;
-    const revenueChange = revenueLast > 0 ? ((revenueCurrent - revenueLast) / revenueLast) * 100 : 0;
-
-    const netProfit = revenueCurrent - thisMonthTotal;
-    const profitMargin = revenueCurrent > 0 ? (netProfit / revenueCurrent) * 100 : 0;
-
-    const pendingTotal = pendingApprovals.reduce((sum: number, exp: any) => sum + exp.amount, 0);
-    const draftTotal = draftExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
-
-    const categorySpending = allExpenses.reduce((acc: any, exp: any) => {
-        acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
+    // ── Category breakdown ──
+    const categorySpending = allRequisitions.reduce((acc: any, r: any) => {
+        if (!r.category) return acc;
+        acc[r.category] = (acc[r.category] || 0) + r.amount;
         return acc;
     }, {});
-    const topCategories = Object.entries(categorySpending).sort(([, a]: any, [, b]: any) => b - a).slice(0, 8) as [string, number][];
 
-    const requisitionCategorySpending = allRequisitions.reduce((acc: any, req: any) => {
-        acc[req.category] = (acc[req.category] || 0) + req.amount;
+    // ── Weekly data (current month) ──
+    const weeklyData = [0, 1, 2, 3].map(week => {
+        const weekStart = new Date(now.getFullYear(), now.getMonth(), week * 7 + 1);
+        const weekEnd   = new Date(now.getFullYear(), now.getMonth(), (week + 1) * 7 + 1);
+        const isCurrentWeek = now >= weekStart && now < weekEnd;
+        const amount = thisMonthReqs.filter((r: any) => {
+            const d = new Date(r.createdAt);
+            return d >= weekStart && d < weekEnd && r.status !== 'DRAFT';
+        }).reduce((s: number, r: any) => s + r.amount, 0);
+        return { week: `Week ${week + 1}`, amount, isCurrentWeek };
+    });
+
+    // ── Category breakdown data ──
+    const categoryData = Object.entries(categorySpending)
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .slice(0, 8)
+        .map(([category, amount]) => ({
+            category,
+            amount: amount as number,
+            count: allRequisitions.filter((r: any) => r.category === category).length,
+        }));
+    const totalCategoryAmount = categoryData.reduce((s, c) => s + c.amount, 0);
+
+    // ── Status summary ──
+    const byStatus = (s: string | string[]) => {
+        const statuses = Array.isArray(s) ? s : [s];
+        const items = allRequisitions.filter((r: any) => statuses.includes(r.status));
+        return { count: items.length, amount: items.reduce((sum: number, r: any) => sum + r.amount, 0) };
+    };
+    const statusSummary = {
+        draft:     byStatus('DRAFT'),
+        submitted: byStatus('PENDING'),
+        pending:   { count: 0, amount: 0 },
+        approved:  byStatus('APPROVED'),
+        paid:      byStatus('PAID'),
+        rejected:  byStatus('REJECTED'),
+    };
+
+    // ── Sparklines (last 7 days) ──
+    const sparkSubmitted = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(now); d.setDate(d.getDate() - (6 - i));
+        const s = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const e = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+        return allRequisitions
+            .filter((x: any) => { const xd = new Date(x.createdAt); return xd >= s && xd < e && x.status !== 'DRAFT'; })
+            .reduce((sum: number, x: any) => sum + x.amount, 0);
+    });
+    const sparkDisbursed = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(now); d.setDate(d.getDate() - (6 - i));
+        const s = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const e = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+        return allRequisitions
+            .filter((x: any) => { const xd = new Date(x.createdAt); return xd >= s && xd < e && ['APPROVED','PAID'].includes(x.status); })
+            .reduce((sum: number, x: any) => sum + x.amount, 0);
+    });
+    const sparkPending = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(now); d.setDate(d.getDate() - (6 - i));
+        const cutoff = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+        return allRequisitions.filter((x: any) => new Date(x.createdAt) < cutoff && x.status === 'PENDING').length;
+    });
+    const sparkRate = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(now); d.setDate(d.getDate() - (6 - i));
+        const cutoff = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+        const subset = allRequisitions.filter((x: any) => new Date(x.createdAt) < cutoff && x.status !== 'DRAFT');
+        const app    = subset.filter((x: any) => ['APPROVED','PAID'].includes(x.status));
+        return subset.length > 0 ? (app.length / subset.length) * 100 : 0;
+    });
+
+    // ── Month-over-month comparison ──
+    const thisMonthCatSpend = thisMonthReqs.reduce((acc: any, r: any) => {
+        if (!r.category) return acc;
+        acc[r.category] = (acc[r.category] || 0) + r.amount;
         return acc;
     }, {});
-    const topReqCategories = Object.entries(requisitionCategorySpending).sort(([, a]: any, [, b]: any) => b - a).slice(0, 8) as [string, number][];
-
-    const avgDailySpend = allExpenses.length > 0 ? allExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0) / 30 : 0;
-    const recentLargeExpenses = allExpenses.filter((exp: any) => exp.amount > avgDailySpend * 3).slice(0, 3);
-
-    const approvedCount = allExpenses.filter((exp: any) => exp.status === 'APPROVED' || exp.status === 'PAID').length;
-    const submittedCount = allExpenses.filter((exp: any) => exp.status !== 'DRAFT').length;
-    const approvalRate = submittedCount > 0 ? (approvedCount / submittedCount) * 100 : 0;
-
-    const thisMonthRequisitions = allRequisitions.filter((req: any) => new Date(req.createdAt) >= firstDayThisMonth);
-    const lastMonthRequisitionsList = allRequisitions.filter((req: any) => new Date(req.createdAt) >= firstDayLastMonth && new Date(req.createdAt) <= lastDayLastMonth);
-    
-    const thisMonthReqTotal = thisMonthRequisitions.reduce((sum: number, req: any) => sum + req.amount, 0);
-    const lastMonthReqTotal = lastMonthRequisitionsList.reduce((sum: number, req: any) => sum + req.amount, 0);
-    const reqMonthOverMonthChange = lastMonthReqTotal > 0 ? ((thisMonthReqTotal - lastMonthReqTotal) / lastMonthReqTotal) * 100 : 0;
-
-    const pendingReqTotal = requisitions.reduce((sum: number, req: any) => sum + req.amount, 0);
-    const pendingPipelineTotal = pendingTotal + pendingReqTotal;
-    
-    const activeRequisitionsCount = requisitions.length;
-    const pendingItemsCount = pendingApprovals.length + activeRequisitionsCount;
-
-    // Accounts Payable Metrics
-    const unpaidApprovedExpenses = allExpenses.filter((e: any) => e.status === 'APPROVED' && !e.paidAt).reduce((sum: number, e: any) => sum + e.amount, 0);
-    const unpaidApprovedReqs = allRequisitions.filter((r: any) => r.status === 'APPROVED' && !r.paymentId).reduce((sum: number, r: any) => sum + r.amount, 0);
-    const outstandingPayables = unpaidApprovedExpenses + unpaidApprovedReqs;
-
-    const paidThisMonthExpenses = thisMonthExpenses.filter((e: any) => e.status === 'PAID').reduce((sum: number, e: any) => sum + e.amount, 0);
-    const paidThisMonthReqs = thisMonthRequisitions.filter((r: any) => r.status === 'PAID').reduce((sum: number, r: any) => sum + r.amount, 0);
-    const cashPaidOut = paidThisMonthExpenses + paidThisMonthReqs;
-
-    // Status distributions
-    const expStatusCounts = allExpenses.reduce((acc: any, exp: any) => {
-        acc[exp.status] = (acc[exp.status] || 0) + 1;
+    const lastMonthCatSpend = lastMonthReqs.reduce((acc: any, r: any) => {
+        if (!r.category) return acc;
+        acc[r.category] = (acc[r.category] || 0) + r.amount;
         return acc;
     }, {});
-    const expenseStatusData = Object.entries(expStatusCounts).sort(([, a]: any, [, b]: any) => b - a);
+    const top5Comparison = Object.entries(categorySpending)
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .slice(0, 5)
+        .map(([cat]) => ({
+            category: cat.length > 11 ? cat.slice(0, 9) + '..' : cat,
+            thisMonth: (thisMonthCatSpend[cat] as number) || 0,
+            lastMonth: (lastMonthCatSpend[cat] as number) || 0,
+        }));
+    const thisMonthLabel = now.toLocaleDateString('en-US', { month: 'short' });
+    const lastMonthLabel = new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString('en-US', { month: 'short' });
 
-    const reqStatusCounts = allRequisitions.reduce((acc: any, req: any) => {
-        acc[req.status] = (acc[req.status] || 0) + 1;
-        return acc;
-    }, {});
-    const requisitionStatusData = Object.entries(reqStatusCounts).sort(([, a]: any, [, b]: any) => b - a);
+    // ── Approval gauge ──
+    const gaugeApproved = approvedAllTime;
+    const gaugePending  = pendingCount;
+    const gaugeRejected = rejectedCount;
 
-    // Monthly trend data for chart
+    // ── Funnel stages (requisition statuses) ──
+    const FUNNEL_CFG: { name: string; key: string; color: string; bg: string }[] = [
+        { name: 'Draft',    key: 'DRAFT',    color: '#9ca3af', bg: 'rgba(156,163,175,0.08)' },
+        { name: 'Pending',  key: 'PENDING',  color: '#f59e0b', bg: 'rgba(245,158,11,0.08)'  },
+        { name: 'Approved', key: 'APPROVED', color: '#6366f1', bg: 'rgba(99,102,241,0.08)'  },
+        { name: 'Paid',     key: 'PAID',     color: '#10b981', bg: 'rgba(16,185,129,0.08)'  },
+        { name: 'Rejected', key: 'REJECTED', color: '#ef4444', bg: 'rgba(239,68,68,0.08)'   },
+    ];
+    const funnelStages: FunnelStage[] = FUNNEL_CFG.map(cfg => ({
+        name:   cfg.name,
+        count:  allRequisitions.filter((r: any) => r.status === cfg.key).length,
+        amount: allRequisitions.filter((r: any) => r.status === cfg.key).reduce((s: number, r: any) => s + r.amount, 0),
+        color:  cfg.color,
+        bg:     cfg.bg,
+    }));
+
+    // ── Budget utilization ──
+    const budgetRows = activeBudgets.map((b: any) => {
+        const spent = allRequisitions
+            .filter((r: any) => r.category === b.category && !['DRAFT','REJECTED'].includes(r.status))
+            .reduce((s: number, r: any) => s + r.amount, 0);
+        return { category: b.category, allocated: b.amount, spent };
+    });
+
+    // ── Spending alerts ──
+    const avgDailySpend       = allRequisitions.length > 0 ? allRequisitions.reduce((s: number, r: any) => s + r.amount, 0) / 30 : 0;
+    const recentLargeExpenses = allRequisitions.filter((r: any) => r.amount > avgDailySpend * 3).slice(0, 3);
+
+    // ── 12-month trend (requisitions only — they are the expenses) ──
     const monthlyData = [];
-
-    // Build exactly 12 months array ending in current month
     for (let i = 11; i >= 0; i--) {
-        const targetMonth = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-        
-        const monthExpenses = allExpenses.filter((exp: any) => {
-            const expDate = new Date(exp.expenseDate);
-            return expDate >= targetMonth && expDate < nextMonth;
-        });
-        const expTotal = monthExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
-
-        const monthRequisitions = allRequisitions.filter((req: any) => {
-            const reqDate = new Date(req.createdAt);
-            return reqDate >= targetMonth && reqDate < nextMonth;
-        });
-        const reqTotal = monthRequisitions.reduce((sum: number, req: any) => sum + req.amount, 0);
-
-        monthlyData.push({ 
-            month: targetMonth.toLocaleDateString('en-US', { month: 'short' }), 
-            expenses: expTotal,
-            requisitions: reqTotal 
-        });
+        const from = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const to   = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+        const amount = allRequisitions
+            .filter((r: any) => { const d = new Date(r.createdAt); return d >= from && d < to; })
+            .reduce((s: number, r: any) => s + r.amount, 0);
+        monthlyData.push({ month: from.toLocaleDateString('en-US', { month: 'short' }), amount });
     }
-
-    // Quick insights
-    const insights = [];
-    if (isSystemAdmin && thisMonthTotal === 0 && revenueCurrent > 0) insights.push({ type: 'success', icon: PiHandCoins, message: `Strong revenue start: $${revenueCurrent.toLocaleString()}`, action: 'View detailed report', link: '/dashboard/reports' });
-    if (isSystemAdmin && revenueChange > 10) insights.push({ type: 'success', icon: PiTrendUp, message: `Revenue up ${revenueChange.toFixed(1)}% vs last month`, action: 'View Sales', link: '/dashboard/reports' });
-    if (pendingApprovals.length > 0) insights.push({ type: 'pending', icon: PiClock, message: `${pendingApprovals.length} expenses awaiting approval`, action: 'Track status', link: '/dashboard/expenses?status=PENDING_APPROVAL' });
-    if (monthOverMonthChange > 20) insights.push({ type: 'warning', icon: PiTrendUp, message: `High spending alert: +${monthOverMonthChange.toFixed(1)}%`, action: 'Review Expenses', link: '/dashboard/expenses' });
 
     return (
-        <div className="space-y-8 animate-fade-in-up">
-            {/* Header */}
+        <div className="space-y-6 pb-12">
+
+            {/* ── HEADER ── */}
             <div className="flex items-end justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">Expense Analytics</h1>
-                    <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">
-                        {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Standard Reporting
+                    <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Expense Dashboard</h1>
+                    <p className="text-[12.5px] text-gray-400 mt-0.5">
+                        {now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · 30-day view
                     </p>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
-                    <Link href="/dashboard/reports" className="px-5 py-2.5 bg-white border border-slate-200 rounded-md text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
-                        <PiDownloadSimple className="text-base" />
-                        Export Data
-                    </Link>
-                </div>
+                <Link href="/dashboard/reports"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                    style={CARD_STYLE}>
+                    <PiDownloadSimple className="text-[14px]" /> Export
+                </Link>
             </div>
 
-            {/* Accounts Payable Pillars */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-up">
+            {/* ── STAT CARDS with sparklines ── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatsCard
-                    title="Gross Expenses (30 Days)"
-                    value={`$${thisMonthTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                    title="Submitted This Month"
+                    value={`KES ${submittedTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                     trend={monthOverMonthChange > 0 ? `+${monthOverMonthChange.toFixed(1)}%` : `${monthOverMonthChange.toFixed(1)}%`}
                     trendUp={monthOverMonthChange <= 0}
-                    icon={PiInvoice}
-                    color="cyan"
+                    icon={PiReceipt}
+                    color="indigo"
+                    lastMonthLabel={`${submittedCount} report${submittedCount !== 1 ? 's' : ''} submitted`}
+                    sparkline={sparkSubmitted}
                 />
                 <StatsCard
-                    title="Cash Paid Out (30 Days)"
-                    value={`$${cashPaidOut.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    trend="Actual payments"
-                    trendUp={true}
-                    icon={PiWallet}
-                    color="emerald"
-                />
-                <StatsCard
-                    title="Outstanding Payables"
-                    value={`$${outstandingPayables.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    trend="Approved, not yet paid"
-                    trendUp={outstandingPayables === 0}
-                    icon={PiBank}
-                    color="slate"
-                />
-                <StatsCard
-                    title="Pending Pipeline"
-                    value={`$${pendingPipelineTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    trend={`${pendingItemsCount} Total Items`}
-                    trendUp={pendingPipelineTotal === 0}
+                    title="Pending Approval"
+                    value={`KES ${pendingTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                    trend={pendingCount === 0 ? "All clear" : `${pendingCount} item${pendingCount !== 1 ? 's' : ''}`}
+                    trendUp={pendingCount === 0}
                     icon={PiClock}
                     color="amber"
+                    lastMonthLabel="Awaiting review"
+                    sparkline={sparkPending}
+                />
+                <StatsCard
+                    title="Disbursed This Month"
+                    value={`KES ${disbursedTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                    trend={disbursedThisMonth.length === 0 ? "None yet" : `${disbursedThisMonth.length} paid`}
+                    trendUp={disbursedThisMonth.length > 0}
+                    icon={PiCoins}
+                    color="emerald"
+                    lastMonthLabel="Paid & reimbursed"
+                    sparkline={sparkDisbursed}
+                />
+                <StatsCard
+                    title="Approval Rate"
+                    value={`${approvalRate.toFixed(1)}%`}
+                    trend={rejectedCount > 0 ? `${rejectedCount} rejected` : "No rejections"}
+                    trendUp={rejectedCount === 0}
+                    icon={PiChartBar}
+                    color="purple"
+                    lastMonthLabel={`${approvedAllTime} of ${submittedAllTime} approved`}
+                    sparkline={sparkRate}
                 />
             </div>
 
-
-            {/* Main Content Grid */}
+            {/* ── MAIN GRID ── */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column - Analytics & History */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Spending Trend */}
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <OverviewChart data={monthlyData} />
-                    </div>
 
-                    {/* Distribution Pie Charts */}
-                    <DistributionCharts expensesData={topCategories} requisitionsData={topReqCategories} />
+                {/* LEFT — charts + funnel + table */}
+                <div className="lg:col-span-2 space-y-5">
 
-                    {/* Expense Anomaly/Unusual Activity */}
+                    {/* 12-month trend area chart */}
+                    <OverviewChart data={monthlyData} />
+
+                    {/* This month by week — bar chart */}
+                    {weeklyData.some(w => w.amount > 0) && (
+                        <WeeklyExpenseChart data={weeklyData} />
+                    )}
+
+                    {/* Month-over-month grouped bar chart */}
+                    {top5Comparison.length > 0 && (
+                        <MonthComparisonChart
+                            data={top5Comparison}
+                            thisMonthLabel={thisMonthLabel}
+                            lastMonthLabel={lastMonthLabel}
+                        />
+                    )}
+
+                    {/* Category spending breakdown */}
+                    <CategoryBreakdown data={categoryData} totalAmount={totalCategoryAmount} />
+
+                    {/* Expense funnel */}
+                    <ExpenseFunnel stages={funnelStages} />
+
+                    {/* Spending alerts */}
                     {recentLargeExpenses.length > 0 && (
-                        <div className="rounded-2xl border border-rose-200 shadow-sm p-6 bg-gradient-to-br from-rose-50 via-white to-orange-50/30 relative overflow-hidden">
-                            {/* Alert ambient pattern */}
-                            <div className="absolute top-0 right-0 p-8 opacity-5">
-                                <PiShieldCheck className="text-[120px] text-rose-500" />
-                            </div>
-                            
-                            <div className="flex items-center justify-between mb-5 relative z-10">
-                                <div className="flex items-center gap-2">
-                                    <span className="relative flex h-2 w-2">
-                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                        <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-5 py-3.5"
+                                style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                <div className="flex items-center gap-2.5">
+                                    <span className="relative flex h-2 w-2 shrink-0">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-60" />
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
                                     </span>
-                                    <h2 className="text-[10px] font-extrabold tracking-widest uppercase text-rose-500">
-                                        Spending Alerts
-                                    </h2>
+                                    <span className="text-[13px] font-[600] text-gray-900">Spending Alerts</span>
                                 </div>
-                                <span className="text-[9px] font-bold text-rose-600 bg-rose-100/50 px-2.5 py-1 rounded-full border border-rose-200/50">
-                                    {recentLargeExpenses.length} Anomalies Detected
+                                <span className="text-[10.5px] font-[600] tabular-nums px-2 py-0.5 rounded-[4px]"
+                                    style={{ background: 'rgba(239,68,68,0.07)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.15)' }}>
+                                    {recentLargeExpenses.length} {recentLargeExpenses.length === 1 ? 'anomaly' : 'anomalies'}
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
-                                {recentLargeExpenses.map((exp: any) => (
-                                    <div key={exp.id} className="p-4 bg-white rounded-xl border border-rose-100 hover:border-rose-300 hover:shadow-md hover:shadow-rose-100 transition-all group">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div className="w-8 h-8 flex items-center justify-center bg-rose-50 border border-rose-100 rounded-lg group-hover:bg-rose-500 transition-colors">
-                                                <PiShieldCheck className="text-rose-500 text-lg group-hover:text-white transition-colors" />
+                            {/* Rows */}
+                            <div className="divide-y" style={{ '--tw-divide-opacity': 1 } as any}>
+                                {recentLargeExpenses.map((exp: any, i: number) => {
+                                    const multiple = (exp.amount / avgDailySpend).toFixed(1);
+                                    return (
+                                        <div key={exp.id} className="flex items-center gap-4 px-5 py-3.5"
+                                            style={{ borderBottom: i < recentLargeExpenses.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
+                                            {/* Icon */}
+                                            <div className="w-8 h-8 rounded-[7px] shrink-0 flex items-center justify-center"
+                                                style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                                                <PiWarning className="text-rose-500 text-[14px]" />
                                             </div>
-                                            <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-md font-mono">
-                                                {(exp.amount / avgDailySpend).toFixed(1)}x avg
+
+                                            {/* Info */}
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[12.5px] font-[500] text-gray-900 truncate">{exp.title}</p>
+                                                {exp.category && (
+                                                    <p className="text-[11px] text-gray-400 truncate mt-0.5">{exp.category}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Multiple badge */}
+                                            <span className="text-[10px] font-[700] font-mono tabular-nums shrink-0 px-1.5 py-0.5 rounded-[4px]"
+                                                style={{ background: 'rgba(239,68,68,0.07)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.12)' }}>
+                                                {multiple}× avg
+                                            </span>
+
+                                            {/* Amount */}
+                                            <span className="text-[12.5px] font-[600] font-mono tabular-nums shrink-0 text-gray-900">
+                                                KES {Number(exp.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </span>
                                         </div>
-                                        <p className="text-xs font-bold text-slate-900 mb-1 truncate group-hover:text-rose-900 transition-colors">{exp.title}</p>
-                                        <p className="text-xs font-bold text-slate-500 font-mono group-hover:text-rose-600 transition-colors">
-                                            ${Number(exp.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                        </p>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
 
-                    {/* Transaction History */}
-                    <TransactionTable expenses={thisMonthExpenses.slice(0, 10)} />
+                    {/* Recent transactions */}
+                    <TransactionTable expenses={thisMonthReqs.slice(0, 10)} />
                 </div>
 
-                {/* Right Column - Utilities */}
-                <div className="space-y-6">
-                    {/* Wallet Balance */}
+                {/* RIGHT — wallet + gauge + status + budget */}
+                <div className="space-y-5">
                     <WalletCard
-                        balance={isStripeConnected ? stripeBalance : (wallet?.balance ?? 0)}
-                        currency={wallet?.currency ?? "USD"}
+                        balance={liveBalance}
+                        currency={wallet?.currency === 'USD' ? 'KES' : (wallet?.currency ?? 'KES')}
                         categories={categories.map((c: { name: string }) => c.name)}
-                        branches={branchesData.map((b: { name: string }) => b.name)}
-                        isStripe={isStripeConnected}
-                        holderName={currentUser?.name || "Card Holder"}
+                        branches={branchesData.map((b: { id: string; name: string }) => ({ id: b.id, name: b.name }))}
+                        isPaystack={paystackConnected}
+                        holderName={currentUser?.name || "Corporate Wallet"}
                     />
 
-                    {/* Quick Actions */}
+                    {/* Approval ring chart */}
+                    <ApprovalGauge
+                        approved={gaugeApproved}
+                        pending={gaugePending}
+                        rejected={gaugeRejected}
+                    />
+
+                    <ExpenseStatusSummary {...statusSummary} />
+
                     <DashboardQuickActions />
 
-                    {/* Active Requisitions */}
+                    {/* Budget utilization */}
+                    {budgetRows.length > 0 && <BudgetUtilization budgets={budgetRows} />}
+
+                    {/* Active requisitions */}
                     {requisitions.length > 0 && (
-                        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                            <h3 className="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-5">Active Requisitions</h3>
-                            <div className="space-y-3">
+                        <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                            <div className="px-5 py-3.5 text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400"
+                                style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                                Active Requisitions
+                            </div>
+                            <div className="p-4 space-y-2">
                                 {requisitions.slice(0, 3).map((req: any) => (
-                                    <div key={req.id} className="p-4 bg-slate-50 rounded-lg border border-slate-100 hover:border-slate-300 transition-colors group cursor-pointer">
-                                        <div className="flex justify-between items-start mb-1">
-                                            <div className="flex-1 min-w-0 pr-4">
-                                                <p className="text-xs font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{req.title}</p>
-                                                <p className="text-[9px] text-slate-500 font-bold mt-1 uppercase tracking-widest">{req.category}</p>
+                                    <div key={req.id} className="p-3.5 rounded-[8px]"
+                                        style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1 min-w-0 pr-3">
+                                                <p className="text-[12.5px] font-[500] text-gray-900 truncate">{req.title}</p>
+                                                <p className="text-[10.5px] text-gray-400 mt-0.5 uppercase tracking-[0.05em]">{req.category}</p>
                                             </div>
-                                            <span className="text-xs font-bold text-slate-900 font-mono">${req.amount.toFixed(2)}</span>
+                                            <span className="text-[12.5px] font-[600] text-gray-900 font-mono whitespace-nowrap">
+                                                KES {req.amount.toFixed(2)}
+                                            </span>
                                         </div>
                                     </div>
                                 ))}

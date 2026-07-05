@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { PiFunnel, PiMagnifyingGlass } from "react-icons/pi";
+import { PiFunnel, PiMagnifyingGlass, PiClock, PiCheckCircle, PiList } from "react-icons/pi";
+import { cn } from "@/lib/utils";
 import { RequisitionList } from "./RequisitionList";
 
 interface RequisitionListWithFilterProps {
@@ -24,57 +25,70 @@ export function RequisitionListWithFilter({ requisitions, monthlyBudgets }: Requ
         all: requisitions.length
     }), [requisitions]);
 
+    const navItems = [
+        { id: 'active' as const, label: 'Active', sub: 'Pending approval or payment', icon: PiClock },
+        { id: 'fulfilled' as const, label: 'Fulfilled', sub: 'Disbursements complete', icon: PiCheckCircle },
+        { id: 'all' as const, label: 'All History', sub: 'Full ledger view', icon: PiList },
+    ];
+
     return (
-        <div className="space-y-6">
-            {/* Status Filter Tabs */}
-            <div className="flex bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
-                {([
-                    { id: 'active', label: 'Active Requisitions', sub: 'Pending approval or payment', count: statusCounts.active, activeColor: 'text-indigo-600 border-indigo-600', badgeActive: 'bg-indigo-100 text-indigo-700' },
-                    { id: 'fulfilled', label: 'Fulfilled', sub: 'Disbursements complete', count: statusCounts.fulfilled, activeColor: 'text-emerald-600 border-emerald-600', badgeActive: 'bg-emerald-100 text-emerald-700' },
-                    { id: 'all', label: 'Ledger History', sub: 'All requisitions', count: statusCounts.all, activeColor: 'text-slate-900 border-slate-900', badgeActive: 'bg-slate-200 text-slate-800' },
-                ] as const).map(tab => {
-                    const isActive = statusFilter === tab.id;
-                    return (
-                        <button
-                            key={tab.id}
-                            onClick={() => setStatusFilter(tab.id)}
-                            className={`flex-1 flex items-center justify-between p-4 group transition-all duration-200 border-b-2 ${isActive ? `bg-white ${tab.activeColor}` : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-transparent'}`}
-                        >
-                            <div className="flex flex-col text-left">
-                                <p className="font-semibold text-[13px] tracking-tight">{tab.label}</p>
-                                <p className={`text-[10px] mt-0.5 ${isActive ? tab.activeColor.split(' ')[0].replace('text-', 'text-').replace('600', '400') : 'text-slate-400'}`}>{tab.sub}</p>
-                            </div>
-                            {tab.count > 0 && (
-                                <span className={`ml-4 px-2 py-0.5 text-[10px] min-w-[24px] text-center rounded-full font-semibold shrink-0 transition-colors ${isActive ? tab.badgeActive : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'}`}>
-                                    {tab.count}
-                                </span>
-                            )}
-                        </button>
-                    );
-                })}
-            </div>
+        <div className="flex gap-0 -mt-6 -mx-0">
 
-            {/* Search & Filter bar */}
-            <div className="flex gap-4">
-                <div className="relative flex-1">
-                    <PiMagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search by ID or title..."
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
-                    />
+            {/* Left Sidebar */}
+            <aside className="w-[190px] shrink-0 border-t border-r border-gray-200 bg-white flex flex-col">
+                <div className="px-4 pt-5 pb-3 border-b border-gray-100">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">Filter by</p>
+                    <h2 className="text-sm font-semibold text-gray-900 mt-0.5">Status</h2>
                 </div>
-                <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-lg flex items-center gap-2 text-gray-500 hover:text-gray-900 hover:border-gray-900 transition-all">
-                    <PiFunnel />
-                    <span className="text-xs font-bold">Filter</span>
-                </button>
-            </div>
+                <nav className="divide-y divide-gray-100">
+                    {navItems.map(item => {
+                        const isActive = statusFilter === item.id;
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => setStatusFilter(item.id)}
+                                className={cn(
+                                    "w-full flex items-center gap-3 px-4 py-3.5 text-sm font-medium transition-all text-left rounded-lg mx-1 my-0.5",
+                                    isActive ? "bg-indigo-50 text-[#6366F1]" : "text-slate-500 hover:bg-gray-50 hover:text-slate-800"
+                                )}
+                            >
+                                <Icon className="shrink-0 text-base" />
+                                <span className="flex-1 truncate">{item.label}</span>
+                                <span className={cn(
+                                    "text-[10px] font-semibold px-1.5 py-0.5 rounded-full min-w-[20px] text-center",
+                                    isActive ? "bg-[#6366F1]/15 text-[#6366F1]" : "bg-white/70 text-slate-500"
+                                )}>{statusCounts[item.id]}</span>
+                            </button>
+                        );
+                    })}
+                </nav>
+            </aside>
 
-            {/* Table */}
-            <RequisitionList
-                requisitions={filteredRequisitions}
-                monthlyBudgets={monthlyBudgets}
-            />
+            {/* Main Content */}
+            <div className="flex-1 min-w-0 pl-6 space-y-4">
+                {/* Search & Filter bar */}
+                <div className="flex gap-4">
+                    <div className="relative flex-1">
+                        <PiMagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search by ID or title..."
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+                        />
+                    </div>
+                    <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-lg flex items-center gap-2 text-gray-500 hover:text-gray-900 hover:border-gray-900 transition-all">
+                        <PiFunnel />
+                        <span className="text-xs font-semibold">Filter</span>
+                    </button>
+                </div>
+
+                {/* Table */}
+                <RequisitionList
+                    requisitions={filteredRequisitions}
+                    monthlyBudgets={monthlyBudgets}
+                />
+            </div>
         </div>
     );
 }

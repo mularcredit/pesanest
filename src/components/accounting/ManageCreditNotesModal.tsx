@@ -113,7 +113,7 @@ export function ManageCreditNotesModal({
                             <PiReceipt className="text-3xl text-gray-300" />
                         </div>
                         <div className="text-center">
-                            <p className="text-gray-900 font-bold">No credit notes found</p>
+                            <p className="text-gray-900 font-semibold">No credit notes found</p>
                             <p className="text-sm text-gray-400">Any credit notes issued to this customer will appear here.</p>
                         </div>
                     </div>
@@ -122,13 +122,13 @@ export function ManageCreditNotesModal({
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50/50 border-b border-gray-100">
                                 <tr>
-                                    <th className="py-4 px-6 text-left font-bold text-gray-400 text-[10px]">DATE</th>
-                                    <th className="py-4 px-6 text-left font-bold text-gray-400 text-[10px]">NUMBER</th>
-                                    <th className="py-4 px-6 text-left font-bold text-gray-400 text-[10px]">INVOICE REF</th>
-                                    <th className="py-4 px-6 text-left font-bold text-gray-400 text-[10px]">REASON</th>
-                                    <th className="py-4 px-6 text-right font-bold text-gray-400 text-[10px]">AMOUNT</th>
-                                    <th className="py-4 px-6 text-center font-bold text-gray-400 text-[10px]">STATUS</th>
-                                    <th className="py-4 px-6 text-right font-bold text-gray-400 text-[10px]">ACTIONS</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-gray-400 text-[10px]">DATE</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-gray-400 text-[10px]">NUMBER</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-gray-400 text-[10px]">INVOICE REF</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-gray-400 text-[10px]">REASON</th>
+                                    <th className="py-4 px-6 text-right font-semibold text-gray-400 text-[10px]">AMOUNT</th>
+                                    <th className="py-4 px-6 text-center font-semibold text-gray-400 text-[10px]">STATUS</th>
+                                    <th className="py-4 px-6 text-right font-semibold text-gray-400 text-[10px]">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -138,21 +138,21 @@ export function ManageCreditNotesModal({
                                             {format(new Date(cn.createdAt), "dd MMM yyyy")}
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className="font-mono font-bold text-gray-900">{cn.cnNumber}</span>
+                                            <span className="font-mono font-semibold text-gray-900">{cn.cnNumber}</span>
                                         </td>
                                         <td className="py-4 px-6 text-gray-500 font-medium">{cn.invoiceRef}</td>
                                         <td className="py-4 px-6 text-gray-500 max-w-[200px] truncate">{cn.reason}</td>
-                                        <td className="py-4 px-6 text-right font-mono font-bold text-gray-900">
+                                        <td className="py-4 px-6 text-right font-mono font-semibold text-gray-900">
                                             ${cn.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex justify-center">
                                                 {cn.status === 'VOIDED' ? (
-                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded-full border border-red-100">
+                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-600 text-[10px] font-semibold rounded-full border border-red-100">
                                                         <PiXCircle /> VOIDED
                                                     </span>
                                                 ) : (
-                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full border border-emerald-100">
+                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-semibold rounded-full border border-emerald-100">
                                                         <PiCheckCircle /> ACTIVE
                                                     </span>
                                                 )}
@@ -231,7 +231,7 @@ export function ManageCreditNotesModal({
             </div>
 
             <div className="h-[70px] px-8 bg-gray-50 border-t border-gray-100 flex items-center justify-end shrink-0">
-                <Button variant="outline" onClick={onClose} className="px-6 py-2.5 rounded-[5px] text-xs font-bold text-gray-500">
+                <Button variant="outline" onClick={onClose} className="px-6 py-2.5 rounded-[5px] text-xs font-semibold text-gray-500">
                     Close
                 </Button>
             </div>

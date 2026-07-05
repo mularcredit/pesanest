@@ -34,82 +34,74 @@ export default async function RolesPage() {
         orderBy: { name: 'asc' }
     });
 
+    const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+
     return (
-        <div className="space-y-8 animate-fade-in-up">
+        <div className="space-y-6 pb-24">
             {/* Header */}
-            <div className="flex items-end justify-between">
+            <div className="flex items-start justify-between">
                 <div>
-                    <p className="text-gds-text-muted text-sm font-medium tracking-wide">
-                        Manage user roles and access control
-                    </p>
+                    <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Roles</h1>
+                    <p className="text-[12.5px] text-gray-400 mt-0.5">Manage user roles and access control</p>
                 </div>
-                {/* Only allow Create if MANAGE permission */}
                 {((session?.user as any).role === 'SYSTEM_ADMIN' || (session?.user as any).permissions?.includes('ROLES.MANAGE')) && (
                     <Link
                         href="/dashboard/roles/new"
-                        className="px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-600 transition-all flex items-center gap-2"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] bg-[#6366F1] text-white hover:bg-indigo-600 transition-colors"
                     >
-                        <PiPlus className="text-xl" />
+                        <PiPlus className="text-[14px]" />
                         Create Role
                     </Link>
                 )}
             </div>
 
             {/* Roles Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {roles.map(role => (
-                    <div key={role.id} className="gds-glass p-6 space-y-4 hover:border-emerald-500/30 transition-all">
-                        <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                    <PiShieldCheck className="text-2xl text-emerald-500" />
+                    <div key={role.id} className="bg-white rounded-[8px] flex flex-col" style={CARD_STYLE}>
+                        {/* Card header */}
+                        <div className="px-5 py-4 flex items-start gap-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <div className="w-8 h-8 rounded-[7px] bg-emerald-50 flex items-center justify-center shrink-0">
+                                <PiShieldCheck className="text-emerald-600 text-[15px]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <h3 className="text-[13px] font-[600] text-gray-900 truncate">{role.name}</h3>
+                                    {role.isSystem && (
+                                        <span className="text-[9.5px] font-[500] px-1.5 py-0.5 rounded-[4px] bg-blue-50 text-blue-600 uppercase tracking-[0.05em]"
+                                            style={{ border: '1px solid rgba(59,130,246,0.2)' }}>
+                                            System
+                                        </span>
+                                    )}
                                 </div>
-                                <div>
-                                    <h3 className="font-bold text-gds-text-main flex items-center gap-2">
-                                        {role.name}
-                                        {role.isSystem && (
-                                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 font-bold uppercase tracking-wide">
-                                                System
-                                            </span>
-                                        )}
-                                    </h3>
-                                    <p className="text-xs text-gds-text-muted">{role.description || 'No description'}</p>
-                                </div>
+                                <p className="text-[11.5px] text-gray-400 mt-0.5 truncate">{role.description || 'No description'}</p>
                             </div>
                         </div>
 
                         {/* Stats */}
-                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[var(--gds-border)]">
-                            <div className="text-center">
-                                <div className="flex items-center justify-center gap-1 text-gds-text-muted mb-1">
-                                    <PiUsers className="text-sm" />
-                                    <p className="text-[10px] font-bold uppercase tracking-wider">Users</p>
-                                </div>
-                                <p className="text-2xl font-heading font-bold text-gds-text-main">{role._count.users}</p>
+                        <div className="px-5 py-3 grid grid-cols-2 gap-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <div className="flex items-center gap-2 text-[12.5px] text-gray-500">
+                                <PiUsers className="text-gray-300 text-[14px]" />
+                                <span><span className="font-[600] text-gray-900">{role._count.users}</span> users</span>
                             </div>
-                            <div className="text-center">
-                                <div className="flex items-center justify-center gap-1 text-gds-text-muted mb-1">
-                                    <PiLockKey className="text-sm" />
-                                    <p className="text-[10px] font-bold uppercase tracking-wider">Permissions</p>
-                                </div>
-                                <p className="text-2xl font-heading font-bold text-gds-text-main">{role.permissions.length}</p>
+                            <div className="flex items-center gap-2 text-[12.5px] text-gray-500">
+                                <PiLockKey className="text-gray-300 text-[14px]" />
+                                <span><span className="font-[600] text-gray-900">{role.permissions.length}</span> permissions</span>
                             </div>
                         </div>
 
-                        {/* Permissions Preview */}
-                        <div className="space-y-2">
-                            <p className="text-[10px] font-bold text-gds-text-muted uppercase tracking-wider">Key Permissions</p>
+                        {/* Permissions preview */}
+                        <div className="px-5 py-4 flex-1">
+                            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-2">Key Permissions</p>
                             <div className="flex flex-wrap gap-1">
                                 {role.permissions.slice(0, 6).map(rp => (
-                                    <span
-                                        key={rp.permission.id}
-                                        className="text-[9px] px-2 py-0.5 rounded bg-[var(--gds-surface-bright)] text-gds-text-muted font-mono"
-                                    >
+                                    <span key={rp.permission.id}
+                                        className="text-[9.5px] px-1.5 py-0.5 rounded-[4px] bg-gray-100 text-gray-500 font-mono">
                                         {rp.permission.resource}.{rp.permission.action}
                                     </span>
                                 ))}
                                 {role.permissions.length > 6 && (
-                                    <span className="text-[9px] px-2 py-0.5 rounded bg-[var(--gds-surface-bright)] text-gds-text-muted font-bold">
+                                    <span className="text-[9.5px] px-1.5 py-0.5 rounded-[4px] bg-gray-100 text-gray-400 font-[500]">
                                         +{role.permissions.length - 6} more
                                     </span>
                                 )}
@@ -117,19 +109,21 @@ export default async function RolesPage() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex gap-2 pt-2">
+                        <div className="px-5 py-3 flex gap-2" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
                             <Link
                                 href={`/dashboard/roles/${role.id}`}
-                                className="flex-1 py-2 px-4 bg-[var(--gds-surface)] border border-[var(--gds-border)] text-gds-text-main font-bold rounded-lg hover:bg-[var(--gds-surface-bright)] transition-all flex items-center justify-center gap-2 text-sm"
+                                className="flex-1 py-1.5 px-3 text-[12.5px] font-[500] text-gray-600 bg-white rounded-[5px] flex items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors"
+                                style={{ border: '1px solid rgba(0,0,0,0.09)' }}
                             >
-                                <PiPencil />
+                                <PiPencil className="text-[13px]" />
                                 Edit
                             </Link>
                             {!role.isSystem && (
                                 <button
-                                    className="py-2 px-4 bg-rose-500/10 border border-rose-500/20 text-rose-500 font-bold rounded-lg hover:bg-rose-500/20 transition-all flex items-center justify-center gap-2 text-sm"
+                                    className="py-1.5 px-3 text-[12.5px] font-[500] text-rose-500 bg-white rounded-[5px] flex items-center justify-center hover:bg-rose-50 transition-colors"
+                                    style={{ border: '1px solid rgba(239,68,68,0.2)' }}
                                 >
-                                    <PiTrash />
+                                    <PiTrash className="text-[13px]" />
                                 </button>
                             )}
                         </div>
@@ -137,19 +131,17 @@ export default async function RolesPage() {
                 ))}
             </div>
 
-            {/* Info Banner */}
-            <div className="gds-glass p-6 border-l-4 border-blue-500">
-                <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                        <PiWarningCircle className="text-xl text-blue-500" />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-gds-text-main mb-1">About System Roles</h4>
-                        <p className="text-sm text-gds-text-muted">
-                            System roles (marked with a blue badge) are built-in and cannot be deleted. They provide baseline access levels for common user types.
-                            You can create custom roles with specific permission combinations to match your organization's needs.
-                        </p>
-                    </div>
+            {/* Info panel — NO border-left */}
+            <div className="bg-white rounded-[8px] px-5 py-4 flex items-start gap-4" style={CARD_STYLE}>
+                <div className="w-8 h-8 rounded-[7px] bg-blue-50 flex items-center justify-center shrink-0">
+                    <PiWarningCircle className="text-blue-500 text-[15px]" />
+                </div>
+                <div>
+                    <p className="text-[13px] font-[600] text-gray-900 mb-1">About System Roles</p>
+                    <p className="text-[12.5px] text-gray-400 leading-relaxed">
+                        System roles (marked with a blue badge) are built-in and cannot be deleted. They provide baseline access levels for common user types.
+                        You can create custom roles with specific permission combinations to match your organization's needs.
+                    </p>
                 </div>
             </div>
         </div>

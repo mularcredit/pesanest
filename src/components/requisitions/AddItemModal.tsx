@@ -27,7 +27,7 @@ export function AddItemModal({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
 
-    const formatCurrency = (amount: number, currencyCode: string = "USD") => {
+    const formatCurrency = (amount: number, currencyCode: string = 'KES') => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currencyCode,
@@ -127,7 +127,7 @@ export function AddItemModal({
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 required
-                                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all"
+                                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all"
                                 placeholder="e.g., Laptop Computer"
                             />
                         </div>
@@ -137,7 +137,7 @@ export function AddItemModal({
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all resize-none"
+                                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all resize-none"
                                 rows={2}
                                 placeholder="Optional details..."
                             />
@@ -150,7 +150,7 @@ export function AddItemModal({
                             <div className="relative">
                                 <div
                                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                                    className="w-full bg-white border border-gray-200 rounded-lg min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-colors hover:border-[#29258D]"
+                                    className="w-full bg-white border border-gray-200 rounded-lg min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-colors hover:border-[#6366F1]"
                                 >
                                     {category ? (
                                         <span className="text-sm text-gray-900">{category}</span>
@@ -171,7 +171,7 @@ export function AddItemModal({
                                                 value={categorySearch}
                                                 onChange={(e) => setCategorySearch(e.target.value)}
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
+                                                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#6366F1] focus:bg-white transition-all"
                                             />
                                         </div>
                                         <div className="max-h-48 overflow-y-auto">
@@ -216,7 +216,7 @@ export function AddItemModal({
                                     min="1"
                                     value={quantity}
                                     onChange={(e) => setQuantity(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all"
+                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all"
                                 />
                             </div>
 
@@ -235,7 +235,7 @@ export function AddItemModal({
                                         value={unitPrice}
                                         onChange={(e) => setUnitPrice(e.target.value)}
                                         required
-                                        className="w-full bg-white border border-gray-200 rounded-lg pl-8 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all font-mono"
+                                        className="w-full bg-white border border-gray-200 rounded-lg pl-8 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all font-mono"
                                         placeholder="0"
                                     />
                                 </div>
@@ -243,9 +243,9 @@ export function AddItemModal({
                         </div>
 
                         {quantity && unitPrice && (
-                            <div className="bg-[#29258D]/5 border border-[#29258D]/20 rounded-lg p-3 flex items-center justify-between">
+                            <div className="bg-[#6366F1]/5 border border-[#6366F1]/20 rounded-lg p-3 flex items-center justify-between">
                                 <span className="text-sm font-medium text-gray-700">Item Total</span>
-                                <span className="text-lg font-bold text-[#29258D]">
+                                <span className="text-lg font-semibold text-[#6366F1]">
                                     {formatCurrency((parseInt(quantity) || 0) * (parseFloat(unitPrice) || 0), currency)}
                                 </span>
                             </div>
@@ -263,7 +263,7 @@ export function AddItemModal({
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 px-4 py-2.5 bg-[#29258D] text-white rounded-lg font-medium text-xs hover:bg-[#29258D]/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 bg-[#6366F1] text-white rounded-lg font-medium text-xs hover:bg-[#6366F1]/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             <PiPlus className="text-sm" />
                             {isSubmitting ? "Adding..." : "Add Item"}

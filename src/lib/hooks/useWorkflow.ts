@@ -5,7 +5,7 @@
 import { useState } from 'react';
 
 export interface ApprovalAction {
-    decision: 'APPROVED' | 'REJECTED';
+    decision: 'APPROVED' | 'REJECTED' | 'ADJUST' | 'CLARIFY' | 'POSTPONE';
     comments?: string;
 }
 
@@ -50,6 +50,7 @@ export function useApproval() {
     return {
         approve,
         reject,
+        processApproval,
         loading,
         error
     };

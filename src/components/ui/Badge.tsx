@@ -3,21 +3,21 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex items-center rounded px-2 py-0.5 text-[9px] font-normal transition-all duration-200 focus:outline-none uppercase tracking-normal",
     {
         variants: {
             variant: {
                 default:
-                    "border-transparent bg-[var(--gds-primary)] text-white shadow hover:bg-[var(--gds-primary)]/80",
+                    "border-transparent bg-[var(--p)] text-white shadow hover:bg-[var(--p-glow)]",
                 secondary:
-                    "border-transparent bg-white/10 text-[var(--gds-text-main)] hover:bg-white/20",
+                    "border-[var(--p-line)] bg-[var(--glass)] text-[var(--t2)] hover:bg-[var(--glass-h)]",
                 destructive:
-                    "border-transparent bg-red-500/10 text-red-600 shadow hover:bg-red-500/20",
-                outline: "text-[var(--gds-text-main)] border-[var(--gds-border)]",
-                success: "border-transparent bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20",
-                warning: "border-transparent bg-amber-500/10 text-amber-600 hover:bg-amber-500/20",
-                info: "border-transparent bg-cyan-500/10 text-cyan-600 hover:bg-cyan-500/20",
-                purple: "border-transparent bg-purple-500/10 text-purple-600 hover:bg-purple-500/20",
+                    "border-[var(--red-glow)] bg-[var(--red-d)] text-[var(--red)] shadow hover:bg-[var(--red)] hover:text-white",
+                outline: "text-[var(--t1)] border-[var(--p-line)] bg-transparent",
+                success: "border-[var(--green-glow)] bg-[var(--green-d)] text-[var(--green)] hover:bg-[var(--green)] hover:text-white",
+                warning: "border-[var(--amber-glow)] bg-[var(--amber-d)] text-[var(--amber)] hover:bg-[var(--amber)] hover:text-white",
+                info: "border-[var(--p-line)] bg-[var(--glass)] text-[var(--p)] hover:bg-[var(--p)] hover:text-white",
+                purple: "border-transparent bg-[var(--p)]/10 text-[var(--p)] hover:bg-[var(--p)]/20",
             },
         },
         defaultVariants: {

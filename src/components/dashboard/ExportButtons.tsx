@@ -42,7 +42,7 @@ export function ExportButtons({ expenses, userName }: ExportButtonsProps) {
                 e.title,
                 e.category,
                 e.status,
-                `$${e.amount.toFixed(2)}`
+                `KSh ${e.amount.toFixed(2)}`
             ]);
 
             autoTable(doc, {
@@ -107,7 +107,7 @@ export function ExportButtons({ expenses, userName }: ExportButtonsProps) {
                 className="gds-glass px-4 py-2 flex items-center gap-2 text-gds-text-muted hover:text-gds-text-main transition-all disabled:opacity-50"
             >
                 <BiDownload className="text-lg" />
-                <span className="text-xs font-bold tracking-wider">Export CSV</span>
+                <span className="text-xs font-semibold tracking-wider">Export CSV</span>
             </button>
             <button
                 onClick={generatePDF}

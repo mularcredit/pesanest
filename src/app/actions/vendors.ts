@@ -13,7 +13,7 @@ const VendorSchema = z.object({
     phone: z.string().optional(),
     website: z.string().url().optional().or(z.literal('')),
     paymentTerms: z.string().optional(),
-    currency: z.string().default('USD'),
+    currency: z.string().default('KES'),
     bankName: z.string().optional(),
     bankAccount: z.string().optional(),
     preferredPaymentMethod: z.string().optional(),
@@ -41,7 +41,7 @@ export async function createVendor(prevState: any, formData: FormData) {
         phone: formData.get('phone') as string,
         website: formData.get('website') as string,
         paymentTerms: formData.get('paymentTerms') as string,
-        currency: formData.get('currency') as string || 'USD',
+        currency: formData.get('currency') as string || 'KES',
         bankName: formData.get('bankName') as string || undefined,
         bankAccount: formData.get('bankAccount') as string || undefined,
         preferredPaymentMethod: formData.get('preferredPaymentMethod') as string || undefined,
@@ -154,7 +154,7 @@ export async function updateVendor(id: string, formData: FormData) {
         phone: formData.get('phone') as string,
         website: formData.get('website') as string,
         paymentTerms: formData.get('paymentTerms') as string,
-        currency: formData.get('currency') as string || 'USD',
+        currency: formData.get('currency') as string || 'KES',
     }
 
     try {

@@ -162,7 +162,7 @@ const styles = PDFStyleSheet.create({
 });
 
 // Helper to format currency
-const formatCurrency = (val: number) => `$ ${Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatCurrency = (val: number) => `KSh ${Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const formatDate = (date: any) => {
     if (!date) return '';
     try {
@@ -215,7 +215,7 @@ export const ReceiptPDF = ({ data, baseUrl, settings = {} }: { data: any, baseUr
             <PDFView style={styles.contactStrip}>
                 <PDFView style={[styles.contactItem, { textAlign: 'left' }]}>
                     <PDFText style={styles.contactLabel}>Site</PDFText>
-                    <PDFText style={styles.contactValue}>https://sscaa.eservices.gov.ss</PDFText>
+                    <PDFText style={styles.contactValue}>www.pesanest.com</PDFText>
                 </PDFView>
                 <PDFView style={styles.contactItem}>
                     <PDFText style={styles.contactLabel}>Contact Number</PDFText>
@@ -223,7 +223,7 @@ export const ReceiptPDF = ({ data, baseUrl, settings = {} }: { data: any, baseUr
                 </PDFView>
                 <PDFView style={[styles.contactItem, { textAlign: 'right' }]}>
                     <PDFText style={styles.contactLabel}>Email</PDFText>
-                    <PDFText style={styles.contactValue}>ans-sscaa@eservices.gov.ss</PDFText>
+                    <PDFText style={styles.contactValue}>support@pesanest.com</PDFText>
                 </PDFView>
             </PDFView>
 
@@ -240,7 +240,7 @@ export const ReceiptPDF = ({ data, baseUrl, settings = {} }: { data: any, baseUr
                 </PDFView>
                 <PDFView style={styles.gridItem}>
                     <PDFText style={styles.label}>Currency</PDFText>
-                    <PDFText style={styles.value}>{data?.currency || 'USD'}</PDFText>
+                    <PDFText style={styles.value}>{data?.currency || 'KES'}</PDFText>
                 </PDFView>
             </PDFView>
 
@@ -383,7 +383,7 @@ export const CreditNotePDF = ({ data, baseUrl, settings = {} }: { data: any, bas
             <PDFView style={[styles.contactStrip, { fontSize: 9, paddingVertical: 4 }]}>
                 <PDFView style={[styles.contactItem, { textAlign: 'left' }]}>
                     <PDFText style={[styles.contactLabel, { fontSize: 8 }]}>Site</PDFText>
-                    <PDFText style={[styles.contactValue, { fontSize: 9 }]}>https://sscaa.eservices.gov.ss</PDFText>
+                    <PDFText style={[styles.contactValue, { fontSize: 9 }]}>www.pesanest.com</PDFText>
                 </PDFView>
                 <PDFView style={styles.contactItem}>
                     <PDFText style={[styles.contactLabel, { fontSize: 8 }]}>Contact Number</PDFText>
@@ -391,7 +391,7 @@ export const CreditNotePDF = ({ data, baseUrl, settings = {} }: { data: any, bas
                 </PDFView>
                 <PDFView style={[styles.contactItem, { textAlign: 'right' }]}>
                     <PDFText style={[styles.contactLabel, { fontSize: 8 }]}>Email</PDFText>
-                    <PDFText style={[styles.contactValue, { fontSize: 9 }]}>ans-sscaa@eservices.gov.ss</PDFText>
+                    <PDFText style={[styles.contactValue, { fontSize: 9 }]}>support@pesanest.com</PDFText>
                 </PDFView>
             </PDFView>
 
@@ -439,7 +439,7 @@ export const CreditNotePDF = ({ data, baseUrl, settings = {} }: { data: any, bas
                 <PDFView style={{ flexDirection: 'row', backgroundColor: '#236A9E', padding: 10 }}>
                     <PDFText style={{ flex: 2, color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Description</PDFText>
                     <PDFText style={{ flex: 0.5, color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Period</PDFText>
-                    <PDFText style={{ flex: 1, color: '#fff', fontSize: 11, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Amount (USD)</PDFText>
+                    <PDFText style={{ flex: 1, color: '#fff', fontSize: 11, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Amount (KES)</PDFText>
                 </PDFView>
                 <PDFView style={{ flexDirection: 'row', padding: 8, borderBottom: '1pt solid #e2e8f0' }}>
                     <PDFView style={{ flex: 2 }}>
@@ -462,7 +462,7 @@ export const CreditNotePDF = ({ data, baseUrl, settings = {} }: { data: any, bas
                         <PDFText style={{ fontSize: 11, color: '#666' }}>0.00</PDFText>
                     </PDFView>
                     <PDFView style={{ flexDirection: 'row', justifyContent: 'space-between', borderTop: '2pt solid #e2e8f0', paddingTop: 8, marginTop: 4 }}>
-                        <PDFText style={{ fontSize: 16, fontWeight: 700, color: '#236A9E' }}>Total Credit USD</PDFText>
+                        <PDFText style={{ fontSize: 16, fontWeight: 700, color: '#236A9E' }}>Total Credit KES</PDFText>
                         <PDFText style={{ fontSize: 16, fontWeight: 700, color: '#236A9E' }}>{formatCurrency(data?.amount || 0)}</PDFText>
                     </PDFView>
                 </PDFView>
@@ -530,7 +530,7 @@ export const StatementPDF = ({ data, baseUrl, settings = {} }: { data: any, base
             <PDFView style={[styles.contactStrip, { fontSize: 7, marginBottom: 6, paddingVertical: 2 }]}>
                 <PDFView style={[styles.contactItem, { textAlign: 'left' }]}>
                     <PDFText style={[styles.contactLabel, { fontSize: 6 }]}>Site</PDFText>
-                    <PDFText style={[styles.contactValue, { fontSize: 7 }]}>https://sscaa.eservices.gov.ss</PDFText>
+                    <PDFText style={[styles.contactValue, { fontSize: 7 }]}>www.pesanest.com</PDFText>
                 </PDFView>
                 <PDFView style={styles.contactItem}>
                     <PDFText style={[styles.contactLabel, { fontSize: 6 }]}>Contact Number</PDFText>
@@ -538,7 +538,7 @@ export const StatementPDF = ({ data, baseUrl, settings = {} }: { data: any, base
                 </PDFView>
                 <PDFView style={[styles.contactItem, { textAlign: 'right' }]}>
                     <PDFText style={[styles.contactLabel, { fontSize: 6 }]}>Email</PDFText>
-                    <PDFText style={[styles.contactValue, { fontSize: 7 }]}>ans-sscaa@eservices.gov.ss</PDFText>
+                    <PDFText style={[styles.contactValue, { fontSize: 7 }]}>support@pesanest.com</PDFText>
                 </PDFView>
             </PDFView>
 
@@ -555,7 +555,7 @@ export const StatementPDF = ({ data, baseUrl, settings = {} }: { data: any, base
                 </PDFView>
                 <PDFView style={[styles.gridItem, { textAlign: 'right' }]}>
                     <PDFText style={[styles.label, { fontSize: 6 }]}>Currency</PDFText>
-                    <PDFText style={[styles.value, { fontSize: 8 }]}>USD</PDFText>
+                    <PDFText style={[styles.value, { fontSize: 8 }]}>KES</PDFText>
                 </PDFView>
                 <PDFView style={[styles.gridItem, { textAlign: 'right' }]}>
                     <PDFText style={[styles.label, { fontSize: 6 }]}>Statement Period</PDFText>
@@ -603,9 +603,9 @@ export const StatementPDF = ({ data, baseUrl, settings = {} }: { data: any, base
                     <PDFText style={{ width: '26%', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase' }}>Description</PDFText>
                     <PDFText style={{ width: '14%', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase' }}>Reference</PDFText>
                     <PDFText style={{ width: '15%', color: '#fff', fontSize: 7, fontWeight: 700, textTransform: 'uppercase' }}>Date</PDFText>
-                    <PDFText style={{ width: '13%', color: '#fff', fontSize: 7, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Debit (USD)</PDFText>
-                    <PDFText style={{ width: '13%', color: '#fff', fontSize: 7, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Credit (USD)</PDFText>
-                    <PDFText style={{ width: '14%', color: '#fff', fontSize: 7, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Balance (USD)</PDFText>
+                    <PDFText style={{ width: '13%', color: '#fff', fontSize: 7, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Debit (KES)</PDFText>
+                    <PDFText style={{ width: '13%', color: '#fff', fontSize: 7, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Credit (KES)</PDFText>
+                    <PDFText style={{ width: '14%', color: '#fff', fontSize: 7, fontWeight: 700, textAlign: 'right', textTransform: 'uppercase' }}>Balance (KES)</PDFText>
                 </PDFView>
                 {data?.transactions?.map((tx: any, idx: number) => (
                     <PDFView key={idx} style={{ flexDirection: 'row', padding: '2pt 4pt', borderBottom: '0.5pt solid #e2e8f0' }} wrap={false}>
@@ -613,16 +613,16 @@ export const StatementPDF = ({ data, baseUrl, settings = {} }: { data: any, base
                         <PDFText style={{ width: '26%', fontSize: 7, color: '#334155' }}>{tx.operator || ''}</PDFText>
                         <PDFText style={{ width: '14%', fontSize: 7, color: '#334155' }}>{tx.invoiceRef || ''}</PDFText>
                         <PDFText style={{ width: '15%', fontSize: 7, color: '#334155' }}>{tx.period || ''}</PDFText>
-                        <PDFText style={{ width: '13%', fontSize: 7, color: '#334155', textAlign: 'right' }}>{tx.debit ? formatCurrency(tx.debit).replace('$ ', '') : '—'}</PDFText>
-                        <PDFText style={{ width: '13%', fontSize: 7, color: '#334155', textAlign: 'right' }}>{tx.credit ? formatCurrency(tx.credit).replace('$ ', '') : '—'}</PDFText>
-                        <PDFText style={{ width: '14%', fontSize: 7, color: '#334155', textAlign: 'right', fontWeight: 700 }}>{formatCurrency(tx.balance || 0).replace('$ ', '')}</PDFText>
+                        <PDFText style={{ width: '13%', fontSize: 7, color: '#334155', textAlign: 'right' }}>{tx.debit ? formatCurrency(tx.debit).replace('KSh ', '') : '—'}</PDFText>
+                        <PDFText style={{ width: '13%', fontSize: 7, color: '#334155', textAlign: 'right' }}>{tx.credit ? formatCurrency(tx.credit).replace('KSh ', '') : '—'}</PDFText>
+                        <PDFText style={{ width: '14%', fontSize: 7, color: '#334155', textAlign: 'right', fontWeight: 700 }}>{formatCurrency(tx.balance || 0).replace('KSh ', '')}</PDFText>
                     </PDFView>
                 ))}
                 <PDFView style={{ flexDirection: 'row', backgroundColor: '#fef9c3', padding: '4pt 4pt', borderTop: '2pt solid #236A9E' }} wrap={false}>
                     <PDFText style={{ width: '60%', textAlign: 'right', fontSize: 7, fontWeight: 700, textTransform: 'uppercase' }}>TOTALS</PDFText>
-                    <PDFText style={{ width: '13%', textAlign: 'right', fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.totalCharges || 0).replace('$ ', '')}</PDFText>
-                    <PDFText style={{ width: '13%', textAlign: 'right', fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.totalPayments || 0).replace('$ ', '')}</PDFText>
-                    <PDFText style={{ width: '14%', textAlign: 'right', fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.outstandingBalance || 0).replace('$ ', '')}</PDFText>
+                    <PDFText style={{ width: '13%', textAlign: 'right', fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.totalCharges || 0).replace('KSh ', '')}</PDFText>
+                    <PDFText style={{ width: '13%', textAlign: 'right', fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.totalPayments || 0).replace('KSh ', '')}</PDFText>
+                    <PDFText style={{ width: '14%', textAlign: 'right', fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.outstandingBalance || 0).replace('KSh ', '')}</PDFText>
                 </PDFView>
             </PDFView>
 
@@ -673,177 +673,4 @@ export const StatementPDF = ({ data, baseUrl, settings = {} }: { data: any, base
 
 
 
-export const SSCAAReportPDF = ({ data, baseUrl, settings = {} }: { data: any, baseUrl: string, settings?: Record<string, string> }) => (
-    <PDFDocument title={`SSCAA Report - ${data?.statementNo || "DOC"}`}>
-        <PDFPage size="A4" style={[styles.page, { fontSize: 8, padding: "20pt 30pt" }]}>
-            {process.env.NEXT_PUBLIC_APP_NAME !== "Pesanest" && (
-                <PDFImage
-                    src={getImageUrl(settings.watermark_logo || "/assets/branding/emblem_of_south_sudan-freelogovectors.net_-400x395.png", baseUrl)}
-                    style={styles.watermark}
-                />
-            )}
 
-            {process.env.NEXT_PUBLIC_APP_NAME === "Pesanest" ? (
-                <PDFView style={[styles.header, { marginBottom: 6, paddingBottom: 6, justifyContent: "flex-start" }]}>
-                    {settings.pesanest_statement_logo !== "__REMOVE__" && (
-                        <PDFImage src={getImageUrl(settings.pesanest_statement_logo || "/pesanest/pesanest-dark.png", baseUrl)} style={{ height: 60, objectFit: "contain" }} />
-                    )}
-                </PDFView>
-            ) : (
-                <PDFView style={[styles.header, { marginBottom: 6, paddingBottom: 2 }]}>
-                    {settings.nra_statement_logo_left !== "__REMOVE__" && (
-                        <PDFImage src={getImageUrl(settings.nra_statement_logo_left || "/assets/branding/south-sudan-revenue-authority-formerly-national-revenue-authority-586928.jpg", baseUrl)} style={{ width: 40, height: 40, objectFit: "contain" }} />
-                    )}
-                    <PDFView style={styles.headerTextContainer}>
-                        <PDFText style={[styles.republicText, { fontSize: 8 }]}>The Republic of South Sudan</PDFText>
-                        <PDFText style={[styles.authorityText, { fontSize: 8 }]}>Civil Aviation Authority</PDFText>
-                    </PDFView>
-                    {settings.caa_statement_logo_right !== "__REMOVE__" && (
-                        <PDFImage src={getImageUrl(settings.caa_statement_logo_right || "/assets/branding/logo.857ac6f8bbd7.png", baseUrl)} style={{ width: 70, height: 70, objectFit: "contain" }} />
-                    )}
-                </PDFView>
-            )}
-
-            <PDFView style={[styles.contactStrip, { fontSize: 7, marginBottom: 6, paddingVertical: 2 }]}>
-                <PDFView style={[styles.contactItem, { textAlign: "left" }]}>
-                    <PDFText style={[styles.contactLabel, { fontSize: 6 }]}>Site</PDFText>
-                    <PDFText style={[styles.contactValue, { fontSize: 7 }]}>https://sscaa.eservices.gov.ss</PDFText>
-                </PDFView>
-                <PDFView style={styles.contactItem}>
-                    <PDFText style={[styles.contactLabel, { fontSize: 6 }]}>Contact Number</PDFText>
-                    <PDFText style={[styles.contactValue, { fontSize: 7 }]}>+211 980 11 77 99</PDFText>
-                </PDFView>
-                <PDFView style={[styles.contactItem, { textAlign: "right" }]}>
-                    <PDFText style={[styles.contactLabel, { fontSize: 6 }]}>Email</PDFText>
-                    <PDFText style={[styles.contactValue, { fontSize: 7 }]}>ans-sscaa@eservices.gov.ss</PDFText>
-                </PDFView>
-            </PDFView>
-
-            <PDFText style={[styles.titleBadge, { fontSize: 9, padding: 3, marginBottom: 6 }]}>SSCAA Requisition & Activity Report</PDFText>
-
-            <PDFView style={[styles.grid, { marginBottom: 6 }]}>
-                <PDFView style={styles.gridItem}>
-                    <PDFText style={[styles.label, { fontSize: 6 }]}>Report No.</PDFText>
-                    <PDFText style={[styles.value, { fontSize: 8 }]}>{data?.statementNo || ""}</PDFText>
-                </PDFView>
-                <PDFView style={[styles.gridItem, { textAlign: "center" }]}>
-                    <PDFText style={[styles.label, { fontSize: 6 }]}>Report Date</PDFText>
-                    <PDFText style={[styles.value, { fontSize: 8 }]}>{formatDate(data?.date)}</PDFText>
-                </PDFView>
-                <PDFView style={[styles.gridItem, { textAlign: "right" }]}>
-                    <PDFText style={[styles.label, { fontSize: 6 }]}>Currency</PDFText>
-                    <PDFText style={[styles.value, { fontSize: 8 }]}>USD</PDFText>
-                </PDFView>
-                <PDFView style={[styles.gridItem, { textAlign: "right" }]}>
-                    <PDFText style={[styles.label, { fontSize: 6 }]}>Report Period</PDFText>
-                    <PDFText style={[styles.value, { fontSize: 8 }]}>{data?.period || ""}</PDFText>
-                </PDFView>
-            </PDFView>
-
-            <PDFView style={{ flexDirection: "row", gap: 10, marginBottom: 8 }}>
-                {/* Customer Details */}
-                <PDFView style={{ flex: 1.2, border: "0.5pt solid #e2e8f0", borderRadius: 4, overflow: "hidden" }}>
-                    <PDFText style={{ backgroundColor: "#f8fafc", padding: "3pt 6pt", fontSize: 8, fontWeight: 700, borderBottom: "0.5pt solid #e2e8f0" }}>SSCAA Details</PDFText>
-                    <PDFView style={{ padding: "4pt 6pt" }}>
-                        <PDFText style={{ fontSize: 8, fontWeight: 700, color: "#333" }}>{data?.customer?.name || ""}</PDFText>
-                        <PDFText style={{ fontSize: 7.5, color: "#475569", marginTop: 1 }}>{data?.customer?.group || ""}</PDFText>
-                        <PDFText style={{ fontSize: 7.5, color: "#475569" }}>{data?.customer?.country || ""}</PDFText>
-                        <PDFText style={{ fontSize: 7, color: "#888", marginTop: 2 }}>Account Type: {data?.customer?.accountType || ""}</PDFText>
-                    </PDFView>
-                </PDFView>
-
-                {/* Summary */}
-                <PDFView style={{ flex: 1, backgroundColor: "#f8fafc", padding: "4pt 8pt", borderRadius: 4, border: "0.5pt solid #e2e8f0" }}>
-                    <PDFText style={{ fontSize: 8, fontWeight: 700, color: "#236A9E", marginBottom: 3 }}>Statement Summary</PDFText>
-                    <PDFView style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
-                        <PDFText style={{ fontSize: 7.5, color: "#64748b" }}>Opening Balance</PDFText>
-                        <PDFText style={{ fontSize: 7.5, fontWeight: 700 }}>{formatCurrency(data?.summary?.openingBalance || 0)}</PDFText>
-                    </PDFView>
-                    <PDFView style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
-                        <PDFText style={{ fontSize: 7.5, color: "#64748b" }}>Total Charges (Overflight Services)</PDFText>
-                        <PDFText style={{ fontSize: 7.5, fontWeight: 700 }}>{formatCurrency(data?.summary?.totalCharges || 0)}</PDFText>
-                    </PDFView>
-                    <PDFView style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
-                        <PDFText style={{ fontSize: 7.5, color: "#64748b" }}>Total Payments Received</PDFText>
-                        <PDFText style={{ fontSize: 7.5, fontWeight: 700 }}>({formatCurrency(data?.summary?.totalPayments || 0)})</PDFText>
-                    </PDFView>
-                    <PDFView style={{ flexDirection: "row", justifyContent: "space-between", borderTop: "0.5pt solid #cbd5e1", paddingTop: 3, marginTop: 2 }}>
-                        <PDFText style={{ fontSize: 8, fontWeight: 700, color: "#236A9E" }}>Outstanding Balance</PDFText>
-                        <PDFText style={{ fontSize: 8, fontWeight: 700, color: "#236A9E" }}>{formatCurrency(data?.summary?.outstandingBalance || 0)}</PDFText>
-                    </PDFView>
-                </PDFView>
-            </PDFView>
-
-            <PDFView style={{ marginBottom: 6 }}>
-                <PDFView style={{ flexDirection: "row", backgroundColor: "#236A9E", padding: "3pt 4pt" }}>
-                    <PDFText style={{ width: "5%", color: "#fff", fontSize: 7, fontWeight: 700, textTransform: "uppercase" }}>#</PDFText>
-                    <PDFText style={{ width: "26%", color: "#fff", fontSize: 7, fontWeight: 700, textTransform: "uppercase" }}>Description</PDFText>
-                    <PDFText style={{ width: "14%", color: "#fff", fontSize: 7, fontWeight: 700, textTransform: "uppercase" }}>Reference</PDFText>
-                    <PDFText style={{ width: "15%", color: "#fff", fontSize: 7, fontWeight: 700, textTransform: "uppercase" }}>Date</PDFText>
-                    <PDFText style={{ width: "13%", color: "#fff", fontSize: 7, fontWeight: 700, textAlign: "right", textTransform: "uppercase" }}>Debit: eService</PDFText>
-                    <PDFText style={{ width: "13%", color: "#fff", fontSize: 7, fontWeight: 700, textAlign: "right", textTransform: "uppercase" }}>Credit: SSCAA</PDFText>
-                    <PDFText style={{ width: "14%", color: "#fff", fontSize: 7, fontWeight: 700, textAlign: "right", textTransform: "uppercase" }}>Balance (USD)</PDFText>
-                </PDFView>
-                {data?.transactions?.map((tx: any, idx: number) => (
-                    <PDFView key={idx} style={{ flexDirection: "row", padding: "2pt 4pt", borderBottom: "0.5pt solid #e2e8f0" }} wrap={false}>
-                        <PDFText style={{ width: "5%", fontSize: 7, color: "#334155" }}>{idx + 1}</PDFText>
-                        <PDFText style={{ width: "26%", fontSize: 7, color: "#334155" }}>{tx.operator || ""}</PDFText>
-                        <PDFText style={{ width: "14%", fontSize: 7, color: "#334155" }}>{tx.invoiceRef || ""}</PDFText>
-                        <PDFText style={{ width: "15%", fontSize: 7, color: "#334155" }}>{tx.period || ""}</PDFText>
-                        <PDFText style={{ width: "13%", fontSize: 7, color: "#334155", textAlign: "right" }}>{tx.amount ? formatCurrency(tx.amount).replace("$ ", "") : "—"}</PDFText>
-                        <PDFText style={{ width: "13%", fontSize: 7, color: "#334155", textAlign: "right" }}>{tx.amount ? formatCurrency(tx.amount).replace("$ ", "") : "—"}</PDFText>
-                        <PDFText style={{ width: "14%", fontSize: 7, color: "#334155", textAlign: "right", fontWeight: 700 }}>{formatCurrency(tx.balance || 0).replace("$ ", "")}</PDFText>
-                    </PDFView>
-                ))}
-                <PDFView style={{ flexDirection: "row", backgroundColor: "#fef9c3", padding: "4pt 4pt", borderTop: "2pt solid #236A9E" }} wrap={false}>
-                    <PDFText style={{ width: "60%", textAlign: "right", fontSize: 7, fontWeight: 700, textTransform: "uppercase" }}>TOTALS</PDFText>
-                    <PDFText style={{ width: "13%", textAlign: "right", fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.totalCharges || 0).replace("$ ", "")}</PDFText>
-                    <PDFText style={{ width: "13%", textAlign: "right", fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.totalPayments || 0).replace("$ ", "")}</PDFText>
-                    <PDFText style={{ width: "14%", textAlign: "right", fontSize: 7, fontWeight: 700 }}>{formatCurrency(data?.summary?.outstandingBalance || 0).replace("$ ", "")}</PDFText>
-                </PDFView>
-            </PDFView>
-
-            {data?.notes && data?.notes.length > 0 && (
-                <PDFView style={{ backgroundColor: "#f8fafc", padding: "4pt 8pt", borderLeft: "2pt solid #236A9E", marginBottom: 8 }}>
-                    <PDFText style={{ fontSize: 7, fontWeight: 700, color: "#236A9E", marginBottom: 2 }}>Notes to Customer</PDFText>
-                    {data.notes.map((note: string, idx: number) => (
-                        <PDFText key={idx} style={{ fontSize: 7, marginBottom: 1, color: "#475569" }}>• {note}</PDFText>
-                    ))}
-                </PDFView>
-            )}
-
-            <PDFView style={{ marginTop: "auto", marginBottom: 6 }}>
-                <PDFView style={{ backgroundColor: "#dc2626", color: "#fff", padding: 10, borderRadius: 4, textAlign: "center" }}>
-                    <PDFText style={{ fontSize: 8, fontWeight: 700, textTransform: "uppercase", marginBottom: 2 }}>Total Outstanding Balance</PDFText>
-                    <PDFText style={{ fontSize: 14, fontWeight: 900 }}>{formatCurrency(data?.summary?.outstandingBalance || 0)}</PDFText>
-                    <PDFText style={{ fontSize: 8, marginTop: 4, opacity: 0.9 }}>Payment Due Upon Receipt</PDFText>
-                </PDFView>
-            </PDFView>
-
-            <PDFView style={[styles.footer, { borderTop: "0.5pt solid #eee", paddingTop: 4 }]}>
-                <PDFText style={[styles.footerText, { fontSize: 6 }]}>We value your business. Please contact us for any billing inquiries.</PDFText>
-                <PDFView style={styles.footerLogos}>
-                    <PDFView style={styles.logoBrand}>
-                        {process.env.NEXT_PUBLIC_APP_NAME !== "Pesanest" && (
-                            <>
-                                <PDFImage src={getImageUrl(settings.statement_footer_logo_left || "/assets/branding/eservice-logo.png", baseUrl)} style={{ width: 10, height: 10 }} />
-                                <PDFText style={[styles.eServiceText, { fontSize: 7 }]}>eServices<PDFText style={{ color: "#dc2626" }}>.</PDFText>gov<PDFText style={{ color: "#dc2626" }}>.</PDFText>ss</PDFText>
-                            </>
-                        )}
-                    </PDFView>
-                    <PDFView style={{ alignItems: "center" }}>
-                        <PDFImage src={getImageUrl(settings.statement_footer_logo_center || "/cpfooter.png", baseUrl)} style={[styles.centerFooterLogo, { height: 14 }]} />
-                    </PDFView>
-                    <PDFView style={styles.southSudanBrand}>
-                        {process.env.NEXT_PUBLIC_APP_NAME !== "Pesanest" && (
-                            <>
-                                <PDFText style={[styles.proudText, { fontSize: 6 }]}>Proudly South{"\n"}Sudanese</PDFText>
-                                <PDFImage src={getImageUrl(settings.statement_footer_logo_right || "/assets/branding/Flag_of_South_Sudan.svg.png", baseUrl)} style={{ width: 14, height: 9 }} />
-                            </>
-                        )}
-                    </PDFView>
-                </PDFView>
-            </PDFView>
-        </PDFPage>
-    </PDFDocument>
-);

@@ -90,7 +90,7 @@ export function SetupBanner() {
                             <div className="flex items-start gap-3 flex-1">
                                 <PiWarning className="text-orange-600 text-2xl mt-0.5 flex-shrink-0" />
                                 <div className="flex-1">
-                                    <h3 className="text-sm font-bold text-gray-900 mb-1">
+                                    <h3 className="text-sm font-semibold text-gray-900 mb-1">
                                         Chart of Accounts Setup Required
                                     </h3>
                                     <p className="text-sm text-gray-700 mb-3">
@@ -143,7 +143,7 @@ export function SetupBanner() {
                             <div className="flex items-start gap-3 flex-1">
                                 <PiCheckCircle className="text-blue-600 text-2xl mt-0.5 flex-shrink-0" />
                                 <div className="flex-1">
-                                    <h3 className="text-sm font-bold text-gray-900 mb-1">
+                                    <h3 className="text-sm font-semibold text-gray-900 mb-1">
                                         Setup Progress: {setupStatus.setupProgress}%
                                     </h3>
                                     <p className="text-sm text-gray-700 mb-2">

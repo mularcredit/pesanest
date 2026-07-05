@@ -346,7 +346,7 @@ export function PhoneInput({ className, value = "", onChange, ...props }: PhoneI
                         alt={selectedCountry.name}
                         className="w-6 h-auto rounded-sm shadow-sm object-cover"
                     />
-                    <span className="text-xs font-bold text-gray-600 tabular-nums tracking-wide">{selectedCountry.dialCode}</span>
+                    <span className="text-xs font-semibold text-gray-600 tabular-nums tracking-wide">{selectedCountry.dialCode}</span>
                     <PiCaretDown className={cn("text-xs text-gray-400 transition-transform duration-200", isOpen && "rotate-180")} />
                 </button>
 

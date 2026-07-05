@@ -55,10 +55,10 @@ export function UnifiedExpenseModal({
 
                         {/* Modal Card */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 15 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative bg-white w-full max-w-2xl rounded-xl overflow-hidden max-h-[90vh] flex flex-col border border-gray-200 shadow-2xl"
+                            exit={{ opacity: 0, scale: 0.98, y: 15 }}
+                            className="relative bg-white w-full max-w-4xl rounded-[24px] overflow-hidden max-h-[92vh] flex flex-col shadow-[0_32px_120px_rgba(0,0,0,0.3)] ring-1 ring-black/10 border border-gray-100"
                         >
                             {/* The ExpenseForm handles its own Header/Body/Footer */}
                             <div className="flex-1 overflow-y-auto custom-scrollbar">

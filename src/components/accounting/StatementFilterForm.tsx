@@ -57,11 +57,11 @@ export function StatementFilterForm() {
             <div className="mb-6 bg-gradient-to-r from-cyan-50 to-emerald-50 p-6 rounded-xl text-cyan-900 border border-cyan-100 flex items-center justify-between relative overflow-hidden">
                 <div className="relative z-10 flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-bold text-base">Statement settings</h3>
+                        <h3 className="font-semibold text-base">Statement settings</h3>
                     </div>
                     <p className="text-sm text-cyan-800 flex items-start gap-1.5 font-medium ml-1 leading-relaxed">
                         <img src="/man.png" alt="Info" className="w-5 h-5 object-contain shrink-0 mt-0.5" />
-                        <span>To generate a complete history, please ensure you have selected a valid <strong className="text-cyan-950 font-bold underline decoration-cyan-400/40 underline-offset-4">date range</strong> below.</span>
+                        <span>To generate a complete history, please ensure you have selected a valid <strong className="text-cyan-950 font-semibold underline decoration-cyan-400/40 underline-offset-4">date range</strong> below.</span>
                     </p>
                 </div>
 
@@ -74,7 +74,7 @@ export function StatementFilterForm() {
 
             <div className="flex flex-wrap items-end gap-4">
                 <div className="space-y-1.5 flex-1 min-w-[200px]">
-                    <label className="text-[10px] font-bold text-gray-400 tracking-tight pl-1">Start date</label>
+                    <label className="text-[10px] font-semibold text-gray-400 tracking-tight pl-1">Start date</label>
                     <DatePicker
                         value={startDate}
                         onChange={setStartDate}
@@ -84,7 +84,7 @@ export function StatementFilterForm() {
                 </div>
 
                 <div className="space-y-1.5 flex-1 min-w-[200px]">
-                    <label className="text-[10px] font-bold text-gray-400 tracking-tight pl-1">End date</label>
+                    <label className="text-[10px] font-semibold text-gray-400 tracking-tight pl-1">End date</label>
                     <DatePicker
                         value={endDate}
                         onChange={setEndDate}
@@ -105,7 +105,7 @@ export function StatementFilterForm() {
                     <button
                         onClick={handleApply}
                         disabled={isLoading}
-                        className="bg-[#29258D] hover:bg-[#29258D]/90 text-white h-[42px] px-6 rounded-[5px] text-xs font-bold transition-all border border-[#29258D]/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="bg-[#6366F1] hover:bg-[#6366F1]/90 text-white h-[42px] px-6 rounded-[5px] text-xs font-semibold transition-all border border-[#6366F1]/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {isLoading && <PiSpinner className="animate-spin text-sm" />}
                         {isLoading ? "Updating..." : "Update view"}

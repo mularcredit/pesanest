@@ -25,7 +25,7 @@ export async function POST(req: Request) {
                 city: body.city || null,
                 country: body.country || "South Sudan",
                 taxId: body.taxId || null,
-                currency: body.currency || "USD",
+                currency: body.currency || 'KES',
                 isActive: true
             }
         });
@@ -58,7 +58,7 @@ export async function PUT(req: Request) {
                 city: body.city || null,
                 country: body.country || "South Sudan",
                 taxId: body.taxId || null,
-                currency: body.currency || "USD",
+                currency: body.currency || 'KES',
                 isActive: body.isActive !== undefined ? body.isActive : true
             }
         });

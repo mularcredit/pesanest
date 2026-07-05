@@ -76,7 +76,7 @@ export function DelegateModal({ approvalId, itemTitle, onClose, onSuccess }: Del
                             <PiUserSwitch className="text-xl text-cyan-500" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-heading font-bold text-gds-text-main">
+                            <h3 className="text-lg font-heading font-semibold text-gds-text-main">
                                 Delegate Approval
                             </h3>
                             <p className="text-xs text-gds-text-muted">{itemTitle}</p>
@@ -93,7 +93,7 @@ export function DelegateModal({ approvalId, itemTitle, onClose, onSuccess }: Del
                 {/* Search Users */}
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-bold text-gds-text-main mb-2">
+                        <label className="block text-sm font-semibold text-gds-text-main mb-2">
                             Delegate To
                         </label>
                         <input
@@ -120,7 +120,7 @@ export function DelegateModal({ approvalId, itemTitle, onClose, onSuccess }: Del
                                         }}
                                         className="w-full text-left p-3 hover:bg-[var(--gds-surface-bright)] rounded-lg transition-all"
                                     >
-                                        <p className="font-bold text-sm text-gds-text-main">{user.name}</p>
+                                        <p className="font-semibold text-sm text-gds-text-main">{user.name}</p>
                                         <p className="text-xs text-gds-text-muted">{user.email} • {user.role}</p>
                                     </button>
                                 ))}
@@ -130,7 +130,7 @@ export function DelegateModal({ approvalId, itemTitle, onClose, onSuccess }: Del
 
                     {/* Reason */}
                     <div>
-                        <label className="block text-sm font-bold text-gds-text-main mb-2">
+                        <label className="block text-sm font-semibold text-gds-text-main mb-2">
                             Reason for Delegation
                         </label>
                         <textarea
@@ -147,13 +147,13 @@ export function DelegateModal({ approvalId, itemTitle, onClose, onSuccess }: Del
                         <button
                             onClick={handleDelegate}
                             disabled={loading || !delegateTo || !reason}
-                            className="flex-1 py-3 px-6 bg-cyan-500 text-white font-bold rounded-xl hover:bg-cyan-600 transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 py-3 px-6 bg-cyan-500 text-white font-semibold rounded-xl hover:bg-cyan-600 transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Delegating...' : 'Delegate Approval'}
                         </button>
                         <button
                             onClick={onClose}
-                            className="py-3 px-6 bg-[var(--gds-surface)] border border-[var(--gds-border)] text-gds-text-muted font-bold rounded-xl hover:bg-[var(--gds-surface-bright)] transition-all"
+                            className="py-3 px-6 bg-[var(--gds-surface)] border border-[var(--gds-border)] text-gds-text-muted font-semibold rounded-xl hover:bg-[var(--gds-surface-bright)] transition-all"
                         >
                             Cancel
                         </button>
@@ -203,7 +203,7 @@ export function EscalationPanel({ onTrigger }: EscalationPanelProps) {
     return (
         <div className="gds-glass p-6 space-y-6">
             <div>
-                <h2 className="text-lg font-bold text-gds-text-main mb-2">Escalation Controls</h2>
+                <h2 className="text-lg font-semibold text-gds-text-main mb-2">Escalation Controls</h2>
                 <p className="text-sm text-gds-text-muted">
                     Automatically handle overdue approvals
                 </p>
@@ -211,7 +211,7 @@ export function EscalationPanel({ onTrigger }: EscalationPanelProps) {
 
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-bold text-gds-text-main mb-2">
+                    <label className="block text-sm font-semibold text-gds-text-main mb-2">
                         Days Overdue
                     </label>
                     <input
@@ -225,7 +225,7 @@ export function EscalationPanel({ onTrigger }: EscalationPanelProps) {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold text-gds-text-main mb-2">
+                    <label className="block text-sm font-semibold text-gds-text-main mb-2">
                         Action
                     </label>
                     <select
@@ -243,26 +243,26 @@ export function EscalationPanel({ onTrigger }: EscalationPanelProps) {
             <button
                 onClick={handleEscalate}
                 disabled={loading}
-                className="w-full py-3 px-6 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-6 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {loading ? 'Processing...' : 'Trigger Escalation'}
             </button>
 
             {result && (
                 <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                    <h3 className="font-bold text-sm text-emerald-500 mb-2">Escalation Complete</h3>
+                    <h3 className="font-semibold text-sm text-emerald-500 mb-2">Escalation Complete</h3>
                     <div className="grid grid-cols-3 gap-4 text-xs">
                         <div>
                             <p className="text-gds-text-muted">Notified</p>
-                            <p className="font-bold text-gds-text-main">{result.notified}</p>
+                            <p className="font-semibold text-gds-text-main">{result.notified}</p>
                         </div>
                         <div>
                             <p className="text-gds-text-muted">Escalated</p>
-                            <p className="font-bold text-gds-text-main">{result.escalated}</p>
+                            <p className="font-semibold text-gds-text-main">{result.escalated}</p>
                         </div>
                         <div>
                             <p className="text-gds-text-muted">Auto-Approved</p>
-                            <p className="font-bold text-gds-text-main">{result.autoApproved}</p>
+                            <p className="font-semibold text-gds-text-main">{result.autoApproved}</p>
                         </div>
                     </div>
                 </div>

@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     const { 
       title, 
       description,
-      currency = "USD", 
+      currency = 'KES', 
       items = [], 
       type = "STANDARD", 
       branch, 

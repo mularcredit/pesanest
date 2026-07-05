@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { Policy } from "@prisma/client";
 import {
     PiShieldCheck,
@@ -13,13 +12,13 @@ import {
     PiToggleLeft,
     PiReceipt,
     PiClock,
-    PiCurrencyDollar,
     PiListBullets,
     PiStorefront,
     PiX,
     PiCheck,
     PiArrowRight
 } from "react-icons/pi";
+import { cn } from "@/lib/utils";
 import { togglePolicy, deletePolicy, createPolicy } from "@/app/dashboard/policies/actions";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useRouter } from "next/navigation";
@@ -28,11 +27,13 @@ interface PolicyManagerProps {
     policies: Policy[];
 }
 
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+
 // Pre-defined policy templates
 const POLICY_TEMPLATES = [
     {
         name: "Expense Receipt Required",
-        description: "Require receipts for all expenses over $50",
+        description: "Require receipts for all expenses over KES 50",
         type: "RECEIPT_REQUIREMENT",
         rules: { threshold: 50 },
         icon: PiReceipt,
@@ -40,10 +41,10 @@ const POLICY_TEMPLATES = [
     },
     {
         name: "Daily Spending Limit",
-        description: "Maximum $500 per day per employee",
+        description: "Maximum KES 500 per day per employee",
         type: "SPENDING_LIMIT",
         rules: { maxAmount: 500, isBlocking: true },
-        icon: PiCurrencyDollar,
+        icon: PiShieldCheck,
         color: "emerald"
     },
     {
@@ -56,7 +57,7 @@ const POLICY_TEMPLATES = [
     },
     {
         name: "High-Value Approval",
-        description: "Expenses over $1,000 require manager approval",
+        description: "Expenses over KES 1,000 require manager approval",
         type: "SPENDING_LIMIT",
         rules: { maxAmount: 1000, isBlocking: true },
         icon: PiShieldCheck,
@@ -64,7 +65,7 @@ const POLICY_TEMPLATES = [
     },
     {
         name: "Auto-Approval Threshold",
-        description: "Small expenses under $50 are auto-approved without manual review",
+        description: "Small expenses under KES 50 are auto-approved without manual review",
         type: "AUTO_APPROVAL",
         rules: { amountMax: 50 },
         icon: PiShieldCheck,
@@ -93,10 +94,12 @@ export function PolicyManager({ policies }: PolicyManagerProps) {
     const router = useRouter();
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState<typeof POLICY_TEMPLATES[0] | null>(null);
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
 
     const getTypeIcon = (type: string) => {
         switch (type) {
-            case 'SPENDING_LIMIT': return PiCurrencyDollar;
+            case 'SPENDING_LIMIT': return PiReceipt;
             case 'RECEIPT_REQUIREMENT': return PiReceipt;
             case 'TIME_LIMIT': return PiClock;
             case 'VENDOR_RESTRICTION': return PiStorefront;
@@ -173,231 +176,241 @@ export function PolicyManager({ policies }: PolicyManagerProps) {
         }
     };
 
+    const modal = (mounted && isCreateOpen) ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/30" onClick={() => { setIsCreateOpen(false); setSelectedTemplate(null); }} />
+            <div className="relative bg-white w-full max-w-3xl rounded-[12px] flex flex-col max-h-[90vh] overflow-hidden"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
+
+                {/* Header */}
+                <div className="px-6 py-4 flex items-center justify-between shrink-0"
+                    style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-[7px] bg-indigo-50 flex items-center justify-center text-[#6366F1]">
+                            <PiShieldCheck className="text-[16px]" />
+                        </div>
+                        <div>
+                            <h3 className="text-[14px] font-[600] text-gray-900">
+                                {selectedTemplate ? 'Configure Policy' : 'Select Policy Template'}
+                            </h3>
+                            <p className="text-[11.5px] text-gray-400 mt-0.5">
+                                {selectedTemplate ? 'Adjust settings before activating' : 'Choose a pre-configured policy to activate'}
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => { setIsCreateOpen(false); setSelectedTemplate(null); }}
+                        className="p-1.5 rounded-[6px] text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                    >
+                        <PiX className="text-[16px]" />
+                    </button>
+                </div>
+
+                {/* Body */}
+                <div className="flex-1 overflow-y-auto px-6 py-5">
+                    {!selectedTemplate ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {POLICY_TEMPLATES.map((template, idx) => {
+                                const Icon = template.icon;
+                                return (
+                                    <button
+                                        key={idx}
+                                        onClick={() => {
+                                            setSelectedTemplate(template);
+                                            if (template.type === 'AUTO_APPROVAL') setConfigValue("50");
+                                            else if (template.type === 'RECEIPT_REQUIREMENT') setConfigValue("50");
+                                            else if (template.type === 'SPENDING_LIMIT') setConfigValue("500");
+                                            else if (template.type === 'KEYWORD_RESTRICTION') setConfigValue((template.rules as any).prohibitedKeywords.join(', '));
+                                        }}
+                                        className="bg-white rounded-[8px] p-4 text-left hover:bg-gray-50 transition-colors group"
+                                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}
+                                    >
+                                        <div className="flex items-start gap-3 mb-3">
+                                            <div className={`w-8 h-8 rounded-[7px] flex items-center justify-center shrink-0 ${getColorClass(template.color)}`}>
+                                                <Icon className="text-[15px]" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-[13px] font-[600] text-gray-900 mb-0.5">{template.name}</h3>
+                                                <p className="text-[11.5px] text-gray-400 leading-relaxed">{template.description}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between pt-3"
+                                            style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                                            <span className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.06em]">
+                                                {template.type.replace(/_/g, ' ')}
+                                            </span>
+                                            <span className="text-[11.5px] text-[#6366F1] font-[500] flex items-center gap-1">
+                                                Configure <PiArrowRight className="text-[12px]" />
+                                            </span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="max-w-md mx-auto">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className={`w-9 h-9 rounded-[7px] flex items-center justify-center ${getColorClass(selectedTemplate.color)}`}>
+                                    {(() => { const Icon = selectedTemplate.icon; return <Icon className="text-[16px]" />; })()}
+                                </div>
+                                <div>
+                                    <h4 className="text-[13px] font-[600] text-gray-900">{selectedTemplate.name}</h4>
+                                    <p className="text-[11.5px] text-gray-400">{selectedTemplate.type.replace(/_/g, ' ')}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-[11.5px] font-[500] text-gray-400 mb-1.5">
+                                    {selectedTemplate.type === 'AUTO_APPROVAL' ? 'Threshold Amount (KES)' :
+                                        selectedTemplate.type === 'RECEIPT_REQUIREMENT' ? 'Threshold Amount (KES)' :
+                                        selectedTemplate.type === 'SPENDING_LIMIT' ? 'Daily Limit (KES)' :
+                                        selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'Prohibited Keywords' : 'Limit Value'}
+                                </label>
+                                <div className="relative">
+                                    {selectedTemplate.type !== 'KEYWORD_RESTRICTION' && (
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-[500]">KES</span>
+                                    )}
+                                    <input
+                                        type={selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'text' : 'number'}
+                                        value={configValue}
+                                        onChange={(e) => setConfigValue(e.target.value)}
+                                        className={`w-full ${selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'px-3' : 'pl-11 pr-3'} py-[10px] rounded-[6px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white`}
+                                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}
+                                        placeholder={selectedTemplate.type === 'KEYWORD_RESTRICTION' ? "alcohol, wine, beer..." : "0"}
+                                    />
+                                </div>
+                                <p className="mt-1.5 text-[10.5px] text-gray-400">
+                                    {selectedTemplate.type === 'AUTO_APPROVAL' ? 'Expenses below this amount will skip manager approval entirely.' :
+                                        'This value will be used to enforce the policy rules.'}
+                                </p>
+                            </div>
+
+                            <div className="mt-8 flex gap-3">
+                                <button
+                                    onClick={() => setSelectedTemplate(null)}
+                                    className="flex-1 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                                    style={{ border: '1px solid rgba(0,0,0,0.09)' }}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={() => handleActivateTemplate(selectedTemplate)}
+                                    className="flex-[2] px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-white bg-[#6366F1] hover:bg-indigo-600 transition-colors"
+                                >
+                                    Activate Policy
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 flex items-center justify-between shrink-0"
+                    style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                    <p className="text-[11.5px] text-gray-400">
+                        You can modify or deactivate policies anytime.
+                    </p>
+                    <button
+                        onClick={() => { setIsCreateOpen(false); setSelectedTemplate(null); }}
+                        className="px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    ) : null;
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-5">
             <div className="flex justify-end">
                 <button
                     onClick={() => setIsCreateOpen(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-indigo-500/20 hover:scale-105 transition-transform"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] bg-[#6366F1] text-white hover:bg-indigo-600 transition-colors"
                 >
-                    <PiPlus className="text-lg" />
+                    <PiPlus className="text-[14px]" />
                     Add Policy
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {policies.map(policy => {
-                    const Icon = getTypeIcon(policy.type);
-                    return (
-                        <div key={policy.id} className={`gds-glass p-6 border-l-4 ${policy.isActive ? 'border-l-emerald-500' : 'border-l-gray-300 opacity-70'}`}>
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${policy.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-gray-100 text-gray-400'}`}>
-                                        <Icon className="text-xl" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gds-text-main">{policy.name}</h3>
-                                        <p className="text-xs text-gds-text-muted">{policy.description}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button onClick={() => handleToggle(policy)} className="text-2xl transition-colors">
-                                        {policy.isActive ?
-                                            <PiToggleRight className="text-emerald-500" /> :
-                                            <PiToggleLeft className="text-gray-400" />
-                                        }
-                                    </button>
-                                    <button onClick={() => handleDelete(policy.id)} className="p-2 hover:bg-rose-500/10 text-gray-400 hover:text-rose-500 rounded-lg transition-colors">
-                                        <PiTrash />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="mt-4 pt-4 border-t border-[var(--gds-border)]">
-                                <p className="text-[10px] font-bold text-gds-text-muted uppercase tracking-widest mb-2">Rules Configuration</p>
-                                <code className="block text-xs bg-[var(--gds-surface-bright)] p-3 rounded-lg font-mono text-gds-text-main truncate">
-                                    {policy.rules}
-                                </code>
-                            </div>
-
-                            <div className="mt-4 flex items-center gap-2">
-                                <span className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider border ${policy.isActive
-                                    ? 'bg-emerald-500/5 text-emerald-600 border-emerald-500/20'
-                                    : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
-                                    {policy.isActive ? 'Active & Enforcing' : 'Inactive'}
-                                </span>
-                                <span className="px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider border bg-blue-500/5 text-blue-600 border-blue-500/20">
-                                    {policy.type.replace('_', ' ')}
-                                </span>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Policy Templates Modal */}
-            {isCreateOpen && createPortal(
-                <AnimatePresence>
-                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 lg:p-8">
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsCreateOpen(false)}
-                            className="fixed inset-0 bg-white/40 backdrop-blur-xl"
-                        />
-
-                        {/* Modal Card */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative bg-white border border-gray-200 w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
-                        >
-                            {/* Header - Fixed 88px */}
-                            <div className="h-[88px] px-6 flex justify-between items-center bg-white border-b border-gray-100 shrink-0">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-600">
-                                        <PiShieldCheck className="text-2xl" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-0.5">
-                                            {selectedTemplate ? 'Configure Policy' : 'Select Policy Template'}
-                                        </h3>
-                                        <p className="text-gray-500 text-xs font-medium">
-                                            {selectedTemplate ? 'Adjust settings before activating' : 'Choose a pre-configured policy to activate'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => {
-                                        setIsCreateOpen(false);
-                                        setSelectedTemplate(null);
-                                    }}
-                                    className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-colors"
-                                >
-                                    <PiX className="text-xl" />
-                                </button>
-                            </div>
-
-                            {/* Body - Grey Background */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#f8f9fa] p-6">
-                                {!selectedTemplate ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {POLICY_TEMPLATES.map((template, idx) => {
-                                            const Icon = template.icon;
-                                            return (
-                                                <button
-                                                    key={idx}
-                                                    onClick={() => {
-                                                        setSelectedTemplate(template);
-                                                        // Set initial default value
-                                                        if (template.type === 'AUTO_APPROVAL') setConfigValue("50");
-                                                        else if (template.type === 'RECEIPT_REQUIREMENT') setConfigValue("50");
-                                                        else if (template.type === 'SPENDING_LIMIT') setConfigValue("500");
-                                                        else if (template.type === 'KEYWORD_RESTRICTION') setConfigValue((template.rules as any).prohibitedKeywords.join(', '));
-                                                    }}
-                                                    className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-indigo-500 hover:shadow-md transition-all group"
-                                                >
-                                                    <div className="flex items-start gap-3 mb-3">
-                                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getColorClass(template.color)} border transition-all group-hover:scale-110`}>
-                                                            <Icon className="text-xl" />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <h3 className="font-bold text-gray-900 text-sm mb-1">{template.name}</h3>
-                                                            <p className="text-xs text-gray-600 leading-relaxed">{template.description}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                                                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                                                            {template.type.replace('_', ' ')}
-                                                        </span>
-                                                        <span className="text-xs text-indigo-600 font-medium group-hover:text-indigo-700 flex items-center gap-1">
-                                                            Configure <PiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-                                                        </span>
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                ) : (
-                                    <div className="max-w-md mx-auto bg-white border border-gray-100 rounded-xl p-8 shadow-sm">
-                                        <div className="flex items-center gap-4 mb-8">
-                                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${getColorClass(selectedTemplate.color)} border shadow-inner`}>
-                                                {(() => { const Icon = selectedTemplate.icon; return <Icon className="text-2xl" /> })()}
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-900">{selectedTemplate.name}</h4>
-                                                <p className="text-xs text-gray-500">{selectedTemplate.type.replace('_', ' ')}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <div>
-                                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-                                                    {selectedTemplate.type === 'AUTO_APPROVAL' ? 'Threshold Amount ($)' :
-                                                        selectedTemplate.type === 'RECEIPT_REQUIREMENT' ? 'Threshold Amount ($)' :
-                                                            selectedTemplate.type === 'SPENDING_LIMIT' ? 'Daily Limit ($)' :
-                                                                selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'Prohibited Keywords' : 'Limit Value'}
-                                                </label>
-                                                <div className="relative">
-                                                    {selectedTemplate.type !== 'KEYWORD_RESTRICTION' && (
-                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
-                                                    )}
-                                                    <input
-                                                        type={selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'text' : 'number'}
-                                                        value={configValue}
-                                                        onChange={(e) => setConfigValue(e.target.value)}
-                                                        className={`w-full ${selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'px-4' : 'pl-8 pr-4'} py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all`}
-                                                        placeholder={selectedTemplate.type === 'KEYWORD_RESTRICTION' ? "alcohol, wine, beer..." : "0.00"}
-                                                    />
-                                                </div>
-                                                <p className="mt-2 text-[10px] text-gray-500 leading-relaxed italic">
-                                                    {selectedTemplate.type === 'AUTO_APPROVAL' ? 'Expenses below this amount will skip manager approval entirely.' :
-                                                        'This value will be used to enforce the policy rules.'}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-10 flex gap-3">
-                                            <button
-                                                onClick={() => setSelectedTemplate(null)}
-                                                className="flex-1 px-4 py-3 bg-gray-50 text-gray-700 rounded-lg font-bold text-xs uppercase tracking-widest border border-gray-200 hover:bg-gray-100 transition-colors"
-                                            >
-                                                Back
-                                            </button>
-                                            <button
-                                                onClick={() => handleActivateTemplate(selectedTemplate)}
-                                                className="flex-[2] px-4 py-3 bg-indigo-600 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-colors"
-                                            >
-                                                Activate Policy
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Footer - Fixed 88px */}
-                            <div className="h-[88px] px-6 bg-white border-t border-gray-100 flex items-center justify-between shrink-0">
-                                <p className="text-xs text-gray-500">
-                                    💡 <strong className="text-gray-700">Tip:</strong> You can modify or deactivate policies anytime
-                                </p>
-                                <button
-                                    onClick={() => {
-                                        setIsCreateOpen(false);
-                                        setSelectedTemplate(null);
-                                    }}
-                                    className="px-4 py-2.5 rounded-md text-xs font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors shadow-none"
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </motion.div>
+            {policies.length === 0 ? (
+                <div className="bg-white rounded-[8px] py-20 flex flex-col items-center" style={CARD_STYLE}>
+                    <div className="w-10 h-10 rounded-[8px] bg-gray-50 flex items-center justify-center mb-3"
+                        style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
+                        <PiShieldCheck className="text-gray-300 text-xl" />
                     </div>
-                </AnimatePresence>,
-                document.body
+                    <p className="text-[13px] font-[500] text-gray-700">No policies configured</p>
+                    <p className="text-[12px] text-gray-400 mt-0.5">Add a policy template to start enforcing spend controls.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {policies.map(policy => {
+                        const Icon = getTypeIcon(policy.type);
+                        return (
+                            <div key={policy.id} className={cn('bg-white rounded-[8px] flex flex-col', !policy.isActive && 'opacity-60')}
+                                style={CARD_STYLE}>
+                                {/* Card header */}
+                                <div className="px-5 py-4 flex items-start justify-between gap-3"
+                                    style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className={cn(
+                                            'w-8 h-8 rounded-[7px] flex items-center justify-center shrink-0',
+                                            policy.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'
+                                        )}>
+                                            <Icon className="text-[15px]" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <h3 className="text-[13px] font-[600] text-gray-900 truncate">{policy.name}</h3>
+                                            <p className="text-[11.5px] text-gray-400 truncate">{policy.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <button onClick={() => handleToggle(policy)} className="text-[28px] transition-colors">
+                                            {policy.isActive
+                                                ? <PiToggleRight className="text-emerald-500" />
+                                                : <PiToggleLeft className="text-gray-300" />
+                                            }
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(policy.id)}
+                                            className="p-1.5 hover:bg-rose-50 text-gray-300 hover:text-rose-500 rounded-[5px] transition-colors"
+                                        >
+                                            <PiTrash className="text-[14px]" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Rules preview */}
+                                <div className="px-5 py-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                    <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-1.5">Rules</p>
+                                    <code className="block text-[11px] bg-gray-50 px-3 py-2 rounded-[5px] font-mono text-gray-600 truncate"
+                                        style={{ border: '1px solid rgba(0,0,0,0.06)' }}>
+                                        {policy.rules as string}
+                                    </code>
+                                </div>
+
+                                {/* Badges */}
+                                <div className="px-5 py-3 flex items-center gap-2">
+                                    <span className={cn(
+                                        'text-[10px] font-[500] px-2 py-0.5 rounded-[4px] uppercase tracking-[0.05em]',
+                                        policy.isActive ? 'text-emerald-600 bg-emerald-50' : 'text-gray-500 bg-gray-100'
+                                    )} style={{ border: policy.isActive ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(0,0,0,0.09)' }}>
+                                        {policy.isActive ? 'Active' : 'Inactive'}
+                                    </span>
+                                    <span className="text-[10px] font-[500] px-2 py-0.5 rounded-[4px] text-blue-600 bg-blue-50 uppercase tracking-[0.05em]"
+                                        style={{ border: '1px solid rgba(59,130,246,0.2)' }}>
+                                        {policy.type.replace(/_/g, ' ')}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             )}
+
+            {modal}
         </div>
     );
 }

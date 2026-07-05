@@ -2,18 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import {
-    PiChartLine,
-    PiClock,
-    PiCheckCircle,
-    PiXCircle,
-    PiWarning,
-    PiTrendUp,
-    PiTrendDown,
-    PiUsers,
-    PiCalendar
+    PiCheckCircle, PiXCircle, PiClock, PiWarning,
+    PiUsers, PiSpinner, PiCaretDown,
 } from 'react-icons/pi';
-import { cn } from '@/lib/utils';
 import { EscalationPanel } from '@/components/workflow/DelegationEscalation';
+
+const CARD: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const SELECT = "appearance-none bg-white rounded-[6px] px-3 py-2 text-[12.5px] font-[500] text-gray-700 outline-none cursor-pointer pr-7";
 
 interface AnalyticsData {
     summary: {
@@ -28,39 +23,28 @@ interface AnalyticsData {
     };
     byLevel: Record<number, any>;
     byCategory: Record<string, any>;
-    dailyTrend: Array<{
-        date: string;
-        total: number;
-        approved: number;
-        rejected: number;
-        pending: number;
-    }>;
+    dailyTrend: Array<{ date: string; total: number; approved: number; rejected: number; pending: number }>;
     overdueApprovals: Array<any>;
     topApprovers?: Array<any>;
-    period: {
-        days: number;
-        scope: string;
-    };
+    period: { days: number; scope: string };
 }
 
 export default function WorkflowAnalyticsPage() {
     const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [scope, setScope] = useState<'personal' | 'system'>('personal');
-    const [days, setDays] = useState(30);
+    const [loading, setLoading]     = useState(true);
+    const [scope, setScope]         = useState<'personal' | 'system'>('personal');
+    const [days, setDays]           = useState(30);
 
-    useEffect(() => {
-        fetchAnalytics();
-    }, [scope, days]);
+    useEffect(() => { fetchAnalytics(); }, [scope, days]);
 
     const fetchAnalytics = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/workflow/analytics?scope=${scope}&days=${days}`);
-            const data = await response.json();
+            const res  = await fetch(`/api/workflow/analytics?scope=${scope}&days=${days}`);
+            const data = await res.json();
             setAnalytics(data);
-        } catch (error) {
-            console.error('Failed to fetch analytics:', error);
+        } catch (e) {
+            console.error(e);
         } finally {
             setLoading(false);
         }
@@ -68,270 +52,229 @@ export default function WorkflowAnalyticsPage() {
 
     if (loading || !analytics) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-                    <p className="text-gds-text-muted">Loading analytics...</p>
-                </div>
+            <div className="flex items-center justify-center min-h-[50vh]">
+                <PiSpinner className="animate-spin text-[28px] text-[#6366f1]" />
             </div>
         );
     }
 
     const { summary, dailyTrend, byCategory, overdueApprovals, topApprovers } = analytics;
+    const maxDay = Math.max(...dailyTrend.map(d => d.total), 1);
+
+    const STATS = [
+        {
+            label: 'Approved',
+            value: summary.approved,
+            sub: `${summary.approvalRate}% rate`,
+            icon: PiCheckCircle,
+            color: '#10b981',
+            bg: 'bg-emerald-50',
+        },
+        {
+            label: 'Rejected',
+            value: summary.rejected,
+            sub: `${summary.total} total`,
+            icon: PiXCircle,
+            color: '#ef4444',
+            bg: 'bg-rose-50',
+        },
+        {
+            label: 'Avg Response',
+            value: `${summary.avgResponseTimeHours.toFixed(1)}h`,
+            sub: 'Processing time',
+            icon: PiClock,
+            color: '#f59e0b',
+            bg: 'bg-amber-50',
+        },
+        {
+            label: 'Overdue',
+            value: summary.overdueCount,
+            sub: summary.overdueCount > 0 ? 'Needs attention' : 'All clear',
+            icon: PiWarning,
+            color: summary.overdueCount > 0 ? '#ef4444' : '#10b981',
+            bg: summary.overdueCount > 0 ? 'bg-rose-50' : 'bg-emerald-50',
+        },
+    ];
 
     return (
-        <div className="space-y-8 animate-fade-in-up">
+        <div className="space-y-6">
+
             {/* Header */}
-            <div className="flex items-end justify-between">
+            <div className="flex items-end justify-between gap-4 flex-wrap">
                 <div>
-                    <h1 className="text-4xl font-heading font-bold text-gds-text-main mb-2">
-                        Workflow Analytics
-                    </h1>
-                    <p className="text-gds-text-muted text-sm font-medium tracking-wide">
-                        Performance insights and approval metrics
-                    </p>
+                    <h1 className="text-[20px] font-[700] text-gray-900">Workflow Analytics</h1>
+                    <p className="text-[12.5px] text-gray-400 mt-0.5">Approval performance & response metrics</p>
                 </div>
 
-                {/* Filters */}
-                <div className="flex gap-3">
-                    <select
-                        value={days}
-                        onChange={(e) => setDays(parseInt(e.target.value))}
-                        className="px-4 py-2 bg-[var(--gds-surface)] border border-[var(--gds-border)] rounded-xl text-sm font-medium focus:outline-none focus:border-emerald-500"
-                    >
-                        <option value={7}>Last 7 days</option>
-                        <option value={30}>Last 30 days</option>
-                        <option value={90}>Last 90 days</option>
-                    </select>
-
-                    <div className="flex gap-2 p-1 bg-[var(--gds-surface)] border border-[var(--gds-border)] rounded-xl">
-                        <button
-                            onClick={() => setScope('personal')}
-                            className={cn(
-                                "px-4 py-2 rounded-lg text-sm font-bold transition-all",
-                                scope === 'personal'
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'text-gds-text-muted hover:text-gds-text-main'
-                            )}
-                        >
-                            Personal
-                        </button>
-                        <button
-                            onClick={() => setScope('system')}
-                            className={cn(
-                                "px-4 py-2 rounded-lg text-sm font-bold transition-all",
-                                scope === 'system'
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'text-gds-text-muted hover:text-gds-text-main'
-                            )}
-                        >
-                            System-Wide
-                        </button>
+                <div className="flex items-center gap-2">
+                    {/* Days selector */}
+                    <div className="relative">
+                        <select value={days} onChange={e => setDays(parseInt(e.target.value))}
+                            className={SELECT} style={CARD}>
+                            <option value={7}>Last 7 days</option>
+                            <option value={30}>Last 30 days</option>
+                            <option value={90}>Last 90 days</option>
+                        </select>
+                        <PiCaretDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[12px]" />
                     </div>
-                </div>
-            </div>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="gds-glass p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                            <PiCheckCircle className="text-2xl text-emerald-500" />
-                        </div>
-                        <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">
-                            {summary.approvalRate}%
-                        </span>
-                    </div>
-                    <h3 className="text-2xl font-heading font-bold text-gds-text-main mb-1">
-                        {summary.approved}
-                    </h3>
-                    <p className="text-xs text-gds-text-muted font-medium uppercase tracking-wider">
-                        Approved
-                    </p>
-                </div>
-
-                <div className="gds-glass p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center">
-                            <PiXCircle className="text-2xl text-rose-500" />
-                        </div>
-                    </div>
-                    <h3 className="text-2xl font-heading font-bold text-gds-text-main mb-1">
-                        {summary.rejected}
-                    </h3>
-                    <p className="text-xs text-gds-text-muted font-medium uppercase tracking-wider">
-                        Rejected
-                    </p>
-                </div>
-
-                <div className="gds-glass p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                            <PiClock className="text-2xl text-amber-500" />
-                        </div>
-                    </div>
-                    <h3 className="text-2xl font-heading font-bold text-gds-text-main mb-1">
-                        {summary.avgResponseTimeHours.toFixed(1)}h
-                    </h3>
-                    <p className="text-xs text-gds-text-muted font-medium uppercase tracking-wider">
-                        Avg Response Time
-                    </p>
-                </div>
-
-                <div className="gds-glass p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center">
-                            <PiWarning className="text-2xl text-red-500" />
-                        </div>
-                        {summary.overdueCount > 0 && (
-                            <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded-full">
-                                URGENT
-                            </span>
-                        )}
-                    </div>
-                    <h3 className="text-2xl font-heading font-bold text-gds-text-main mb-1">
-                        {summary.overdueCount}
-                    </h3>
-                    <p className="text-xs text-gds-text-muted font-medium uppercase tracking-wider">
-                        Overdue Approvals
-                    </p>
-                </div>
-            </div>
-
-            {/* Daily Trend Chart */}
-            <div className="gds-glass p-6">
-                <h2 className="text-lg font-bold text-gds-text-main mb-6 flex items-center gap-2">
-                    <PiChartLine className="text-emerald-500" />
-                    Daily Trend
-                </h2>
-                <div className="space-y-3">
-                    {dailyTrend.map((day, index) => {
-                        const maxValue = Math.max(...dailyTrend.map(d => d.total));
-                        const percentage = maxValue > 0 ? (day.total / maxValue) * 100 : 0;
-
-                        return (
-                            <div key={index} className="space-y-1">
-                                <div className="flex items-center justify-between text-xs">
-                                    <span className="text-gds-text-muted font-medium">
-                                        {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                    </span>
-                                    <span className="text-gds-text-main font-bold">{day.total}</span>
-                                </div>
-                                <div className="h-2 bg-[var(--gds-surface)] rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all"
-                                        style={{ width: `${percentage}%` }}
-                                    />
-                                </div>
-                                <div className="flex gap-3 text-[10px] font-medium">
-                                    <span className="text-emerald-500">✓ {day.approved}</span>
-                                    <span className="text-rose-500">✗ {day.rejected}</span>
-                                    <span className="text-amber-500">⏳ {day.pending}</span>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Category Breakdown & Overdue Approvals */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* By Category */}
-                <div className="gds-glass p-6">
-                    <h2 className="text-lg font-bold text-gds-text-main mb-6">
-                        By Category
-                    </h2>
-                    <div className="space-y-4">
-                        {Object.entries(byCategory).map(([category, stats]: [string, any]) => (
-                            <div key={category} className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-gds-text-main">{category}</span>
-                                    <span className="text-xs text-gds-text-muted">
-                                        ${stats.totalAmount.toLocaleString()}
-                                    </span>
-                                </div>
-                                <div className="flex gap-2">
-                                    <div className="flex-1 h-2 bg-emerald-500/20 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-emerald-500"
-                                            style={{ width: `${(stats.approved / stats.total) * 100}%` }}
-                                        />
-                                    </div>
-                                    <span className="text-xs font-bold text-gds-text-muted">
-                                        {stats.approved}/{stats.total}
-                                    </span>
-                                </div>
-                            </div>
+                    {/* Scope toggle */}
+                    <div className="flex items-center bg-white rounded-[6px] p-0.5" style={CARD}>
+                        {(['personal', 'system'] as const).map(s => (
+                            <button key={s} onClick={() => setScope(s)}
+                                className="px-3 py-1.5 rounded-[5px] text-[12px] font-[500] transition-all"
+                                style={scope === s
+                                    ? { background: '#6366f1', color: '#fff' }
+                                    : { color: '#6b7280' }}>
+                                {s === 'personal' ? 'Personal' : 'System-wide'}
+                            </button>
                         ))}
                     </div>
                 </div>
+            </div>
 
-                {/* Overdue Approvals */}
-                <div className="gds-glass p-6">
-                    <h2 className="text-lg font-bold text-gds-text-main mb-6 flex items-center gap-2">
-                        <PiWarning className="text-red-500" />
-                        Overdue Approvals
-                    </h2>
-                    {overdueApprovals.length === 0 ? (
-                        <p className="text-center py-8 text-gds-text-muted text-sm">
-                            No overdue approvals 🎉
-                        </p>
-                    ) : (
-                        <div className="space-y-3">
-                            {overdueApprovals.slice(0, 5).map((approval) => (
-                                <div
-                                    key={approval.id}
-                                    className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl"
-                                >
-                                    <div className="flex items-start justify-between mb-2">
-                                        <h4 className="font-bold text-sm text-gds-text-main">
-                                            {approval.title}
-                                        </h4>
-                                        <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded-full">
-                                            {approval.daysOverdue}d
+            {/* Stat cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {STATS.map(({ label, value, sub, icon: Icon, color, bg }) => (
+                    <div key={label} className="bg-white rounded-[8px] p-4" style={CARD}>
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="text-[11px] font-[500] text-gray-400 uppercase tracking-[0.06em]">{label}</p>
+                            <div className={`w-7 h-7 rounded-[6px] flex items-center justify-center ${bg}`}>
+                                <Icon className="text-[14px]" style={{ color }} />
+                            </div>
+                        </div>
+                        <p className="text-[22px] font-[700] text-gray-900 leading-none tabular-nums">{value}</p>
+                        <p className="text-[11px] text-gray-400 mt-1">{sub}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* Daily trend + category breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                {/* Daily trend */}
+                <div className="bg-white rounded-[8px] p-5" style={CARD}>
+                    <h3 className="text-[13px] font-[600] text-gray-900 mb-4">Daily Trend</h3>
+                    <div className="space-y-2.5">
+                        {dailyTrend.slice(-14).map((day, i) => {
+                            const pct = (day.total / maxDay) * 100;
+                            return (
+                                <div key={i}>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-[11px] text-gray-400 font-[500]">
+                                            {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                         </span>
+                                        <div className="flex items-center gap-3 text-[10.5px] font-[600]">
+                                            <span className="text-emerald-600">{day.approved} ✓</span>
+                                            <span className="text-rose-500">{day.rejected} ✗</span>
+                                            <span className="text-amber-500">{day.pending} ⏳</span>
+                                        </div>
                                     </div>
-                                    <p className="text-xs text-gds-text-muted">
-                                        {approval.submitter} • ${approval.amount.toLocaleString()}
-                                    </p>
+                                    <div className="h-[5px] rounded-full overflow-hidden"
+                                        style={{ background: 'rgba(0,0,0,0.05)' }}>
+                                        <div className="h-full rounded-full transition-all"
+                                            style={{ width: `${pct}%`, background: '#6366f1' }} />
+                                    </div>
                                 </div>
-                            ))}
+                            );
+                        })}
+                        {dailyTrend.length === 0 && (
+                            <p className="text-[12px] text-gray-400 py-4 text-center">No activity in this period</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* By category */}
+                <div className="bg-white rounded-[8px] p-5" style={CARD}>
+                    <h3 className="text-[13px] font-[600] text-gray-900 mb-4">By Category</h3>
+                    {Object.keys(byCategory).length === 0 ? (
+                        <p className="text-[12px] text-gray-400 py-4 text-center">No data yet</p>
+                    ) : (
+                        <div className="space-y-3.5">
+                            {Object.entries(byCategory).map(([cat, stats]: [string, any]) => {
+                                const rate = stats.total > 0 ? Math.round((stats.approved / stats.total) * 100) : 0;
+                                return (
+                                    <div key={cat}>
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <span className="text-[12px] font-[500] text-gray-700">{cat}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[11px] text-gray-400">
+                                                    {stats.approved}/{stats.total}
+                                                </span>
+                                                <span className="text-[10.5px] font-[600] px-1.5 py-0.5 rounded-[4px]"
+                                                    style={{
+                                                        background: rate >= 70 ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+                                                        color: rate >= 70 ? '#10b981' : '#f59e0b',
+                                                    }}>
+                                                    {rate}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="h-[5px] rounded-full overflow-hidden"
+                                            style={{ background: 'rgba(0,0,0,0.05)' }}>
+                                            <div className="h-full rounded-full"
+                                                style={{ width: `${rate}%`, background: rate >= 70 ? '#10b981' : '#f59e0b' }} />
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Top Approvers (System-wide only) */}
-            {scope === 'system' && topApprovers && topApprovers.length > 0 && (
-                <div className="gds-glass p-6">
-                    <h2 className="text-lg font-bold text-gds-text-main mb-6 flex items-center gap-2">
-                        <PiUsers className="text-emerald-500" />
-                        Top Approvers
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {topApprovers.slice(0, 6).map((approver, index) => (
-                            <div key={index} className="p-4 bg-[var(--gds-surface)] rounded-xl">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center font-bold text-emerald-500">
-                                        #{index + 1}
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-bold text-sm text-gds-text-main">{approver.name}</h4>
-                                        <p className="text-xs text-gds-text-muted">{approver.role}</p>
-                                    </div>
+            {/* Overdue approvals */}
+            {overdueApprovals.length > 0 && (
+                <div className="bg-white rounded-[8px] p-5" style={CARD}>
+                    <div className="flex items-center gap-2 mb-4">
+                        <PiWarning className="text-[15px] text-rose-500" />
+                        <h3 className="text-[13px] font-[600] text-gray-900">Overdue Approvals</h3>
+                        <span className="ml-auto text-[10.5px] font-[600] text-rose-600 px-2 py-0.5 rounded-[4px]"
+                            style={{ background: 'rgba(239,68,68,0.08)' }}>
+                            {overdueApprovals.length} overdue
+                        </span>
+                    </div>
+                    <div className="space-y-2">
+                        {overdueApprovals.slice(0, 5).map((a: any) => (
+                            <div key={a.id} className="flex items-center justify-between px-3 py-2.5 rounded-[6px]"
+                                style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)' }}>
+                                <div>
+                                    <p className="text-[12.5px] font-[500] text-gray-900">{a.title}</p>
+                                    <p className="text-[11px] text-gray-400 mt-0.5">
+                                        {a.submitter} · KES {Number(a.amount).toLocaleString()}
+                                    </p>
                                 </div>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div>
-                                        <p className="text-gds-text-muted">Total</p>
-                                        <p className="font-bold text-gds-text-main">{approver.total}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-gds-text-muted">Rate</p>
-                                        <p className="font-bold text-emerald-500">{approver.approvalRate.toFixed(0)}%</p>
-                                    </div>
-                                    <div className="col-span-2">
-                                        <p className="text-gds-text-muted">Avg Time</p>
-                                        <p className="font-bold text-gds-text-main">{approver.avgResponseTime.toFixed(1)}h</p>
+                                <span className="text-[10.5px] font-[700] text-rose-600 shrink-0 ml-4">
+                                    {a.daysOverdue}d overdue
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Top approvers — system wide only */}
+            {scope === 'system' && topApprovers && topApprovers.length > 0 && (
+                <div className="bg-white rounded-[8px] p-5" style={CARD}>
+                    <div className="flex items-center gap-2 mb-4">
+                        <PiUsers className="text-[15px] text-[#6366f1]" />
+                        <h3 className="text-[13px] font-[600] text-gray-900">Top Approvers</h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {topApprovers.slice(0, 6).map((a: any, i: number) => (
+                            <div key={i} className="flex items-center gap-3 p-3 rounded-[6px]"
+                                style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}>
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-[700]"
+                                    style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>
+                                    #{i + 1}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-[12.5px] font-[600] text-gray-900 truncate">{a.name}</p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <span className="text-[10.5px] text-gray-400">{a.total} decisions</span>
+                                        <span className="text-[10.5px] font-[600] text-emerald-600">
+                                            {a.approvalRate.toFixed(0)}%
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -339,11 +282,10 @@ export default function WorkflowAnalyticsPage() {
                     </div>
                 </div>
             )}
-            {/* Escalation Controls (System-wide only) */}
+
+            {/* Escalation panel — system wide only */}
             {scope === 'system' && (
-                <div className="grid grid-cols-1 gap-6">
-                    <EscalationPanel onTrigger={() => fetchAnalytics()} />
-                </div>
+                <EscalationPanel onTrigger={fetchAnalytics} />
             )}
         </div>
     );

@@ -14,11 +14,15 @@ import {
     PiCheckCircle,
     PiSpinner,
     PiBuildings,
-    PiUserCircle
+    PiUserCircle,
+    PiX,
 } from "react-icons/pi";
 import Link from "next/link";
-import { Input } from "@/components/ui/Input";
-import { PhoneInput } from "@/components/ui/PhoneInput";
+
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
 
 export default function NewCustomerPage() {
     const router = useRouter();
@@ -34,25 +38,22 @@ export default function NewCustomerPage() {
         city: "Juba",
         country: "South Sudan",
         taxId: "",
-        currency: "USD"
+        currency: 'KES'
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         try {
             const res = await fetch("/api/accounting/customers", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             });
-
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.error || "Failed to create customer");
             }
-
             showToast("Customer added successfully", "success");
             router.push("/dashboard/accounting/customers");
             router.refresh();
@@ -64,206 +65,226 @@ export default function NewCustomerPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto pb-12 font-sans animate-fade-in-up">
-            <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+        <form onSubmit={handleSubmit} className="pb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {/* 1. HEADER */}
-                <div className="bg-white px-6 h-[88px] flex flex-col justify-center border-b border-gray-100">
-                    <h1 className="text-base font-semibold text-gray-900">
-                        Add New Customer
-                    </h1>
-                    <p className="text-xs text-gray-500 mt-1">
-                        Enter the details of your new client or customer below.
-                    </p>
+                {/* Main — left 2 cols */}
+                <div className="lg:col-span-2 space-y-5">
+
+                    {/* Company Details */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <h2 className="text-[13px] font-[600] text-gray-900">Company Details</h2>
+                            <p className="text-[11.5px] text-gray-400 mt-0.5">Basic identity and contact information</p>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className={LABEL_CLS}>Customer / Company Name <span className="text-rose-400">*</span></label>
+                                <div className="relative">
+                                    <PiBuildings className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <input
+                                        required
+                                        type="text"
+                                        className={INPUT_CLS + " pl-9"}
+                                        style={INPUT_STYLE}
+                                        placeholder="e.g. Acme Corp Ltd."
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className={LABEL_CLS}>Email Address</label>
+                                    <div className="relative">
+                                        <PiEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                        <input
+                                            type="email"
+                                            className={INPUT_CLS + " pl-9"}
+                                            style={INPUT_STYLE}
+                                            placeholder="billing@acme.com"
+                                            value={formData.email}
+                                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className={LABEL_CLS}>Phone Number</label>
+                                    <div className="relative">
+                                        <PiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                        <input
+                                            type="tel"
+                                            className={INPUT_CLS + " pl-9"}
+                                            style={INPUT_STYLE}
+                                            placeholder="+211 ..."
+                                            value={formData.phone}
+                                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className={LABEL_CLS}>Primary Contact Person</label>
+                                <div className="relative">
+                                    <PiUserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <input
+                                        type="text"
+                                        className={INPUT_CLS + " pl-9"}
+                                        style={INPUT_STYLE}
+                                        placeholder="e.g. John Doe"
+                                        value={formData.contactPerson}
+                                        onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Location */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <h2 className="text-[13px] font-[600] text-gray-900">Location</h2>
+                            <p className="text-[11.5px] text-gray-400 mt-0.5">Billing address and region</p>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className={LABEL_CLS}>Billing Address</label>
+                                <div className="relative">
+                                    <PiMapPin className="absolute left-3 top-3 text-gray-400 text-[14px] pointer-events-none" />
+                                    <textarea
+                                        className="w-full rounded-[6px] pl-9 pr-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white resize-none h-20"
+                                        style={INPUT_STYLE}
+                                        placeholder="Street address, PO Box..."
+                                        value={formData.address}
+                                        onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className={LABEL_CLS}>City</label>
+                                    <input
+                                        type="text"
+                                        className={INPUT_CLS}
+                                        style={INPUT_STYLE}
+                                        value={formData.city}
+                                        onChange={e => setFormData({ ...formData, city: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={LABEL_CLS}>Country</label>
+                                    <div className="relative">
+                                        <PiGlobe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                        <input
+                                            type="text"
+                                            className={INPUT_CLS + " pl-9"}
+                                            style={INPUT_STYLE}
+                                            value={formData.country}
+                                            onChange={e => setFormData({ ...formData, country: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Financial Details */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <h2 className="text-[13px] font-[600] text-gray-900">Financial Details</h2>
+                            <p className="text-[11.5px] text-gray-400 mt-0.5">Tax and currency preferences</p>
+                        </div>
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className={LABEL_CLS}>Tax ID / TIN</label>
+                                    <div className="relative">
+                                        <PiIdentificationCard className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                        <input
+                                            type="text"
+                                            className={INPUT_CLS + " pl-9"}
+                                            style={INPUT_STYLE}
+                                            placeholder="Tax Identification Number"
+                                            value={formData.taxId}
+                                            onChange={e => setFormData({ ...formData, taxId: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className={LABEL_CLS}>Default Currency</label>
+                                    <div className="relative">
+                                        <select
+                                            className={INPUT_CLS + " appearance-none pr-8 cursor-pointer"}
+                                            style={INPUT_STYLE}
+                                            value={formData.currency}
+                                            onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                                        >
+                                            <option value="KES">KES - Kenyan Shilling</option>
+                                            <option value="USD">USD - US Dollar</option>
+                                            <option value="SSP">SSP - South Sudanese Pound</option>
+                                        </select>
+                                        <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[13px]" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* 2. BODY */}
-                <div className="bg-[#f8f9fa] p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Sidebar */}
+                <div className="lg:col-span-1">
+                    <div className="bg-white rounded-[8px] p-5 sticky top-6" style={CARD_STYLE}>
+                        <p className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.07em] mb-4 pb-3"
+                            style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            Actions
+                        </p>
 
-                    {/* SECTION: Company Info */}
-                    <div className="md:col-span-2 pb-2 border-b border-gray-200/50 mb-2">
-                        <div className="flex items-center gap-2 text-[#29258D]">
-                            <PiBuildings className="text-lg" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Company Details</h3>
-                        </div>
-                    </div>
-
-                    <div className="md:col-span-2">
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Customer / Company Name <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                            <PiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <Input
-                                required
-                                type="text"
-                                className="pl-9 bg-white border border-gray-200 text-gray-900 rounded-md focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all text-sm py-2 w-full shadow-none placeholder:text-gray-400"
-                                placeholder="e.g. Acme Corp Ltd."
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Email Address
-                        </label>
-                        <div className="relative">
-                            <PiEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <Input
-                                type="email"
-                                className="pl-9 bg-white border border-gray-200 text-gray-900 rounded-md focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all text-sm py-2 w-full shadow-none placeholder:text-gray-400"
-                                placeholder="billing@acme.com"
-                                value={formData.email}
-                                onChange={e => setFormData({ ...formData, email: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Phone Number
-                        </label>
-                        <PhoneInput
-                            value={formData.phone}
-                            onChange={(val) => setFormData({ ...formData, phone: val })}
-                            placeholder="+211 ..."
-                        />
-                    </div>
-
-                    {/* SECTION: Address */}
-                    <div className="md:col-span-2 pb-2 border-b border-gray-200/50 mb-2 mt-4">
-                        <div className="flex items-center gap-2 text-[#29258D]">
-                            <PiMapPin className="text-lg" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Location & Contact</h3>
-                        </div>
-                    </div>
-
-                    <div className="md:col-span-2">
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Billing Address
-                        </label>
-                        <textarea
-                            className="bg-white border border-gray-200 text-gray-900 rounded-md focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all text-sm p-3 w-full shadow-none resize-none placeholder:text-gray-400 h-20"
-                            placeholder="Street address, PO Box..."
-                            value={formData.address}
-                            onChange={e => setFormData({ ...formData, address: e.target.value })}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            City
-                        </label>
-                        <Input
-                            type="text"
-                            className="bg-white border border-gray-200 text-gray-900 rounded-md focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all text-sm py-2 w-full shadow-none"
-                            value={formData.city}
-                            onChange={e => setFormData({ ...formData, city: e.target.value })}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Country
-                        </label>
-                        <div className="relative">
-                            <PiGlobe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <Input
-                                type="text"
-                                className="pl-9 bg-white border border-gray-200 text-gray-900 rounded-md focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all text-sm py-2 w-full shadow-none"
-                                value={formData.country}
-                                onChange={e => setFormData({ ...formData, country: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="md:col-span-2">
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Primary Contact Person
-                        </label>
-                        <div className="relative">
-                            <PiUserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <Input
-                                type="text"
-                                className="pl-9 bg-white border border-gray-200 text-gray-900 rounded-md focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all text-sm py-2 w-full shadow-none placeholder:text-gray-400"
-                                placeholder="e.g. John Doe"
-                                value={formData.contactPerson}
-                                onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    {/* SECTION: Financials */}
-                    <div className="md:col-span-2 pb-2 border-b border-gray-200/50 mb-2 mt-4">
-                        <div className="flex items-center gap-2 text-[#29258D]">
-                            <PiIdentificationCard className="text-lg" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Financial Details</h3>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Tax ID / TIN
-                        </label>
-                        <Input
-                            type="text"
-                            className="bg-white border border-gray-200 text-gray-900 rounded-md focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all text-sm py-2 w-full shadow-none placeholder:text-gray-400"
-                            placeholder="Tax Identification Number"
-                            value={formData.taxId}
-                            onChange={e => setFormData({ ...formData, taxId: e.target.value })}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                            Default Currency
-                        </label>
-                        <div className="relative">
-                            <select
-                                className="w-full px-3 py-2.5 pl-3 bg-white border border-gray-200 rounded-md outline-none focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] transition-all appearance-none text-sm text-gray-900 shadow-none cursor-pointer"
-                                value={formData.currency}
-                                onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                        <div className="space-y-2.5">
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[6px] text-[12.5px] font-[500] text-white bg-[#6366F1] hover:bg-indigo-600 transition-colors disabled:opacity-60"
                             >
-                                <option value="USD">USD - US Dollar</option>
-                                <option value="SSP">SSP - South Sudanese Pound</option>
-                                <option value="KES">KES - Kenyan Shilling</option>
-                            </select>
-                            <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                {isSubmitting
+                                    ? <PiSpinner className="animate-spin text-[14px]" />
+                                    : <PiCheckCircle className="text-[14px]" />
+                                }
+                                {isSubmitting ? "Creating..." : "Create Customer"}
+                            </button>
+
+                            <Link href="/dashboard/accounting/customers" className="block">
+                                <button
+                                    type="button"
+                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                                    style={CARD_STYLE}
+                                >
+                                    <PiX className="text-[14px]" /> Cancel
+                                </button>
+                            </Link>
                         </div>
+
+                        {/* Preview chip — shows when name filled in */}
+                        {formData.name && (
+                            <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                                <p className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] mb-2">Preview</p>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-9 h-9 rounded-[7px] bg-indigo-50 text-[#6366F1] flex items-center justify-center font-[700] text-[12px] shrink-0">
+                                        {formData.name.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="text-[12.5px] font-[500] text-gray-900 leading-tight">{formData.name}</p>
+                                        {(formData.city || formData.country) && (
+                                            <p className="text-[11px] text-gray-400">{formData.city}{formData.city && formData.country ? ', ' : ''}{formData.country}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/* 3. FOOTER */}
-                <div className="bg-white px-6 h-[88px] flex items-center justify-end gap-3 border-t border-gray-100">
-                    <Link href="/dashboard/accounting/customers">
-                        <button
-                            type="button"
-                            className="px-3 py-2.5 rounded-md text-xs font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors shadow-none"
-                        >
-                            Cancel
-                        </button>
-                    </Link>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-4 py-2.5 rounded-md text-xs font-medium text-white bg-[#29258D] hover:bg-[#29258D]/90 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-none"
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <PiSpinner className="animate-spin" />
-                                Creating...
-                            </>
-                        ) : (
-                            <>
-                                <PiCheckCircle />
-                                Create Customer
-                            </>
-                        )}
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
     );
 }

@@ -134,6 +134,16 @@ export async function deleteAsset(id: string) {
 
 export async function runDepreciation() {
     try {
+        const session = await auth();
+        if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { role: true, customRole: { select: { isSystem: true } } }
+        });
+        const isAdmin = user?.role === 'SYSTEM_ADMIN' || user?.customRole?.isSystem;
+        if (!isAdmin) return { success: false, error: "Only System Admins can run depreciation" };
+
         const assets = await prisma.asset.findMany({
             where: {
                 status: 'ACTIVE',
@@ -164,16 +174,15 @@ export async function runDepreciation() {
             amount = Math.round(amount * 100) / 100;
 
             if (amount > 0) {
-                await AccountingEngine.postAssetDepreciation(asset.id, amount, currentPeriod);
-
-                // Update Asset Value
-                await prisma.asset.update({
-                    where: { id: asset.id },
-                    data: {
-                        currentValue: { decrement: amount }
-                    }
-                });
-                postedCount++;
+                const entry = await AccountingEngine.postAssetDepreciation(asset.id, amount, currentPeriod);
+                // entry is null when already posted this period (idempotent skip)
+                if (entry) {
+                    await prisma.asset.update({
+                        where: { id: asset.id },
+                        data: { currentValue: { decrement: amount } }
+                    });
+                    postedCount++;
+                }
             }
         }
 

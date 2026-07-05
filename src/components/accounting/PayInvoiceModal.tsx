@@ -1,16 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import {
-    PiX,
-    PiCurrencyDollar,
-    PiBank,
-    PiCalendar,
-    PiCheckCircle,
-    PiWarning
-} from "react-icons/pi";
-import { Button } from "@/components/ui/Button";
+import { PiX, PiCurrencyDollar, PiBank, PiCheckCircle, PiWarningCircle } from "react-icons/pi";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/ToastProvider";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { format, parseISO } from "date-fns";
@@ -20,6 +14,7 @@ interface PayInvoiceModalProps {
         id: string;
         invoiceNumber: string;
         amount: number;
+        currency: string;
         vendor: {
             name: string;
             bankName?: string | null;
@@ -29,10 +24,19 @@ interface PayInvoiceModalProps {
     onClose: () => void;
 }
 
+const INPUT_CLASS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLASS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
+
+function fmtAmt(amount: number, currency: string) {
+    return `${currency} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+}
+
 export function PayInvoiceModal({ invoice, onClose }: PayInvoiceModalProps) {
     const router = useRouter();
     const { showToast } = useToast();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading]   = useState(false);
+    const [mounted, setMounted]   = useState(false);
     const [formData, setFormData] = useState({
         amount: invoice.amount,
         paymentDate: new Date().toISOString().split('T')[0],
@@ -41,199 +45,173 @@ export function PayInvoiceModal({ invoice, onClose }: PayInvoiceModalProps) {
         notes: ''
     });
 
+    useEffect(() => { setMounted(true); }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-
         try {
             const response = await fetch(`/api/invoices/${invoice.id}/pay`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
-
             if (!response.ok) throw new Error('Payment failed');
-
             showToast('Payment recorded successfully', 'success');
             router.refresh();
             onClose();
-        } catch (error) {
+        } catch {
             showToast('Failed to record payment', 'error');
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
     };
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in border border-gray-200">
+    if (!mounted) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            {/* Overlay */}
+            <div className="fixed inset-0 bg-black/30" onClick={onClose} />
+
+            {/* Modal */}
+            <div className="relative bg-white w-full max-w-lg rounded-[12px] flex flex-col max-h-[90vh] overflow-hidden"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
+
                 {/* Header */}
-                <div className="px-8 py-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-green-50">
+                <div className="flex items-center justify-between px-6 py-4 shrink-0"
+                    style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-emerald-100 rounded-xl">
-                            <PiCurrencyDollar className="text-2xl text-emerald-600" />
+                        <div className="w-8 h-8 rounded-[7px] bg-emerald-50 flex items-center justify-center shrink-0">
+                            <PiCurrencyDollar className="text-emerald-600 text-[15px]" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900">Record Payment</h2>
-                            <p className="text-sm text-gray-600">Invoice {invoice.invoiceNumber}</p>
+                            <h3 className="text-[14px] font-[600] text-gray-900 leading-none">Record Payment</h3>
+                            <p className="text-[12px] text-gray-400 mt-0.5">Invoice {invoice.invoiceNumber}</p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-white rounded-lg transition-colors text-gray-500 hover:text-gray-900"
-                    >
-                        <PiX className="text-xl" />
+                    <button onClick={onClose}
+                        className="p-1.5 rounded-[6px] text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                        <PiX className="text-[16px]" />
                     </button>
                 </div>
 
-                {/* Vendor Info */}
-                <div className="px-8 py-6 bg-gray-50 border-b border-gray-200">
-                    <div className="grid grid-cols-2 gap-6">
+                {/* Vendor info strip */}
+                <div className="px-6 py-3 shrink-0" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: 'rgba(0,0,0,0.02)' }}>
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Payee</p>
-                            <p className="text-sm font-bold text-gray-900">{invoice.vendor.name}</p>
+                            <p className="text-[10.5px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-0.5">Payee</p>
+                            <p className="text-[13px] font-[600] text-gray-900">{invoice.vendor.name}</p>
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Invoice Amount</p>
-                            <p className="text-lg font-heading font-bold text-gray-900">
-                                ${invoice.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </p>
+                            <p className="text-[10.5px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-0.5">Invoice amount</p>
+                            <p className="text-[14px] font-[700] text-gray-900 tabular-nums">{fmtAmt(invoice.amount, invoice.currency)}</p>
                         </div>
                         {invoice.vendor.bankAccount && (
                             <>
                                 <div>
-                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bank</p>
-                                    <p className="text-sm font-medium text-gray-700">{invoice.vendor.bankName || 'N/A'}</p>
+                                    <p className="text-[10.5px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-0.5">Bank</p>
+                                    <p className="text-[12.5px] text-gray-700">{invoice.vendor.bankName || '—'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Account</p>
-                                    <p className="text-sm font-mono font-medium text-gray-700">{invoice.vendor.bankAccount}</p>
+                                    <p className="text-[10.5px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-0.5">Account</p>
+                                    <p className="text-[12.5px] font-mono text-gray-700">{invoice.vendor.bankAccount}</p>
                                 </div>
                             </>
                         )}
                     </div>
                 </div>
 
-                {/* Payment Form */}
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                Payment Amount
-                            </label>
-                            <div className="relative">
-                                <PiCurrencyDollar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={formData.amount}
-                                    onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                                    required
+                {/* Scrollable form */}
+                <div className="overflow-y-auto flex-1">
+                    <form id="pay-invoice-form" onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className={LABEL_CLASS}>Payment amount</label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-[500] text-gray-400">
+                                        {invoice.currency}
+                                    </span>
+                                    <input type="number" step="0.01" required
+                                        value={formData.amount}
+                                        onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+                                        className={cn(INPUT_CLASS, 'pl-12 font-mono tabular-nums')}
+                                        style={INPUT_STYLE} />
+                                </div>
+                            </div>
+                            <div>
+                                <label className={LABEL_CLASS}>Payment date</label>
+                                <DatePicker
+                                    value={formData.paymentDate ? parseISO(formData.paymentDate) : undefined}
+                                    onChange={d => setFormData({ ...formData, paymentDate: format(d, 'yyyy-MM-dd') })}
+                                    placeholder="Payment date"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                Payment Date
-                            </label>
-                            <DatePicker
-                                value={formData.paymentDate ? parseISO(formData.paymentDate) : undefined}
-                                onChange={(d) => setFormData({ ...formData, paymentDate: format(d, 'yyyy-MM-dd') })}
-                                placeholder="Payment Date"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            Payment Method
-                        </label>
-                        <div className="relative">
-                            <PiBank className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <select
-                                value={formData.method}
-                                onChange={(e) => setFormData({ ...formData, method: e.target.value })}
-                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 outline-none focus:border-emerald-500 focus:bg-white transition-all appearance-none cursor-pointer"
-                                required
-                            >
-                                <option value="BANK_TRANSFER">Bank Transfer</option>
-                                <option value="CHECK">Check</option>
-                                <option value="CASH">Cash</option>
-                                <option value="MOBILE_MONEY">Mobile Money</option>
-                                <option value="WIRE">Wire Transfer</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            Reference / Transaction ID
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.reference}
-                            onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                            placeholder="e.g., TXN-123456, Check #789"
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 outline-none focus:border-emerald-500 focus:bg-white transition-all placeholder:text-gray-400"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            Notes (Optional)
-                        </label>
-                        <textarea
-                            value={formData.notes}
-                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                            rows={3}
-                            placeholder="Add any additional payment details..."
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 outline-none focus:border-emerald-500 focus:bg-white transition-all resize-none placeholder:text-gray-400"
-                        />
-                    </div>
-
-                    {/* Warning if partial payment */}
-                    {formData.amount < invoice.amount && (
-                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-                            <PiWarning className="text-xl text-amber-600 mt-0.5" />
-                            <div>
-                                <p className="text-sm font-bold text-amber-900">Partial Payment</p>
-                                <p className="text-xs text-amber-700 mt-1">
-                                    This is a partial payment. Remaining balance: ${(invoice.amount - formData.amount).toFixed(2)}
-                                </p>
+                        <div>
+                            <label className={LABEL_CLASS}>Payment method</label>
+                            <div className="relative">
+                                <PiBank className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                <select value={formData.method}
+                                    onChange={e => setFormData({ ...formData, method: e.target.value })}
+                                    className={cn(INPUT_CLASS, 'pl-8 cursor-pointer')} style={INPUT_STYLE} required>
+                                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                                    <option value="CHECK">Cheque</option>
+                                    <option value="CASH">Cash</option>
+                                    <option value="MOBILE_MONEY">Mobile Money</option>
+                                    <option value="WIRE">Wire Transfer</option>
+                                </select>
                             </div>
                         </div>
-                    )}
 
-                    {/* Actions */}
-                    <div className="flex gap-3 pt-4">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onClose}
-                            className="flex-1"
-                            disabled={loading}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                'Processing...'
-                            ) : (
-                                <>
-                                    <PiCheckCircle className="mr-2 text-lg" />
-                                    Record Payment
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                </form>
+                        <div>
+                            <label className={LABEL_CLASS}>Reference / Transaction ID</label>
+                            <input type="text" value={formData.reference}
+                                onChange={e => setFormData({ ...formData, reference: e.target.value })}
+                                placeholder="e.g. TXN-123456"
+                                className={INPUT_CLASS} style={INPUT_STYLE} />
+                        </div>
+
+                        <div>
+                            <label className={LABEL_CLASS}>Notes <span className="text-gray-300">(optional)</span></label>
+                            <textarea rows={3} value={formData.notes}
+                                onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                                placeholder="Add any additional payment details…"
+                                className={cn(INPUT_CLASS, 'resize-none')} style={INPUT_STYLE} />
+                        </div>
+
+                        {formData.amount < invoice.amount && (
+                            <div className="flex items-start gap-3 px-4 py-3 rounded-[6px] bg-amber-50"
+                                style={{ border: '1px solid rgba(245,158,11,0.25)' }}>
+                                <PiWarningCircle className="text-amber-500 text-[16px] shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="text-[12.5px] font-[600] text-amber-800">Partial payment</p>
+                                    <p className="text-[12px] text-amber-700 mt-0.5">
+                                        Remaining balance: {fmtAmt(invoice.amount - formData.amount, invoice.currency)}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="h-1" />
+                    </form>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-end gap-2.5 px-6 py-4 shrink-0"
+                    style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                    <button type="button" onClick={onClose} disabled={loading}
+                        className="px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                        Cancel
+                    </button>
+                    <button type="submit" form="pay-invoice-form" disabled={loading}
+                        className="flex items-center gap-2 px-5 py-2 rounded-[6px] text-[12.5px] font-[500] text-white bg-emerald-600 hover:bg-emerald-700 transition-colors disabled:opacity-50">
+                        <PiCheckCircle className="text-[14px]" />
+                        {loading ? 'Processing…' : 'Record Payment'}
+                    </button>
+                </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

@@ -6,22 +6,16 @@ import Link from "next/link";
 import {
     PiArrowLeft,
     PiTable,
-    PiFileText,
-    PiChartPieSlice,
-    PiLightning,
-    PiMagicWand,
-    PiGear,
-    PiInfo
 } from "react-icons/pi";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { StatementFilterForm } from "@/components/accounting/StatementFilterForm";
 import { RecordPaymentButton } from "@/components/accounting/RecordPaymentButton";
 import { CreateCreditNoteButton } from "@/components/accounting/CreateCreditNoteButton";
 import { ClickableReferenceCell } from "./ClickableReferenceCell";
 
-// Format currency
-const formatCurrency = (amount: number, currency = "USD") => {
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+
+const formatCurrency = (amount: number, currency = 'KES') => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency,
@@ -41,7 +35,6 @@ export default async function CustomerStatementPage({
     const { id } = await params;
     const query = await searchParams;
 
-    // Date Logic
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -53,45 +46,28 @@ export default async function CustomerStatementPage({
     const endDateInclusive = new Date(endDate);
     endDateInclusive.setHours(23, 59, 59, 999);
 
-    // 1. Calculate Opening Balance
     const prevSales = await prisma.sale.aggregate({
-        where: {
-            customerId: id,
-            issueDate: { lt: startDate }
-        },
+        where: { customerId: id, issueDate: { lt: startDate } },
         _sum: { totalAmount: true }
     });
 
     const prevPayments = await prisma.customerPayment.aggregate({
-        where: {
-            customerId: id,
-            paymentDate: { lt: startDate }
-        },
+        where: { customerId: id, paymentDate: { lt: startDate } },
         _sum: { amount: true }
     });
 
     const prevCreditNotes = await prisma.creditNote.aggregate({
-        where: {
-            customerId: id,
-            createdAt: { lt: startDate },
-            status: { not: 'VOIDED' }
-        },
+        where: { customerId: id, createdAt: { lt: startDate }, status: { not: 'VOIDED' } },
         _sum: { amount: true }
     });
 
-    const openingBalance = (prevSales._sum.totalAmount || 0) - (prevPayments._sum.amount || 0) - (prevCreditNotes._sum.amount || 0);
+    const openingBalance = Number(prevSales._sum.totalAmount || 0) - Number(prevPayments._sum.amount || 0) - Number(prevCreditNotes._sum.amount || 0);
 
-    // 2. Fetch Customer Details and Transactions
     const customer = await prisma.customer.findUnique({
         where: { id },
         include: {
             sales: {
-                where: {
-                    issueDate: {
-                        gte: startDate,
-                        lte: endDateInclusive
-                    }
-                },
+                where: { issueDate: { gte: startDate, lte: endDateInclusive } },
                 orderBy: { issueDate: 'asc' },
                 select: {
                     id: true, invoiceNumber: true, issueDate: true,
@@ -99,12 +75,7 @@ export default async function CustomerStatementPage({
                 }
             },
             payments: {
-                where: {
-                    paymentDate: {
-                        gte: startDate,
-                        lte: endDateInclusive
-                    }
-                },
+                where: { paymentDate: { gte: startDate, lte: endDateInclusive } },
                 orderBy: { paymentDate: 'asc' },
                 select: {
                     id: true, amount: true, currency: true,
@@ -114,10 +85,7 @@ export default async function CustomerStatementPage({
             },
             creditNotes: {
                 where: {
-                    createdAt: {
-                        gte: startDate,
-                        lte: endDateInclusive
-                    },
+                    createdAt: { gte: startDate, lte: endDateInclusive },
                     status: { not: 'VOIDED' }
                 },
                 orderBy: { createdAt: 'asc' },
@@ -131,60 +99,36 @@ export default async function CustomerStatementPage({
 
     if (!customer) return redirect("/dashboard/accounting/customers");
 
-    // 3. Fetch unpaid/partial sales for payment allocation
-    const unpaidSales = await prisma.sale.findMany({
-        where: {
-            customerId: id,
-            status: {
-                not: 'PAID'
-            }
-        },
+    const unpaidSalesRaw = await prisma.sale.findMany({
+        where: { customerId: id, status: { not: 'PAID' } },
         orderBy: { issueDate: 'desc' },
-        select: {
-            id: true,
-            invoiceNumber: true,
-            totalAmount: true,
-            issueDate: true,
-            status: true
-        }
+        select: { id: true, invoiceNumber: true, totalAmount: true, issueDate: true, status: true }
     });
+    const unpaidSales = unpaidSalesRaw.map(s => ({ ...s, totalAmount: Number(s.totalAmount) }));
 
-    const periodInvoiced = customer.sales.reduce((sum: number, sale: any) => sum + sale.totalAmount, 0);
+    const periodInvoiced = customer.sales.reduce((sum: number, sale: any) => sum + Number(sale.totalAmount), 0);
     const periodPaid = customer.payments.reduce((sum: number, payment: any) => sum + payment.amount, 0);
     const periodCreditNotes = customer.creditNotes.reduce((sum: number, cn: any) => sum + cn.amount, 0);
     const endingBalance = openingBalance + periodInvoiced - periodPaid - periodCreditNotes;
 
     const transactions = [
         ...customer.sales.map((s: any) => ({
-            id: s.id,
-            date: s.issueDate,
-            type: 'INVOICE',
-            reference: s.invoiceNumber,
-            description: 'Sales Invoice',
-            debit: s.totalAmount,
-            credit: 0,
-            invoiceUrl: s.invoiceUrl || null
+            id: s.id, date: s.issueDate, type: 'INVOICE',
+            reference: s.invoiceNumber, description: 'Sales Invoice',
+            debit: s.totalAmount, credit: 0, invoiceUrl: s.invoiceUrl || null
         })),
         ...customer.payments.map((p: any) => ({
-            id: p.id,
-            date: p.paymentDate,
-            type: 'PAYMENT',
+            id: p.id, date: p.paymentDate, type: 'PAYMENT',
             reference: p.reference || 'PAYMENT',
             description: `Payment via ${p.method.replace('_', ' ')}`,
-            debit: 0,
-            credit: p.amount,
-            saleId: p.saleId || null,
-            invoiceUrl: p.invoiceUrl || null
+            debit: 0, credit: p.amount,
+            saleId: p.saleId || null, invoiceUrl: p.invoiceUrl || null
         })),
         ...customer.creditNotes.map((cn: any) => ({
-            id: cn.id,
-            date: cn.createdAt,
-            type: 'CREDIT_NOTE',
+            id: cn.id, date: cn.createdAt, type: 'CREDIT_NOTE',
             reference: cn.cnNumber,
             description: `Credit Note - ${cn.reason}`,
-            debit: 0,
-            credit: cn.amount,
-            invoiceUrl: cn.invoiceUrl || null
+            debit: 0, credit: cn.amount, invoiceUrl: cn.invoiceUrl || null
         }))
     ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -195,31 +139,31 @@ export default async function CustomerStatementPage({
     });
 
     return (
-        <div className="space-y-8 animate-fade-in-up pb-20 font-sans w-full">
-            {/* Header / Actions - Responsive Wrap */}
-            <div className="flex flex-wrap items-center justify-between gap-6 pb-6 border-b border-gray-100">
-                <div className="flex items-center gap-5">
+        <div className="space-y-6 pb-20 w-full">
+            {/* Header */}
+            <div className="flex flex-wrap items-center justify-between gap-6 pb-5"
+                style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                <div className="flex items-center gap-4">
                     <Link
                         href="/dashboard/accounting/customers"
-                        className="p-3 rounded-2xl bg-white hover:bg-gray-50 text-gray-400 hover:text-[#5e48b8] transition-all border border-gray-200"
+                        className="p-2 rounded-[6px] bg-white hover:bg-gray-50 text-gray-400 hover:text-gray-700 transition-colors"
+                        style={CARD_STYLE}
                     >
-                        <PiArrowLeft className="text-xl" />
+                        <PiArrowLeft className="text-[16px]" />
                     </Link>
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-md border border-indigo-100/50">
+                            <span className="px-2 py-0.5 text-[10px] font-[500] rounded-[4px] text-[#6366F1] bg-indigo-50"
+                                style={{ border: '1px solid rgba(99,102,241,0.2)' }}>
                                 Transaction history
                             </span>
                         </div>
-                        <h1 className="text-3xl font-heading font-bold text-[#0f172a]">
-                            {customer.name}
-                        </h1>
-                        <p className="text-xs text-gray-400 font-medium">
-                            {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
+                        <h1 className="text-[22px] font-[600] text-gray-900 tracking-tight">{customer.name}</h1>
+                        <p className="text-[11.5px] text-gray-400 font-[500] mt-0.5">
+                            {startDate.toLocaleDateString()} – {endDate.toLocaleDateString()}
                         </p>
                     </div>
                 </div>
-
 
                 <div className="flex items-center gap-3">
                     <CreateCreditNoteButton
@@ -234,81 +178,76 @@ export default async function CustomerStatementPage({
                         currency={customer.currency}
                         unpaidSales={unpaidSales}
                     />
-                    <Link
-                        href={`/finance-studio?type=STATEMENT&customerId=${id}&from=${startDateStr}&to=${endDateStr}`}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#29258D] hover:bg-[#29258D]/90 text-white text-xs font-medium border border-[#29258D]/20 transition-all hover:-translate-y-0.5"
-                    >
-                        <PiMagicWand className="text-lg" />
-                        Statement studio
-                    </Link>
                 </div>
             </div>
 
-            {/* Filter Form */}
+            {/* Filter */}
             <div>
                 <StatementFilterForm />
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200">
-                        <p className="text-[10px] font-bold text-gray-400 mb-2">Opening balance</p>
-                        <p className="text-xl font-bold text-gray-900 font-mono">{formatCurrency(openingBalance, customer.currency)}</p>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white rounded-[8px] p-5" style={CARD_STYLE}>
+                        <p className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.06em] mb-2">Opening balance</p>
+                        <p className="text-[18px] font-[600] text-gray-900 font-mono">{formatCurrency(openingBalance, customer.currency)}</p>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200">
-                        <p className="text-[10px] font-bold text-gray-400 mb-2">Total invoiced</p>
-                        <p className="text-xl font-bold text-gray-900 font-mono">{formatCurrency(periodInvoiced, customer.currency)}</p>
+                    <div className="bg-white rounded-[8px] p-5" style={CARD_STYLE}>
+                        <p className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.06em] mb-2">Total invoiced</p>
+                        <p className="text-[18px] font-[600] text-gray-900 font-mono">{formatCurrency(periodInvoiced, customer.currency)}</p>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200">
-                        <p className="text-[10px] font-bold text-emerald-500 mb-2">Total received</p>
-                        <p className="text-xl font-bold text-emerald-600 font-mono">{formatCurrency(periodPaid, customer.currency)}</p>
+                    <div className="bg-white rounded-[8px] p-5" style={CARD_STYLE}>
+                        <p className="text-[10px] font-[500] text-emerald-500 uppercase tracking-[0.06em] mb-2">Total received</p>
+                        <p className="text-[18px] font-[600] text-emerald-600 font-mono">{formatCurrency(periodPaid, customer.currency)}</p>
                     </div>
-                    <div className="bg-[#5e48b8] p-6 rounded-2xl border border-white/10 text-white">
-                        <p className="text-[10px] font-bold opacity-80 mb-2">Ending balance</p>
-                        <p className="text-xl font-bold font-mono">{formatCurrency(endingBalance, customer.currency)}</p>
+                    <div className="rounded-[8px] p-5 text-white" style={{ background: '#5e48b8' }}>
+                        <p className="text-[10px] font-[500] opacity-80 uppercase tracking-[0.06em] mb-2">Ending balance</p>
+                        <p className="text-[18px] font-[600] font-mono">{formatCurrency(endingBalance, customer.currency)}</p>
                     </div>
                 </div>
 
-                {/* Report Table */}
-                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-                    <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                        <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                            <img src="/shopping.png" alt="Shopping" className="w-6 h-6 object-contain" />
+                {/* Transactions Table */}
+                <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                    <div className="px-5 py-4 flex items-center justify-between"
+                        style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: '#FAFAFA' }}>
+                        <h3 className="text-[13px] font-[600] text-gray-900 flex items-center gap-1.5">
+                            <PiTable className="text-[#6366F1]" />
                             Transactions
                         </h3>
-                        <span className="text-xs text-gray-400 font-medium">{statementRows.length} activities found</span>
+                        <span className="text-[11.5px] text-gray-400 font-[500]">{statementRows.length} activities</span>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                            <thead className="bg-gray-50/50">
+                            <thead style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: '#FAFAFA' }}>
                                 <tr>
-                                    <th className="py-4 px-6 text-left font-bold text-gray-400 text-[10px]">Date</th>
-                                    <th className="py-4 px-6 text-left font-bold text-gray-400 text-[10px]">Reference</th>
-                                    <th className="py-4 px-6 text-left font-bold text-gray-400 text-[10px]">Description</th>
-                                    <th className="py-4 px-6 text-right font-bold text-gray-400 text-[10px]">Debit</th>
-                                    <th className="py-4 px-6 text-right font-bold text-gray-400 text-[10px]">Credit</th>
-                                    <th className="py-4 px-6 text-right font-bold text-gray-400 text-[10px]">Running balance</th>
+                                    <th className="py-3 px-5 text-left font-[500] text-gray-400 text-[10.5px] uppercase tracking-[0.06em]">Date</th>
+                                    <th className="py-3 px-5 text-left font-[500] text-gray-400 text-[10.5px] uppercase tracking-[0.06em]">Reference</th>
+                                    <th className="py-3 px-5 text-left font-[500] text-gray-400 text-[10.5px] uppercase tracking-[0.06em]">Description</th>
+                                    <th className="py-3 px-5 text-right font-[500] text-gray-400 text-[10.5px] uppercase tracking-[0.06em]">Debit</th>
+                                    <th className="py-3 px-5 text-right font-[500] text-gray-400 text-[10.5px] uppercase tracking-[0.06em]">Credit</th>
+                                    <th className="py-3 px-5 text-right font-[500] text-gray-400 text-[10.5px] uppercase tracking-[0.06em]">Running balance</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                <tr className="bg-gray-50/20 italic">
-                                    <td className="py-4 px-6" colSpan={3}>
-                                        <span className="text-xs font-bold text-gray-400">Opening balance</span>
+                            <tbody>
+                                <tr style={statementRows.length > 0 ? { borderBottom: '1px solid rgba(0,0,0,0.06)' } : {}}>
+                                    <td className="py-3.5 px-5" colSpan={3}>
+                                        <span className="text-[12px] font-[500] text-gray-400 italic">Opening balance</span>
                                     </td>
-                                    <td className="py-4 px-6 text-right font-mono text-gray-400" colSpan={3}>
+                                    <td className="py-3.5 px-5 text-right font-mono text-[12.5px] text-gray-400" colSpan={3}>
                                         {formatCurrency(openingBalance, customer.currency)}
                                     </td>
                                 </tr>
-                                {statementRows.map((row) => (
+                                {statementRows.map((row, idx) => (
                                     <tr
                                         key={`${row.type}-${row.id}`}
-                                        className="even:bg-indigo-50/30 hover:bg-indigo-50/50 transition-colors group cursor-pointer"
+                                        className="hover:bg-indigo-50/30 transition-colors"
+                                        style={idx < statementRows.length - 1 ? { borderBottom: '1px solid rgba(0,0,0,0.06)' } : {}}
                                     >
-                                        <td className="py-4 px-6 text-gray-600 font-medium whitespace-nowrap">
+                                        <td className="py-3.5 px-5 text-[12.5px] text-gray-500 whitespace-nowrap">
                                             {format(new Date(row.date), "dd MMM yyyy")}
                                         </td>
-                                        <td className="py-4 px-6">
+                                        <td className="py-3.5 px-5">
                                             <ClickableReferenceCell
                                                 type={row.type as 'INVOICE' | 'PAYMENT' | 'CREDIT_NOTE'}
                                                 id={row.id}
@@ -321,16 +260,16 @@ export default async function CustomerStatementPage({
                                                 currency={customer.currency}
                                             />
                                         </td>
-                                        <td className="py-4 px-6 text-gray-700 font-medium">
+                                        <td className="py-3.5 px-5 text-[12.5px] text-gray-600 font-[500]">
                                             {row.description}
                                         </td>
-                                        <td className="py-4 px-6 text-right font-mono font-bold text-gray-900">
+                                        <td className="py-3.5 px-5 text-right font-mono font-[600] text-[13px] text-gray-900">
                                             {row.debit > 0 ? formatCurrency(row.debit, customer.currency) : "—"}
                                         </td>
-                                        <td className="py-4 px-6 text-right font-mono font-bold text-emerald-600">
+                                        <td className="py-3.5 px-5 text-right font-mono font-[600] text-[13px] text-emerald-600">
                                             {row.credit > 0 ? formatCurrency(row.credit, customer.currency) : "—"}
                                         </td>
-                                        <td className="py-4 px-6 text-right font-mono font-bold text-[#0f172a] bg-gray-50/30 group-hover:bg-indigo-100/30 transition-colors">
+                                        <td className="py-3.5 px-5 text-right font-mono font-[600] text-[13px] text-gray-900">
                                             {formatCurrency(row.balance, customer.currency)}
                                         </td>
                                     </tr>

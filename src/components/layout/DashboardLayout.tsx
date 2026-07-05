@@ -5,7 +5,6 @@ import { Header } from "@/components/layout/Header";
 import { SetupBanner } from "@/components/onboarding/SetupBanner";
 import { OnboardingTutorial } from "@/components/onboarding/OnboardingTutorial";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
     children,
@@ -16,18 +15,13 @@ export default function DashboardLayout({
     const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
 
     return (
-        <div className="relative bg-[#f8f9fa] min-h-screen" style={{ fontFamily: 'var(--font-montserrat), sans-serif', color: 'var(--gds-text-main)' }}>
-
-            {/* Global Ambient Background - Clean Faint Grey with Subtle Smart Glows */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-                {/* Top Right: Subtle Indigo Glow */}
-                <div className="absolute top-[-10%] right-[-5%] w-[1000px] h-[1000px] bg-indigo-100/40 rounded-full blur-3xl mix-blend-multiply opacity-50"></div>
-
-                {/* Top Left: Subtle Cyan Glow */}
-                <div className="absolute top-[10%] left-[-10%] w-[800px] h-[800px] bg-cyan-100/40 rounded-full blur-3xl mix-blend-multiply opacity-50"></div>
-
-                {/* Bottom: Subtle Balancer */}
-                <div className="absolute -bottom-[20%] left-[20%] w-[1200px] h-[800px] bg-slate-100/60 rounded-full blur-3xl mix-blend-multiply"></div>
+        <div className="flex h-screen overflow-hidden bg-[var(--page)] font-[var(--font-midnight)] text-[var(--t1)]">
+            {/* Technical Ambient Pattern — hidden in light mode */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10 opacity-30 dark-deco-layer">
+                <div className="absolute inset-0 opacity-[0.1]"
+                     style={{ backgroundImage: `linear-gradient(var(--p-line) 1px, transparent 1px), linear-gradient(90deg, var(--p-line) 1px, transparent 1px)`, backgroundSize: '40px 40px' }}
+                />
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[var(--p-glow)] rounded-full blur-[150px] mix-blend-screen opacity-10"></div>
             </div>
 
             <Sidebar
@@ -45,18 +39,16 @@ export default function DashboardLayout({
                 />
             )}
 
-            <div className={cn(
-                "flex flex-col min-h-screen relative transition-all duration-300 ease-in-out dash-main",
-                isDesktopCollapsed ? "lg:pl-[80px]" : "lg:pl-[280px]"
-            )}>
+            <div className="flex-1 flex flex-col min-w-0 w-full relative">
                 <Header onMenuClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
-                <main className="flex-1 p-4 md:p-8 w-full">
-                    {/* Onboarding Components */}
-                    <SetupBanner />
-                    <OnboardingTutorial />
 
-                    {children}
-                </main>
+                <div className="flex-1 overflow-y-auto w-full" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--t4) transparent' }}>
+                    <main className="w-full" style={{ padding: '22px 26px 52px' }}>
+                        <SetupBanner />
+                        <OnboardingTutorial />
+                        {children}
+                    </main>
+                </div>
             </div>
         </div>
     );

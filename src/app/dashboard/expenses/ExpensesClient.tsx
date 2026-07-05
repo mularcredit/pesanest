@@ -13,8 +13,6 @@ import {
     PiUploadSimple
 } from "react-icons/pi";
 import { UnifiedExpenseModal } from "@/components/expenses/UnifiedExpenseModal";
-import { SalaryUploadModal } from "@/components/expenses/SalaryUploadModal";
-import { SalaryDetailsModal } from "@/components/expenses/SalaryDetailsModal";
 import { Button } from "@/components/ui/Button";
 
 import { useRouter } from "next/navigation";
@@ -37,8 +35,6 @@ export function ExpensesClient({
     isAdmin
 }: ExpensesClientProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
-    const [isSalaryDetailsOpen, setIsSalaryDetailsOpen] = useState(false);
     const [viewingExpense, setViewingExpense] = useState<any>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -122,13 +118,8 @@ export function ExpensesClient({
     };
 
     const handleExpenseClick = (exp: any) => {
-        if (exp.category === "Salaries & Wages" && exp.description && exp.description.includes("| Name |")) {
-            setViewingExpense(exp);
-            setIsSalaryDetailsOpen(true);
-        } else {
-            setViewingExpense(exp);
-            setIsModalOpen(true);
-        }
+        setViewingExpense(exp);
+        setIsModalOpen(true);
     };
 
     const handleToggleSelect = (id: string, e: React.MouseEvent) => {
@@ -152,6 +143,8 @@ export function ExpensesClient({
                 return "text-emerald-600 bg-emerald-50 border-emerald-200";
             case 'PENDING_APPROVAL': case 'SUBMITTED':
                 return "text-blue-600 bg-blue-50 border-blue-200";
+            case 'ADJUSTMENT_REQUIRED':
+                return "text-amber-600 bg-amber-50 border-amber-200";
             case 'REJECTED':
                 return "text-rose-600 bg-rose-50 border-rose-200";
             default:
@@ -160,48 +153,71 @@ export function ExpensesClient({
     };
 
     return (
-        <div className="space-y-6 animate-fade-in-up pb-12 font-sans w-full max-w-[1400px]">
-            {/* Header Area */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 md:py-6 relative z-10 w-full mb-2">
-                <div className="flex-1 w-full flex items-center gap-4">
-                    <div>
-                        <h1 className="text-3xl font-heading font-medium tracking-tight text-slate-900 group flex items-center gap-3">
-                            My Emergencies
-                        </h1>
-                        <p className="text-sm font-medium text-slate-500 mt-1 flex items-center gap-2">
-                            Track and submit your expenditures
-                        </p>
-                    </div>
-                </div>
+        <div className="flex -mt-[22px] -mx-[26px] -mb-[52px] min-h-[calc(100vh-64px)] animate-fade-in-up font-sans">
 
-                <div className="flex items-center gap-3 w-full sm:w-auto shrink-0 touch-manipulation">
-                    <Button
-                        variant="secondary"
-                        onClick={() => setIsSalaryModalOpen(true)}
-                        className="bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shadow-sm font-semibold rounded-md h-9 px-4 text-xs"
+            {/* Left Sidebar */}
+            <aside className="w-[220px] shrink-0 border-r border-indigo-100 bg-violet-50 flex flex-col sticky top-0 h-[calc(100vh-64px)] overflow-y-auto">
+                <div className="px-5 pt-6 pb-4 border-b border-indigo-100">
+                    <h1 className="text-sm font-semibold text-slate-900 tracking-tight">My Emergencies</h1>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Track and submit your expenditures</p>
+                </div>
+                <nav className="flex-1 divide-y divide-indigo-100/60">
+                    <button
+                        onClick={() => setActiveTab('pending')}
+                        className={cn(
+                            "w-full flex items-center gap-3 px-5 py-4 border-l-[3px] text-sm font-medium transition-all text-left",
+                            activeTab === 'pending' ? "border-[#6366F1] bg-white/70 text-[#6366F1]" : "border-indigo-200 text-slate-500 hover:bg-white/50 hover:text-slate-800"
+                        )}
                     >
-                        <PiUploadSimple className="mr-2 text-base" />
-                        Upload Salaries
-                    </Button>
+                        <PiClock className="shrink-0 text-base" />
+                        <span className="flex-1 truncate">Pending Drafts</span>
+                        {draftExpenses.length > 0 && (
+                            <span className={cn(
+                                "text-[10px] font-semibold px-1.5 py-0.5 rounded-full min-w-[20px] text-center",
+                                activeTab === 'pending' ? "bg-[#6366F1]/15 text-[#6366F1]" : "bg-white/70 text-slate-500"
+                            )}>{draftExpenses.length}</span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('history')}
+                        className={cn(
+                            "w-full flex items-center gap-3 px-5 py-4 border-l-[3px] text-sm font-medium transition-all text-left",
+                            activeTab === 'history' ? "border-[#6366F1] bg-white/70 text-[#6366F1]" : "border-indigo-200 text-slate-500 hover:bg-white/50 hover:text-slate-800"
+                        )}
+                    >
+                        <PiFileText className="shrink-0 text-base" />
+                        <span className="flex-1 truncate">History</span>
+                        {submittedExpenses.length > 0 && (
+                            <span className={cn(
+                                "text-[10px] font-semibold px-1.5 py-0.5 rounded-full min-w-[20px] text-center",
+                                activeTab === 'history' ? "bg-[#6366F1]/15 text-[#6366F1]" : "bg-white/70 text-slate-500"
+                            )}>{submittedExpenses.length}</span>
+                        )}
+                    </button>
+                </nav>
+                <div className="p-3 border-t border-indigo-100">
                     <Button
                         onClick={() => setShowEmergencyAlert(true)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-none font-semibold rounded-md h-9 px-4 text-xs"
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-none font-semibold rounded-md h-9 px-4 text-xs justify-center"
                     >
                         <PiPlus className="mr-2 text-base" />
                         New Emergency
                     </Button>
                 </div>
-            </div>
+            </aside>
+
+            {/* Main Content */}
+            <div className="flex-1 min-w-0 p-6 pb-12 space-y-6">
 
             {/* Global Stats Bar */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Active Pending Values */}
-                <div className="bg-white rounded-xl p-5 border border-slate-200 flex items-center justify-between shadow-sm">
+ <div className="glass-card glass-frost p-5 flex items-center justify-between">
                     <div>
-                        <h3 className="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-1">
+                        <h3 className="text-[10px] font-semibold tracking-widest uppercase text-slate-500 mb-1">
                             {selectedIds.length > 0 ? 'Selected To Submit' : 'Unsubmitted Drafts'}
                         </h3>
-                        <p className="text-3xl font-bold tracking-tight text-slate-900">
+                        <p className="text-3xl font-semibold tracking-tight text-slate-900">
                             ${(selectedIds.length > 0
                                 ? draftExpenses.filter(e => selectedIds.includes(e.id)).reduce((sum, e) => sum + e.amount, 0)
                                 : unsubmittedAmount
@@ -227,12 +243,12 @@ export function ExpensesClient({
                 </div>
 
                 {/* Policy Snippet */}
-                <div className="bg-white rounded-xl p-5 border border-slate-200 flex items-center gap-5 shadow-sm">
+ <div className="glass-card glass-frost p-5 flex items-center gap-5">
                     <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 text-slate-500 flex items-center justify-center shrink-0">
                         <PiWarningCircle className="text-xl" />
                     </div>
                     <div className="text-sm text-slate-600">
-                        <h3 className="text-xs font-bold text-slate-900 mb-0.5 uppercase tracking-wide">Policy Information</h3>
+                        <h3 className="text-xs font-semibold text-slate-900 mb-0.5 uppercase tracking-wide">Policy Information</h3>
                         <ul className="list-disc pl-4 space-y-0.5 text-[11px] font-medium text-slate-500">
                             <li>Receipts mandatory for items over <strong className="text-slate-700">$25.00</strong>.</li>
                             <li>Mileage rate is <strong className="text-slate-700">$0.67</strong>/mile.</li>
@@ -242,53 +258,21 @@ export function ExpensesClient({
                 </div>
             </div>
 
-            {/* Standardized Tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-8 pb-4">
-                <div className="flex bg-slate-50 border border-slate-200/60 rounded-lg p-1 shrink-0 w-full sm:w-auto h-11 shadow-sm touch-manipulation">
-                    <button
-                        onClick={() => setActiveTab('pending')}
-                        className={cn(
-                            "flex items-center gap-2 flex-1 sm:px-6 rounded-md text-xs font-semibold whitespace-nowrap transition-all w-full sm:w-auto justify-center",
-                            activeTab === 'pending'
-                                ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
-                                : "text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 bg-transparent border border-transparent"
-                        )}
-                    >
-                        Pending Drafts
-                        {draftExpenses.length > 0 && (
-                            <span className={cn(
-                                "flex items-center justify-center min-w-[20px] h-5 rounded-full text-[10px] px-1.5 ml-1 font-bold",
-                                activeTab === 'pending' ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
-                            )}>{draftExpenses.length}</span>
-                        )}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('history')}
-                        className={cn(
-                            "flex items-center gap-2 flex-1 sm:px-6 rounded-md text-xs font-semibold whitespace-nowrap transition-all w-full sm:w-auto justify-center",
-                            activeTab === 'history'
-                                ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
-                                : "text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 bg-transparent border border-transparent"
-                        )}
-                    >
-                        History
-                    </button>
-                </div>
-
-                {activeTab === 'pending' && draftExpenses.length > 0 && (
+            {activeTab === 'pending' && draftExpenses.length > 0 && (
+                <div className="flex justify-end">
                     <button
                         onClick={handleToggleAll}
-                        className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 transition-colors bg-white border border-slate-200 px-3 py-1.5 rounded-md shadow-sm"
+                        className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-800 transition-colors bg-white border border-slate-200 px-3 py-1.5 rounded-md shadow-sm"
                     >
                         {selectedIds.length === draftExpenses.length ? <PiCheckSquare className="text-base text-emerald-600" /> : <PiSquare className="text-base" />}
                         {selectedIds.length === draftExpenses.length ? 'Deselect All' : 'Select All'}
                     </button>
-                )}
-            </div>
+                </div>
+            )}
 
             {/* Content Queue */}
             {activeTab === 'pending' ? (
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+ <div className="glass-card glass-frost overflow-hidden">
                     {draftExpenses.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50">
                             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4 border border-slate-200">
@@ -334,20 +318,25 @@ export function ExpensesClient({
                                             <td className="py-4 px-4 align-top">
                                                 <p className="font-semibold text-slate-900 text-sm">{exp.title}</p>
                                                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{exp.category}</span>
-                                                    {exp.receiptUrl && <span className="text-[10px] text-emerald-600 bg-emerald-50 border border-emerald-100 flex items-center gap-1 font-bold px-2 py-0.5 rounded"><PiCheckCircle /> Receipt</span>}
+                                                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{exp.category}</span>
+                                                    {exp.receiptUrl && <span className="text-[10px] text-emerald-600 bg-emerald-50 border border-emerald-100 flex items-center gap-1 font-semibold px-2 py-0.5 rounded"><PiCheckCircle /> Receipt</span>}
+                                                    {exp.etrNumber && (
+                                                        <span className={`text-[10px] flex items-center gap-1 font-semibold px-2 py-0.5 rounded border font-mono ${exp.etrVerified ? 'text-indigo-700 bg-indigo-50 border-indigo-100' : 'text-amber-700 bg-amber-50 border-amber-100'}`}>
+                                                            {exp.etrVerified ? <PiCheckCircle /> : <PiWarningCircle />}
+                                                            ETR{exp.etrVerified ? ' ✓' : ' ?'}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="py-4 px-4 align-top">
                                                 {exp.costCenter ? (
                                                     <span className={cn(
-                                                        "inline-flex text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border",
-                                                        exp.costCenter === 'SSCAA' ? 'text-[#29258D] bg-indigo-50 border-indigo-200' : 'text-slate-600 bg-slate-50 border-slate-200'
+                                                        "inline-flex text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded border text-slate-600 bg-slate-50 border-slate-200"
                                                     )}>{exp.costCenter}</span>
                                                 ) : <span className="text-xs text-slate-400">-</span>}
                                             </td>
                                             <td className="py-4 px-4 align-top text-right">
-                                                <p className="font-bold text-slate-900">${exp.amount.toFixed(2)}</p>
+                                                <p className="font-semibold text-slate-900">${exp.amount.toFixed(2)}</p>
                                                 <span className="text-[10px] font-semibold text-slate-400 mt-1 block">TBD</span>
                                             </td>
                                             <td className="py-4 px-4 align-top text-right">
@@ -380,7 +369,7 @@ export function ExpensesClient({
                     )}
                 </div>
             ) : (
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+ <div className="glass-card glass-frost overflow-hidden">
                     {submittedExpenses.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50">
                             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4 border border-slate-200">
@@ -423,10 +412,10 @@ export function ExpensesClient({
                                                 )}
                                             </td>
                                             <td className="py-4 px-4 align-top">
-                                                <p className="font-bold text-slate-900">${exp.amount.toFixed(2)}</p>
+                                                <p className="font-semibold text-slate-900">${exp.amount.toFixed(2)}</p>
                                             </td>
                                             <td className="py-4 px-4 align-top">
-                                                <span className={cn("inline-flex text-[10px] font-bold px-2.5 py-1 rounded-md border uppercase tracking-wider text-center", getStatusStyles(exp.status))}>
+                                                <span className={cn("inline-flex text-[10px] font-semibold px-2.5 py-1 rounded-md border uppercase tracking-wider text-center", getStatusStyles(exp.status))}>
                                                     {exp.status.replace('_', ' ')}
                                                 </span>
                                             </td>
@@ -435,7 +424,7 @@ export function ExpensesClient({
                                                     <a
                                                         href={`/receipt-studio?expenseId=${exp.id}`}
                                                         onClick={(e) => e.stopPropagation()}
-                                                        className="inline-flex items-center gap-1 h-8 px-3 rounded-md text-xs font-semibold bg-[#29258D]/5 text-[#29258D] hover:bg-[#29258D]/10 transition-colors border border-[#29258D]/10"
+                                                        className="inline-flex items-center gap-1 h-8 px-3 rounded-md text-xs font-semibold bg-[#6366F1]/5 text-[#6366F1] hover:bg-[#6366F1]/10 transition-colors border border-[#6366F1]/10"
                                                     >
                                                         <PiFileText className="text-sm" />
                                                         Voucher
@@ -451,7 +440,6 @@ export function ExpensesClient({
                 </div>
             )}
 
-                {/* Unified Modal */}
                 <UnifiedExpenseModal
                     isOpen={isModalOpen}
                     onClose={() => {
@@ -459,20 +447,6 @@ export function ExpensesClient({
                         setViewingExpense(null);
                     }}
                     mode="full"
-                    expense={viewingExpense}
-                />
-
-                <SalaryUploadModal
-                    isOpen={isSalaryModalOpen}
-                    onClose={() => setIsSalaryModalOpen(false)}
-                />
-
-                <SalaryDetailsModal
-                    isOpen={isSalaryDetailsOpen}
-                    onClose={() => {
-                        setIsSalaryDetailsOpen(false);
-                        setViewingExpense(null);
-                    }}
                     expense={viewingExpense}
                 />
 
@@ -529,6 +503,7 @@ export function ExpensesClient({
                     variant="danger"
                     isLoading={!!isRejecting}
                 />
+            </div>
         </div>
     );
 }

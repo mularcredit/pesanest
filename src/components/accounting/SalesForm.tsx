@@ -1,25 +1,19 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import {
-    PiUser,
-    PiCalendarBlank,
-    PiInvoice,
-    PiPlus,
-    PiTrash,
-    PiSpinner,
-    PiPaperPlaneRight,
-    PiFloppyDisk
+    PiUser, PiInvoice, PiPlus, PiTrash,
+    PiSpinner, PiPaperPlaneRight, PiFloppyDisk,
+    PiCalendarBlank, PiWarning
 } from "react-icons/pi";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { DatePicker } from "@/components/ui/DatePicker";
-import { format, parseISO } from "date-fns";
-import { ConfirmationModal } from "@/components/ui/Modal";
+
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
 
 interface SaleItem {
     id: number | string;
@@ -52,6 +46,10 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
     const router = useRouter();
     const { showToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mounted, setMounted] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
 
     const [formData, setFormData] = useState({
         customerId: initialData?.customerId || "",
@@ -65,66 +63,45 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
         notes: initialData?.notes || "",
         items: initialData?.items?.map(i => ({
             ...i,
-            id: i.id || Date.now() + Math.random(), // Ensure unique ID for key
+            id: i.id || Date.now() + Math.random(),
             quantity: Number(i.quantity),
             unitPrice: Number(i.unitPrice)
-        })) || [
-                { id: Date.now(), description: "", quantity: 1, unitPrice: "" as any }
-            ]
+        })) || [{ id: Date.now(), description: "", quantity: 1, unitPrice: 0 as any }]
     });
 
     const activeCustomer = customers.find(c => c.id === formData.customerId);
-    const currency = activeCustomer?.currency || "USD";
+    const currency = activeCustomer?.currency || 'KES';
 
-    const calculateTotal = () => {
-        return formData.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0);
-    };
+    const subtotal = formData.items.reduce((sum, item) =>
+        sum + (Number(item.quantity) * Number(item.unitPrice)), 0);
 
     const handleAddItem = () => {
-        setFormData({
-            ...formData,
-            items: [
-                ...formData.items,
-                { id: Date.now(), description: "", quantity: 1, unitPrice: "" as any }
-            ]
-        });
+        setFormData(prev => ({
+            ...prev,
+            items: [...prev.items, { id: Date.now(), description: "", quantity: 1, unitPrice: 0 as any }]
+        }));
     };
 
     const handleRemoveItem = (id: number | string) => {
         if (formData.items.length === 1) return;
-        setFormData({
-            ...formData,
-            items: formData.items.filter(item => item.id !== id)
-        });
+        setFormData(prev => ({ ...prev, items: prev.items.filter(item => item.id !== id) }));
     };
 
     const handleItemChange = (id: number | string, field: string, value: any) => {
-        setFormData({
-            ...formData,
-            items: formData.items.map(item =>
-                item.id === id ? { ...item, [field]: value } : item
-            )
-        });
+        setFormData(prev => ({
+            ...prev,
+            items: prev.items.map(item => item.id === id ? { ...item, [field]: value } : item)
+        }));
     };
-
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const handleDelete = async () => {
         if (!initialData?.id) return;
-
         setIsSubmitting(true);
         try {
-            const res = await fetch(`/api/accounting/sales/${initialData.id}`, {
-                method: "DELETE"
-            });
-
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to delete");
-            }
-
+            const res = await fetch(`/api/accounting/sales/${initialData.id}`, { method: "DELETE" });
+            if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed to delete"); }
             showToast("Invoice deleted successfully", "success");
-            setIsDeleteModalOpen(false);
+            setIsDeleteOpen(false);
             router.push("/dashboard/accounting/sales");
             router.refresh();
         } catch (error: any) {
@@ -134,47 +111,27 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
     };
 
     const handleSubmit = async (status: 'DRAFT' | 'SENT') => {
-        if (!formData.customerId) {
-            showToast("Please select a customer", "error");
-            return;
+        if (!formData.customerId) { showToast("Please select a customer", "error"); return; }
+        if (formData.items.some(i => !i.description || Number(i.unitPrice) <= 0)) {
+            showToast("Please complete all line items", "error"); return;
         }
-        if (formData.items.some(i => !i.description || i.unitPrice <= 0)) {
-            showToast("Please complete all line items", "error");
-            return;
-        }
-
         setIsSubmitting(true);
-
         try {
-            const url = initialData?.id
-                ? `/api/accounting/sales/${initialData.id}`
-                : "/api/accounting/sales";
-
-            const method = initialData?.id ? "PATCH" : "POST";
-
+            const url = initialData?.id ? `/api/accounting/sales/${initialData.id}` : "/api/accounting/sales";
             const res = await fetch(url, {
-                method,
+                method: initialData?.id ? "PATCH" : "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...formData, status })
             });
-
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to save sale");
-            }
-
-            const sale = await res.json();
+            if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed to save sale"); }
             showToast(
                 initialData
                     ? "Invoice updated successfully"
                     : (status === 'SENT' ? "Invoice saved and posted!" : "Draft saved successfully"),
                 "success"
             );
-
-            // Redirect to the list
             router.push("/dashboard/accounting/sales");
             router.refresh();
-
         } catch (error: any) {
             showToast(error.message, "error");
         } finally {
@@ -182,30 +139,63 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
         }
     };
 
-    return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
-            {/* Main Form */}
-            <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-                    {/* Header */}
-                    <div className="bg-white px-6 py-6 flex flex-col justify-center border-b border-gray-100">
-                        <h2 className="text-base font-bold text-gray-900">Invoice Details</h2>
-                        <p className="text-xs text-gray-500 mt-1">Manage customer and sales information</p>
+    // Delete confirmation modal
+    const deleteModal = (mounted && isDeleteOpen) ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/30" onClick={() => !isSubmitting && setIsDeleteOpen(false)} />
+            <div className="relative bg-white w-full max-w-sm rounded-[12px] overflow-hidden"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
+                <div className="px-6 py-5">
+                    <div className="w-10 h-10 rounded-[8px] bg-rose-50 flex items-center justify-center mb-4"
+                        style={{ border: '1px solid rgba(239,68,68,0.2)' }}>
+                        <PiWarning className="text-rose-500 text-[18px]" />
                     </div>
+                    <h3 className="text-[14px] font-[600] text-gray-900 mb-1">Delete Invoice?</h3>
+                    <p className="text-[12.5px] text-gray-500 leading-relaxed">
+                        Permanently delete invoice <strong className="text-gray-700">{formData.invoiceNumber || 'this invoice'}</strong>?
+                        This will remove all associated ledger entries and cannot be undone.
+                    </p>
+                </div>
+                <div className="px-6 py-4 flex gap-3" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                    <button onClick={() => setIsDeleteOpen(false)} disabled={isSubmitting}
+                        className="flex-1 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                        style={CARD_STYLE}>
+                        Cancel
+                    </button>
+                    <button onClick={handleDelete} disabled={isSubmitting}
+                        className="flex-1 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-white bg-rose-500 hover:bg-rose-600 transition-colors disabled:opacity-60">
+                        {isSubmitting ? 'Deleting...' : 'Delete Invoice'}
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    ) : null;
 
-                    {/* Body */}
-                    <div className="p-6 lg:p-8 space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="col-span-2">
-                                <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Customer <span className="text-rose-500">*</span></label>
+    return (
+        <>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Form */}
+                <div className="lg:col-span-2 space-y-5">
+                    {/* Invoice Details card */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <h2 className="text-[13px] font-[600] text-gray-900">Invoice Details</h2>
+                            <p className="text-[11.5px] text-gray-400 mt-0.5">Customer and billing information</p>
+                        </div>
+
+                        <div className="p-6 space-y-5">
+                            {/* Customer */}
+                            <div>
+                                <label className={LABEL_CLS}>Customer <span className="text-rose-400">*</span></label>
                                 <div className="relative">
-                                    <PiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
+                                    <PiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
                                     <select
-                                        className="w-full pl-10 pr-4 h-11 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] focus:bg-white transition-all text-sm font-medium text-gray-900 cursor-pointer appearance-none"
                                         value={formData.customerId}
-                                        onChange={e => setFormData({ ...formData, customerId: e.target.value })}
-                                    >
-                                        <option value="">Select a customer...</option>
+                                        onChange={e => setFormData(p => ({ ...p, customerId: e.target.value }))}
+                                        className={INPUT_CLS + " pl-9 appearance-none cursor-pointer"}
+                                        style={INPUT_STYLE}>
+                                        <option value="">Select a customer…</option>
                                         {customers.map(c => (
                                             <option key={c.id} value={c.id}>{c.name} ({c.currency})</option>
                                         ))}
@@ -213,173 +203,232 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Invoice Number</label>
-                                <div className="relative">
-                                    <PiInvoice className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
-                                    <Input
-                                        type="text"
-                                        className="pl-10 bg-gray-50/50 border-gray-200 focus:bg-white transition-all h-11 font-mono"
-                                        placeholder="Auto-generated"
-                                        value={formData.invoiceNumber}
-                                        onChange={e => setFormData({ ...formData, invoiceNumber: e.target.value })}
-                                    />
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Invoice # */}
+                                <div>
+                                    <label className={LABEL_CLS}>Invoice Number</label>
+                                    <div className="relative">
+                                        <PiInvoice className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                        <input
+                                            type="text"
+                                            placeholder="Auto-generated"
+                                            value={formData.invoiceNumber}
+                                            onChange={e => setFormData(p => ({ ...p, invoiceNumber: e.target.value }))}
+                                            className={INPUT_CLS + " pl-9 font-mono"}
+                                            style={INPUT_STYLE}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Issue Date */}
+                                <div>
+                                    <label className={LABEL_CLS}>Issue Date</label>
+                                    <div className="relative">
+                                        <PiCalendarBlank className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                        <input
+                                            type="date"
+                                            value={formData.issueDate}
+                                            onChange={e => setFormData(p => ({ ...p, issueDate: e.target.value }))}
+                                            className={INPUT_CLS + " pl-9"}
+                                            style={INPUT_STYLE}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Due Date */}
+                                <div>
+                                    <label className={LABEL_CLS}>Due Date</label>
+                                    <div className="relative">
+                                        <PiCalendarBlank className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                        <input
+                                            type="date"
+                                            value={formData.dueDate}
+                                            onChange={e => setFormData(p => ({ ...p, dueDate: e.target.value }))}
+                                            className={INPUT_CLS + " pl-9"}
+                                            style={INPUT_STYLE}
+                                        />
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
+                    {/* Line Items card */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-6 py-4 flex items-center justify-between"
+                            style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                             <div>
-                                <DatePicker
-                                    label="ISSUE DATE"
-                                    value={formData.issueDate ? parseISO(formData.issueDate) : undefined}
-                                    onChange={(d) => setFormData({ ...formData, issueDate: format(d, 'yyyy-MM-dd') })}
-                                    placeholder="Issue Date"
-                                />
+                                <h2 className="text-[13px] font-[600] text-gray-900">Line Items</h2>
+                                <p className="text-[11.5px] text-gray-400 mt-0.5">{formData.items.length} item{formData.items.length !== 1 ? 's' : ''}</p>
                             </div>
+                            <button onClick={handleAddItem}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[12px] font-[500] text-[#6366F1] bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                                <PiPlus className="text-[13px]" /> Add Item
+                            </button>
                         </div>
 
-                        {/* Line Items */}
-                        <div className="pt-8 border-t border-gray-100">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Item Details</h3>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleAddItem}
-                                    className="text-xs font-bold text-[#29258D] hover:bg-indigo-50 hover:text-[#29258D] gap-1 h-8"
-                                >
-                                    <PiPlus /> Add Line Item
-                                </Button>
+                        <div className="p-6 space-y-3">
+                            {/* Column labels */}
+                            <div className="hidden md:grid grid-cols-12 gap-3 px-1">
+                                <span className="col-span-6 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Description</span>
+                                <span className="col-span-2 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] text-center">Qty</span>
+                                <span className="col-span-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] text-right">Unit Price</span>
                             </div>
 
-                            <div className="space-y-3 bg-gray-50/50 rounded-xl p-4 border border-gray-100">
-                                {formData.items.map((item, index) => (
-                                    <div key={item.id} className="flex flex-col sm:flex-row gap-3 items-start animate-fade-in group">
-                                        <div className="flex-1 w-full">
-                                            <Input
-                                                type="text"
-                                                placeholder="Description"
-                                                className="bg-white border-gray-200 focus:ring-[#29258D] h-10"
-                                                value={item.description}
-                                                onChange={e => handleItemChange(item.id, 'description', e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="flex gap-3 w-full sm:w-auto">
-                                            <div className="w-24">
-                                                <Input
-                                                    type="number"
-                                                    min="1"
-                                                    placeholder="Qty"
-                                                    className="bg-white border-gray-200 focus:ring-[#29258D] text-center h-10"
-                                                    value={item.quantity || ""}
-                                                    onChange={e => handleItemChange(item.id, 'quantity', e.target.value ? parseInt(e.target.value) : "")}
-                                                />
-                                            </div>
-                                            <div className="w-32">
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    placeholder="Price"
-                                                    step="0.01"
-                                                    className="bg-white border-gray-200 focus:ring-[#29258D] text-right font-mono h-10"
-                                                    value={item.unitPrice || ""}
-                                                    onChange={e => handleItemChange(item.id, 'unitPrice', e.target.value ? parseFloat(e.target.value) : "")}
-                                                />
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleRemoveItem(item.id)}
-                                                className="text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors h-10 w-10 shrink-0"
-                                            >
-                                                <PiTrash className="text-lg" />
-                                            </Button>
-                                        </div>
+                            {formData.items.map((item, idx) => (
+                                <div key={item.id}
+                                    className="flex flex-col md:grid md:grid-cols-12 gap-3 items-start md:items-center p-3 rounded-[8px]"
+                                    style={idx % 2 === 0 ? { background: '#FAFAFA', border: '1px solid rgba(0,0,0,0.06)' } : CARD_STYLE}>
+                                    {/* Description */}
+                                    <div className="col-span-6 w-full">
+                                        <input
+                                            type="text"
+                                            placeholder="Item description…"
+                                            value={item.description}
+                                            onChange={e => handleItemChange(item.id, 'description', e.target.value)}
+                                            className={INPUT_CLS}
+                                            style={INPUT_STYLE}
+                                        />
                                     </div>
-                                ))}
-                            </div>
+                                    {/* Qty */}
+                                    <div className="col-span-2 w-full">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            placeholder="1"
+                                            value={item.quantity || ""}
+                                            onChange={e => handleItemChange(item.id, 'quantity', e.target.value ? parseInt(e.target.value) : "")}
+                                            className={INPUT_CLS + " text-center"}
+                                            style={INPUT_STYLE}
+                                        />
+                                    </div>
+                                    {/* Unit Price */}
+                                    <div className="col-span-3 w-full">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            placeholder="0.00"
+                                            value={item.unitPrice || ""}
+                                            onChange={e => handleItemChange(item.id, 'unitPrice', e.target.value ? parseFloat(e.target.value) : "")}
+                                            className={INPUT_CLS + " text-right font-mono"}
+                                            style={INPUT_STYLE}
+                                        />
+                                    </div>
+                                    {/* Remove */}
+                                    <div className="col-span-1 flex justify-end">
+                                        <button
+                                            onClick={() => handleRemoveItem(item.id)}
+                                            disabled={formData.items.length === 1}
+                                            className="p-1.5 rounded-[6px] text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                            style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
+                                            <PiTrash className="text-[13px]" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
+                    </div>
 
-                        <div className="pt-8 border-t border-gray-100">
-                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Notes / Terms</label>
+                    {/* Notes card */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <h2 className="text-[13px] font-[600] text-gray-900">Notes / Terms</h2>
+                        </div>
+                        <div className="p-6">
                             <textarea
-                                className="w-full p-4 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] focus:bg-white transition-all text-sm h-32 resize-none placeholder:text-gray-400"
-                                placeholder="Payment terms, delivery notes, etc."
+                                rows={4}
+                                placeholder="Payment terms, delivery notes, special instructions…"
                                 value={formData.notes}
-                                onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                                onChange={e => setFormData(p => ({ ...p, notes: e.target.value }))}
+                                className="w-full rounded-[6px] px-3 py-3 text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white resize-none"
+                                style={INPUT_STYLE}
                             />
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Sidebar Summary */}
-            <div className="space-y-6">
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-8">
-                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6 pb-2 border-b border-gray-100">
-                        Summary
-                    </h3>
+                {/* Sidebar Summary */}
+                <div className="lg:col-span-1">
+                    <div className="bg-white rounded-[8px] p-5 sticky top-6" style={CARD_STYLE}>
+                        <p className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.07em] mb-4 pb-3"
+                            style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            Summary
+                        </p>
 
-                    <div className="space-y-3 mb-8">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 font-medium">Subtotal</span>
-                            <span className="font-mono font-bold text-gray-900">{calculateTotal().toFixed(2)} {currency}</span>
+                        {/* Totals */}
+                        <div className="space-y-2.5 mb-5">
+                            <div className="flex justify-between text-[12.5px]">
+                                <span className="text-gray-400">Subtotal</span>
+                                <span className="font-mono font-[600] text-gray-700 tabular-nums">
+                                    {currency} {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
+                            <div className="flex justify-between text-[12.5px]">
+                                <span className="text-gray-400">Tax (0%)</span>
+                                <span className="font-mono font-[600] text-gray-400 tabular-nums">{currency} 0.00</span>
+                            </div>
+                            <div className="flex justify-between text-[14px] font-[600] pt-3"
+                                style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                                <span className="text-gray-900">Total</span>
+                                <span className="font-mono text-[#6366F1] tabular-nums">
+                                    {currency} {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 font-medium">Tax (0%)</span>
-                            <span className="font-mono font-bold text-gray-900">0.00 {currency}</span>
-                        </div>
-                        <div className="flex justify-between text-lg font-bold pt-4 border-t border-gray-100">
-                            <span className="text-gray-900">Total</span>
-                            <span className="text-[#29258D]">{calculateTotal().toFixed(2)} {currency}</span>
-                        </div>
-                    </div>
 
-                    <div className="space-y-3">
-                        <Button
-                            onClick={() => handleSubmit('SENT')}
-                            disabled={isSubmitting}
-                            className="w-full h-11 bg-[#29258D] hover:bg-[#29258D]/90 text-white font-bold shadow-lg shadow-indigo-500/20"
-                        >
-                            {isSubmitting ? <PiSpinner className="animate-spin text-lg" /> : (initialData ? <PiFloppyDisk className="text-lg" /> : <PiPaperPlaneRight className="text-lg" />)}
-                            <span className="ml-2">{initialData ? "Update Invoice" : "Save & Post to Ledger"}</span>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => handleSubmit('DRAFT')}
-                            disabled={isSubmitting}
-                            className="w-full h-11 border-gray-200 hover:bg-gray-50 text-gray-700 font-bold"
-                        >
-                            <PiFloppyDisk className="text-lg mr-2" />
-                            Save as Draft
-                        </Button>
-
-                        {initialData && (
-                            <Button
-                                variant="ghost"
-                                onClick={() => setIsDeleteModalOpen(true)}
-                                type="button"
+                        {/* Actions */}
+                        <div className="space-y-2.5">
+                            <button
+                                onClick={() => handleSubmit('SENT')}
                                 disabled={isSubmitting}
-                                className="w-full text-rose-500 hover:text-rose-600 hover:bg-rose-50 font-bold h-11"
-                            >
-                                <PiTrash className="text-lg mr-2" />
-                                Delete Invoice
-                            </Button>
+                                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[6px] text-[12.5px] font-[500] text-white bg-[#6366F1] hover:bg-indigo-600 transition-colors disabled:opacity-60">
+                                {isSubmitting
+                                    ? <PiSpinner className="animate-spin text-[14px]" />
+                                    : (initialData ? <PiFloppyDisk className="text-[14px]" /> : <PiPaperPlaneRight className="text-[14px]" />)
+                                }
+                                {initialData ? "Update Invoice" : "Save & Post to Ledger"}
+                            </button>
+
+                            <button
+                                onClick={() => handleSubmit('DRAFT')}
+                                disabled={isSubmitting}
+                                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors disabled:opacity-60"
+                                style={CARD_STYLE}>
+                                <PiFloppyDisk className="text-[14px]" /> Save as Draft
+                            </button>
+
+                            {initialData && (
+                                <button
+                                    onClick={() => setIsDeleteOpen(true)}
+                                    disabled={isSubmitting}
+                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[6px] text-[12.5px] font-[500] text-rose-500 bg-white hover:bg-rose-50 transition-colors disabled:opacity-60"
+                                    style={{ border: '1px solid rgba(239,68,68,0.15)' }}>
+                                    <PiTrash className="text-[14px]" /> Delete Invoice
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Customer info pill */}
+                        {activeCustomer && (
+                            <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                                <p className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] mb-2">Billing To</p>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-7 h-7 rounded-[6px] bg-indigo-50 flex items-center justify-center shrink-0">
+                                        <PiUser className="text-[#6366F1] text-[12px]" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[12.5px] font-[500] text-gray-900">{activeCustomer.name}</p>
+                                        <p className="text-[11px] text-gray-400">{activeCustomer.currency}</p>
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            <ConfirmationModal
-                isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-                onConfirm={handleDelete}
-                title="Delete Invoice?"
-                description={`Are you sure you want to delete invoice ${formData.invoiceNumber || 'this invoice'}? This action will permanently remove it and all associated ledger entries. This cannot be undone.`}
-                confirmText="Yes, Delete"
-                cancelText="Cancel"
-                variant="danger"
-                isLoading={isSubmitting}
-            />
-        </div>
+            {deleteModal}
+        </>
     );
 }

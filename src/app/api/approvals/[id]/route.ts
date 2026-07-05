@@ -19,9 +19,9 @@ export async function PATCH(
 
         const { decision, comments } = await request.json();
 
-        if (!['APPROVED', 'REJECTED'].includes(decision)) {
+        if (!['APPROVED', 'REJECTED', 'ADJUSTMENT'].includes(decision)) {
             return NextResponse.json(
-                { error: 'Invalid decision. Must be APPROVED or REJECTED' },
+                { error: 'Invalid decision. Must be APPROVED, REJECTED, or ADJUSTMENT' },
                 { status: 400 }
             );
         }

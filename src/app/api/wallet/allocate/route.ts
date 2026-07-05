@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { auth } from '@/auth';
+import { postWalletAllocation } from '@/lib/accounting/wallet-gl';
 
 export async function POST(req: NextRequest) {
     try {
@@ -10,71 +11,102 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { branch, amount, category, description } = body;
+        const { branchId, amount, category, description } = body;
 
         // Validate required fields
-        if (!branch || !amount || !category) {
+        if (!branchId || !amount || !category) {
             return NextResponse.json(
-                { error: 'Missing required fields: branch, amount, category' },
+                { error: 'Missing required fields: branchId, amount, category' },
                 { status: 400 }
             );
         }
 
-        // Get user's wallet
-        let wallet = await prisma.wallet.findUnique({
-            where: { userId: session.user.id }
-        });
+        const allocationAmount = parseFloat(amount);
 
-        if (!wallet) {
-            // Auto-create wallet if it doesn't exist
-            wallet = await prisma.wallet.create({
+        // Execute as a transaction to ensure atomicity
+        const result = await prisma.$transaction(async (tx) => {
+            // 1. Get and Lock User's Wallet
+            const wallet = await tx.wallet.findUnique({
+                where: { userId: (session as any).user.id }
+            });
+
+            if (!wallet) throw new Error('Corporate wallet not found for your account.');
+            if (wallet.balance < allocationAmount) throw new Error('Insufficient balance in Corporate wallet.');
+
+            // 2. Identify or Create Branch Wallet
+            let branchWallet = await tx.branchWallet.findUnique({
+                where: { branchId }
+            });
+
+            if (!branchWallet) {
+                branchWallet = await tx.branchWallet.create({
+                    data: {
+                        branchId,
+                        balance: 0,
+                        currency: wallet.currency
+                    }
+                });
+            }
+
+            // 3. Deduct from Main Wallet
+            const updatedMainWallet = await tx.wallet.update({
+                where: { id: wallet.id },
+                data: { balance: { decrement: allocationAmount } }
+            });
+
+            // 4. Record Main Wallet Transaction
+            await tx.walletTransaction.create({
                 data: {
-                    userId: session.user.id,
-                    balance: 0,
-                    currency: 'USD'
+                    walletId: wallet.id,
+                    userId: (session as any).user.id,
+                    type: 'DEDUCTION',
+                    amount: -allocationAmount,
+                    description: description || `Allocation to branch: ${branchId}`,
+                    reference: `ALLOC-OUT-${Date.now()}`
                 }
             });
-        }
 
-        // Check if user has sufficient balance
-        if (wallet.balance < parseFloat(amount)) {
-            return NextResponse.json(
-                { error: 'Insufficient balance' },
-                { status: 400 }
-            );
-        }
+            // 5. Increment Branch Wallet
+            await tx.branchWallet.update({
+                where: { id: branchWallet.id },
+                data: { balance: { increment: allocationAmount } }
+            });
 
-        const transaction = await prisma.walletTransaction.create({
-            data: {
-                walletId: wallet.id,
-                userId: session.user.id,
-                type: 'DEDUCTION', // Valid type from schema
-                amount: -parseFloat(amount), // Negative for deduction
-                description: description || `Allocated ${amount} to ${branch} for ${category}`,
-                reference: `ALLOC-${Date.now()}`
-            }
-        });
-
-        // Update wallet balance
-        await prisma.wallet.update({
-            where: { id: wallet.id },
-            data: {
-                balance: {
-                    decrement: parseFloat(amount)
+            // 6. Record Branch Wallet Transaction
+            const allocRef = `ALLOC-IN-${Date.now()}`;
+            await tx.branchWalletTransaction.create({
+                data: {
+                    branchWalletId: branchWallet.id,
+                    type: 'FUNDING',
+                    amount: allocationAmount,
+                    description: `Internal allocation from HQ for ${category}`,
+                    reference: allocRef
                 }
-            }
+            });
+
+            // 7. Post GL entry — Dr Branch Cash / Cr HQ Cash
+            await postWalletAllocation(tx as any, {
+                amount: allocationAmount,
+                hqGlAccountId: (wallet as any).glAccountId,
+                branchGlAccountId: (branchWallet as any).glAccountId,
+                branchId,
+                userId: (session as any).user.id,
+                reference: allocRef,
+            });
+
+            return updatedMainWallet;
         });
 
         return NextResponse.json({
             success: true,
-            transaction,
-            message: `Successfully allocated $${amount} to ${branch}`
+            balance: result.balance,
+            message: `Successfully allocated KSh ${amount} to branch`
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Wallet allocation error:', error);
         return NextResponse.json(
-            { error: 'Failed to allocate funds' },
+            { error: error.message || 'Failed to allocate funds' },
             { status: 500 }
         );
     }

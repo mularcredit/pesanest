@@ -1,22 +1,27 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { CreditNoteTemplate } from '@/components/finance-studio/CreditNoteTemplate';
 import { PaymentReceiptTemplate } from '@/components/finance-studio/PaymentReceiptTemplate';
 import { CustomerStatementTemplate, Transaction } from '@/components/finance-studio/CustomerStatementTemplate';
-import { SSCAAStatementTemplate, SSCAATransaction } from '@/components/finance-studio/SSCAAStatementTemplate';
 import { StudioDatePicker } from '@/components/finance-studio/StudioDatePicker';
 import { StudioDateRangePicker } from '@/components/finance-studio/StudioDateRangePicker';
 import { read, utils, writeFile } from 'xlsx';
 import { pdf } from '@react-pdf/renderer';
-import { ReceiptPDF, CreditNotePDF, StatementPDF, SSCAAReportPDF } from '@/components/finance-studio/VectorTemplates';
-import { checkCreditNoteNumberUniqueness, getCustomersForStudio, getStatementData, getSSCAAStatementData } from '@/app/actions/finance-studio';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, setMonth, setYear } from "date-fns";
-import { PiTrash, PiPlus, PiFloppyDisk, PiFileText, PiReceipt, PiListBullets, PiArrowLeft, PiUpload, PiCaretDown, PiInfo, PiGear, PiCalendar, PiCaretLeft, PiCaretRight, PiWarningCircle, PiSortAscending, PiBuildings } from 'react-icons/pi';
+import { ReceiptPDF, CreditNotePDF, StatementPDF } from '@/components/finance-studio/VectorTemplates';
+import { checkCreditNoteNumberUniqueness, getCustomersForStudio, getStatementData } from '@/app/actions/finance-studio';
+import { format } from "date-fns";
+import {
+    PiTrash, PiPlus, PiFloppyDisk, PiFileText, PiReceipt, PiListBullets,
+    PiArrowLeft, PiUpload, PiCaretDown, PiInfo, PiWarningCircle,
+    PiSortAscending, PiBuildings,
+} from 'react-icons/pi';
 
-// Known airlines for quick fallback
+const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
+
 const KNOWN_AIRLINES = [
     "Ethiopian Airlines", "Emirates", "Qatar Airways", "FlyDubai", "Kenya Airways",
     "Turkish Airlines", "EgyptAir", "Flyadeal", "Saudi Arabian Airlines",
@@ -24,59 +29,59 @@ const KNOWN_AIRLINES = [
     "Sudan Airways", "Air Arabia"
 ];
 
-// --- UI COMPONENTS (Defined outside to prevent re-creation/focus loss) ---
 const InputLabel = ({ children }: { children: React.ReactNode }) => (
-    <label className="block text-[10px] font-bold text-slate-400 mb-1.5 ml-0.5">{children}</label>
+    <label className="block text-[10.5px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-1.5">
+        {children}
+    </label>
 );
 
-const TextInput = ({ value, onChange, placeholder, ...props }: any) => (
+const StudioInput = ({ value, onChange, placeholder, className, ...props }: any) => (
     <input
         type="text"
         value={value}
         onChange={onChange}
-        className="w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium shadow-sm hover:border-slate-600 studio-input"
-        style={{ color: '#ffffff', backgroundColor: '#1e293b', caretColor: '#ffffff' }} // Inline override to force visibility
         placeholder={placeholder}
+        className={`w-full rounded-[7px] px-3 py-2.5 text-[12.5px] text-gray-900 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all ${className ?? ''}`}
+        style={{ border: HAIRLINE }}
         {...props}
     />
 );
 
-const NumberInput = ({ value, onChange, placeholder }: any) => (
+const StudioNumberInput = ({ value, onChange, placeholder }: any) => (
     <input
         type="number"
         value={value}
         onChange={onChange}
-        className="w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium font-mono shadow-sm hover:border-slate-600 studio-input"
-        style={{ color: '#ffffff', backgroundColor: '#1e293b', caretColor: '#ffffff' }} // Inline override to force visibility
         placeholder={placeholder}
+        className="w-full rounded-[7px] px-3 py-2.5 text-[12.5px] font-mono tabular-nums text-gray-900 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+        style={{ border: HAIRLINE }}
     />
 );
 
-import { Suspense } from 'react';
-
-// ... (keep all imports and other code same)
+const SectionHeader = ({ title }: { title: string }) => (
+    <div className="pb-2 mb-4" style={{ borderBottom: HAIRLINE }}>
+        <p className="text-[10px] font-[700] uppercase tracking-[0.09em] text-gray-400">{title}</p>
+    </div>
+);
 
 function FinanceStudioContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'CREDIT_NOTE' | 'RECEIPT' | 'STATEMENT' | 'SSCAA_REPORT'>('CREDIT_NOTE');
+    const [activeTab, setActiveTab] = useState<'CREDIT_NOTE' | 'RECEIPT' | 'STATEMENT'>('CREDIT_NOTE');
     const [settings, setSettings] = useState<Record<string, string>>({});
     const [draftSaved, setDraftSaved] = useState(false);
 
-    // Customer Selection State
     const [availableCustomers, setAvailableCustomers] = useState<any[]>([]);
     const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
     const [isCnNumberChecking, setIsCnNumberChecking] = useState(false);
     const [cnNumberError, setCnNumberError] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Initial Fetch of Customers and URL Params
     useEffect(() => {
         const fetchCustomers = async () => {
             const customers = await getCustomersForStudio();
             setAvailableCustomers(customers);
 
-            // Attempt to populate customer details from ID
             const urlCustomerId = searchParams.get('customerId');
             if (urlCustomerId && customers.length > 0) {
                 const match = customers.find((c: any) => c.id === urlCustomerId);
@@ -85,20 +90,14 @@ function FinanceStudioContent() {
                     if (type === 'CREDIT_NOTE') {
                         setCreditNoteData(prev => ({
                             ...prev,
-                            customer: {
-                                ...prev.customer,
-                                name: match.name,
-                                address: match.address || '',
-                                tin: match.taxId || ''
-                            }
+                            customer: { ...prev.customer, name: match.name, address: match.address || '', tin: match.taxId || '' }
                         }));
                     }
                 }
             }
         };
         fetchCustomers();
-        
-        // Fetch settings required for PDFs so they can match the HTML previews
+
         const fetchSettings = async () => {
             try {
                 const keys = [
@@ -107,16 +106,12 @@ function FinanceStudioContent() {
                     'pesanest_receipt_logo', 'nra_receipt_logo_left', 'caa_receipt_logo_right',
                     'receipt_footer_logo_left', 'receipt_footer_logo_center', 'receipt_footer_logo_right',
                     'watermark_logo',
-                    // Draft keys
                     'studio_draft_credit_note', 'studio_draft_receipt', 'studio_draft_statement'
                 ].join(',');
-                
                 const res = await fetch(`/api/settings?keys=${keys}`);
                 if (res.ok) {
                     const data = await res.json();
                     setSettings(data);
-
-                    // Restore drafts from DB
                     try {
                         if (data.studio_draft_credit_note) {
                             const cn = JSON.parse(data.studio_draft_credit_note);
@@ -129,23 +124,17 @@ function FinanceStudioContent() {
                         if (data.studio_draft_statement) {
                             const s = JSON.parse(data.studio_draft_statement);
                             setStatementData(prev => ({
-                                ...prev, ...s,
-                                date: new Date(s.date),
+                                ...prev, ...s, date: new Date(s.date),
                                 periodStart: s.periodStart ? new Date(s.periodStart) : null,
                                 periodEnd: s.periodEnd ? new Date(s.periodEnd) : null
                             }));
                         }
-                    } catch (e) {
-                        console.warn('Could not restore studio drafts:', e);
-                    }
+                    } catch (e) { console.warn('Could not restore studio drafts:', e); }
                 }
-            } catch (err) {
-                console.error("Failed to fetch settings:", err);
-            }
+            } catch (err) { console.error("Failed to fetch settings:", err); }
         };
         fetchSettings();
 
-        // Handle URL Params for Prefilling
         const type = searchParams.get('type');
         const customerId = searchParams.get('customerId');
         const fromDate = searchParams.get('from');
@@ -153,16 +142,12 @@ function FinanceStudioContent() {
 
         if (type === 'STATEMENT' && customerId && fromDate && toDate) {
             setActiveTab('STATEMENT');
-            // Fetch statement data
             getStatementData(customerId, fromDate, toDate).then(data => {
                 if (data) {
                     setStatementData(prev => ({
                         ...prev,
                         period: `${new Date(fromDate).toLocaleDateString()} - ${new Date(toDate).toLocaleDateString()}`,
-                        customer: {
-                            ...prev.customer,
-                            ...data.customer
-                        },
+                        customer: { ...prev.customer, ...data.customer },
                         summary: data.summary,
                         transactions: data.transactions as Transaction[]
                     }));
@@ -177,10 +162,7 @@ function FinanceStudioContent() {
                 amount: parseFloat(searchParams.get('amount') || '0') || prev.amount,
                 reason: searchParams.get('reason') || prev.reason,
                 date: searchParams.get('date') ? new Date(searchParams.get('date')!) : new Date(),
-                customer: {
-                    ...prev.customer,
-                    name: searchParams.get('customerName') || prev.customer.name,
-                }
+                customer: { ...prev.customer, name: searchParams.get('customerName') || prev.customer.name }
             }));
         } else if (type === 'RECEIPT') {
             setActiveTab('RECEIPT');
@@ -198,7 +180,6 @@ function FinanceStudioContent() {
             }));
         }
 
-        // Click outside listener
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setShowCustomerDropdown(false);
@@ -208,26 +189,20 @@ function FinanceStudioContent() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [searchParams]);
 
-    // --- STATE FOR CREDIT NOTE ---
+    // --- STATE ---
     const [creditNoteData, setCreditNoteData] = useState({
-
         cnNumber: `CN-${format(new Date(), 'yyyyMMdd')}-001`,
         invoiceRef: '',
         amount: 0,
         reason: '',
         date: new Date(),
-        customer: {
-            name: '',
-            address: '',
-            tin: ''
-        }
+        customer: { name: '', address: '', tin: '' }
     });
 
-    // --- STATE FOR PAYMENT RECEIPT ---
     const [receiptData, setReceiptData] = useState({
         receiptNo: `REC-${format(new Date(), 'yyyyMMdd')}-001`,
         receiptDate: new Date(),
-        currency: 'USD',
+        currency: 'KES',
         receivedFrom: '',
         paymentMethod: 'Bank Transfer',
         transactionRef: '',
@@ -242,24 +217,13 @@ function FinanceStudioContent() {
         notes: ''
     });
 
-    // --- STATE FOR CUSTOMER STATEMENT ---
     const [statementData, setStatementData] = useState({
         statementNo: `SOA-${format(new Date(), 'yyyyMMdd')}-001`,
         date: new Date(),
         periodStart: null as Date | null,
         periodEnd: null as Date | null,
-        customer: {
-            name: '',
-            group: '',
-            country: '',
-            accountType: ''
-        },
-        summary: {
-            openingBalance: 0,
-            totalCharges: 0,
-            totalPayments: 0,
-            outstandingBalance: 0
-        },
+        customer: { name: '', group: '', country: '', accountType: '' },
+        summary: { openingBalance: 0, totalCharges: 0, totalPayments: 0, outstandingBalance: 0 },
         transactions: [] as Transaction[],
         notes: [
             'This statement provides a detailed summary of your account activity for the specified period.',
@@ -268,67 +232,26 @@ function FinanceStudioContent() {
         ]
     });
 
-    // --- STATE FOR SSCAA REPORT ---
-    const [sscaaData, setSscaaData] = useState({
-        statementNo: `SSCAA-${format(new Date(), 'yyyyMMdd')}-001`,
-        date: new Date(),
-        periodStart: null as Date | null,
-        periodEnd: null as Date | null,
-        isLoading: false,
-        customer: {
-            name: 'South Sudanese Civil Aviation Authority',
-            group: 'Government Agency',
-            country: 'South Sudan',
-            accountType: 'Treasury Beneficiary'
-        },
-        summary: {
-            openingBalance: 0,
-            totalCharges: 0,
-            totalPayments: 0,
-            outstandingBalance: 0
-        },
-        transactions: [] as SSCAATransaction[],
-        notes: [
-            'This report reflects all requisition payouts disbursed to SSCAA by eService.',
-            'Debit: eService column reflects amounts debited from eService accounts.',
-            'Credit: SSCAA column reflects amounts credited to SSCAA.'
-        ]
-    });
-
     // --- UNIQUENESS CHECK ---
     useEffect(() => {
         if (activeTab !== 'CREDIT_NOTE' || !creditNoteData.cnNumber) return;
-
         const checkUniqueness = async () => {
-            // Don't warn if it's the number passed from the URL (likely the one we just created)
             const urlCnNumber = searchParams.get('cnNumber');
-            if (creditNoteData.cnNumber === urlCnNumber) {
-                setCnNumberError(null);
-                return;
-            }
-
+            if (creditNoteData.cnNumber === urlCnNumber) { setCnNumberError(null); return; }
             setIsCnNumberChecking(true);
             const result = await checkCreditNoteNumberUniqueness(creditNoteData.cnNumber);
             setIsCnNumberChecking(false);
-
-            if (result.exists) {
-                setCnNumberError("This Credit Note number is already in use.");
-            } else {
-                setCnNumberError(null);
-            }
+            setCnNumberError(result.exists ? "This Credit Note number is already in use." : null);
         };
-
         const timer = setTimeout(checkUniqueness, 500);
         return () => clearTimeout(timer);
     }, [creditNoteData.cnNumber, activeTab, searchParams]);
 
-    // --- SHARED HELPERS & COMPONENTS ---
-
+    // --- HELPERS ---
     const recalculateStatementSummary = (transactions: Transaction[], openingBalance: number) => {
         const totalCharges = transactions.reduce((sum, tx) => sum + (tx.debit || 0), 0);
         const totalPayments = transactions.reduce((sum, tx) => sum + (tx.credit || 0), 0);
-        const outstandingBalance = openingBalance + totalCharges - totalPayments;
-        return { openingBalance, totalCharges, totalPayments, outstandingBalance };
+        return { openingBalance, totalCharges, totalPayments, outstandingBalance: openingBalance + totalCharges - totalPayments };
     };
 
     const handleStatementTransactionChange = (idx: number, field: keyof Transaction, value: any) => {
@@ -341,68 +264,41 @@ function FinanceStudioContent() {
             runningBalance = runningBalance + debit - credit;
             tx.balance = runningBalance;
         });
-        const newSummary = recalculateStatementSummary(newTransactions, statementData.summary.openingBalance);
-        setStatementData({ ...statementData, transactions: newTransactions, summary: newSummary });
+        setStatementData({ ...statementData, transactions: newTransactions, summary: recalculateStatementSummary(newTransactions, statementData.summary.openingBalance) });
     };
 
     const addStatementTransaction = () => {
-        const newTx: Transaction = {
-            id: Date.now(),
-            operator: 'New Description',
-            invoiceRef: 'INV-NEW',
-            period: 'Period',
-            debit: 0,
-            credit: 0,
-            balance: 0
-        };
+        const newTx: Transaction = { id: Date.now(), operator: 'New Description', invoiceRef: 'INV-NEW', period: 'Period', debit: 0, credit: 0, balance: 0 };
         const newTransactions = [...statementData.transactions, newTx];
-        const newSummary = recalculateStatementSummary(newTransactions, statementData.summary.openingBalance);
-        setStatementData({ ...statementData, transactions: newTransactions, summary: newSummary });
-        // Trigger recalc of balances effectively
-        handleStatementTransactionChange(newTransactions.length - 1, 'balance', 0); // Hacky trigger, but safe
-    }
+        setStatementData({ ...statementData, transactions: newTransactions, summary: recalculateStatementSummary(newTransactions, statementData.summary.openingBalance) });
+        handleStatementTransactionChange(newTransactions.length - 1, 'balance', 0);
+    };
 
     const removeStatementTransaction = (idx: number) => {
         const newTransactions = statementData.transactions.filter((_, i) => i !== idx);
-        // Recalc
         let runningBalance = statementData.summary.openingBalance;
         newTransactions.forEach(tx => {
-            const debit = parseFloat(tx.debit as any) || 0;
-            const credit = parseFloat(tx.credit as any) || 0;
-            runningBalance = runningBalance + debit - credit;
-            tx.balance = runningBalance;
+            tx.balance = runningBalance = runningBalance + (parseFloat(tx.debit as any) || 0) - (parseFloat(tx.credit as any) || 0);
         });
-        const newSummary = recalculateStatementSummary(newTransactions, statementData.summary.openingBalance);
-        setStatementData({ ...statementData, transactions: newTransactions, summary: newSummary });
-    }
-    const sortTransactions = () => {
-        const sorted = [...statementData.transactions].sort((a, b) => {
-            const getDate = (d: string) => {
-                const parts = d.split('/'); // Assume DD/MM/YYYY
-                if (parts.length === 3) return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0])).getTime();
-                return new Date(d).getTime() || 0;
-            };
-            return getDate(a.period) - getDate(b.period);
-        });
-
-        // Update balances
-        let runningBalance = statementData.summary.openingBalance;
-        sorted.forEach(tx => {
-            const debit = parseFloat(tx.debit as any) || 0;
-            const credit = parseFloat(tx.credit as any) || 0;
-            runningBalance = runningBalance + debit - credit;
-            tx.balance = runningBalance;
-        });
-
-        const newSummary = recalculateStatementSummary(sorted, statementData.summary.openingBalance);
-        setStatementData({ ...statementData, transactions: sorted, summary: newSummary });
+        setStatementData({ ...statementData, transactions: newTransactions, summary: recalculateStatementSummary(newTransactions, statementData.summary.openingBalance) });
     };
 
-    // --- TEMPLATE HANDLERS ---
+    const sortTransactions = () => {
+        const getDate = (d: string) => {
+            const parts = d.split('/');
+            if (parts.length === 3) return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0])).getTime();
+            return new Date(d).getTime() || 0;
+        };
+        const sorted = [...statementData.transactions].sort((a, b) => getDate(a.period) - getDate(b.period));
+        let runningBalance = statementData.summary.openingBalance;
+        sorted.forEach(tx => {
+            tx.balance = runningBalance = runningBalance + (parseFloat(tx.debit as any) || 0) - (parseFloat(tx.credit as any) || 0);
+        });
+        setStatementData({ ...statementData, transactions: sorted, summary: recalculateStatementSummary(sorted, statementData.summary.openingBalance) });
+    };
+
     const handleDownloadTemplate = () => {
-        const ws = utils.json_to_sheet([
-            { Description: 'Example Description', 'Reference': 'INV-001', Period: 'Jan 2026', Debit: 1000, Credit: 0 }
-        ]);
+        const ws = utils.json_to_sheet([{ Description: 'Example Description', Reference: 'INV-001', Period: 'Jan 2026', Debit: 1000, Credit: 0 }]);
         const wb = utils.book_new();
         utils.book_append_sheet(wb, ws, "Transactions");
         writeFile(wb, "Statement_Template.xlsx");
@@ -415,8 +311,7 @@ function FinanceStudioContent() {
         reader.onload = (evt) => {
             const bstr = evt.target?.result;
             const wb = read(bstr, { type: 'binary' });
-            const wsname = wb.SheetNames[0];
-            const ws = wb.Sheets[wsname];
+            const ws = wb.Sheets[wb.SheetNames[0]];
             const data = utils.sheet_to_json(ws);
             const newTransactions = data.map((row: any, idx) => ({
                 id: Date.now() + idx,
@@ -426,11 +321,9 @@ function FinanceStudioContent() {
                 debit: row['Debit'] || 0,
                 credit: row['Credit'] || 0,
                 balance: 0
-            }));
-            const transactionsList = newTransactions as Transaction[];
+            })) as Transaction[];
 
-            // Auto-Sort by Date
-            transactionsList.sort((a, b) => {
+            newTransactions.sort((a, b) => {
                 const getDate = (d: string) => {
                     const parts = d?.split('/') || [];
                     if (parts.length === 3) return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0])).getTime();
@@ -439,118 +332,74 @@ function FinanceStudioContent() {
                 return getDate(a.period) - getDate(b.period);
             });
 
-            // Recalculate Balances
             let runningBalance = statementData.summary.openingBalance;
-            transactionsList.forEach(tx => {
-                const debit = parseFloat(tx.debit as any) || 0;
-                const credit = parseFloat(tx.credit as any) || 0;
-                runningBalance = runningBalance + debit - credit;
-                tx.balance = runningBalance;
+            newTransactions.forEach(tx => {
+                tx.balance = runningBalance = runningBalance + (parseFloat(tx.debit as any) || 0) - (parseFloat(tx.credit as any) || 0);
             });
 
-            const newSummary = recalculateStatementSummary(transactionsList, statementData.summary.openingBalance);
-            setStatementData({ ...statementData, transactions: transactionsList, summary: newSummary });
+            setStatementData({ ...statementData, transactions: newTransactions, summary: recalculateStatementSummary(newTransactions, statementData.summary.openingBalance) });
         };
         reader.readAsBinaryString(file);
     };
 
-
-
-    // --- CUSTOMER AUTO-COMPLETE LOGIC ---
     const handleCustomerSelect = (customer: any) => {
         if (activeTab === 'STATEMENT') {
-            setStatementData(prev => ({
-                ...prev,
-                customer: {
-                    ...prev.customer,
-                    name: customer.name,
-                    country: customer.country || prev.customer.country,
-                    // If DB has address/tin, we could theoretically map them if schema matched exactly
-                }
-            }));
+            setStatementData(prev => ({ ...prev, customer: { ...prev.customer, name: customer.name, country: customer.country || prev.customer.country } }));
         } else if (activeTab === 'CREDIT_NOTE') {
-            setCreditNoteData(prev => ({
-                ...prev,
-                customer: {
-                    ...prev.customer,
-                    name: customer.name,
-                    address: customer.address || prev.customer.address,
-                    tin: customer.taxId || prev.customer.tin
-                }
-            }));
+            setCreditNoteData(prev => ({ ...prev, customer: { ...prev.customer, name: customer.name, address: customer.address || prev.customer.address, tin: customer.taxId || prev.customer.tin } }));
         } else if (activeTab === 'RECEIPT') {
-            setReceiptData(prev => ({
-                ...prev,
-                receivedFrom: customer.name
-            }));
+            setReceiptData(prev => ({ ...prev, receivedFrom: customer.name }));
         }
         setShowCustomerDropdown(false);
     };
 
     const renderCustomerInput = (value: string, onChange: (val: string) => void) => {
-        // Filter DB customers + Known Airlines
         const filteredDB = availableCustomers.filter(c => c.name.toLowerCase().includes(value.toLowerCase()));
-        const filteredKnown = KNOWN_AIRLINES.filter(a => a.toLowerCase().includes(value.toLowerCase()))
-            .filter(a => !filteredDB.find(db => db.name === a)); // Avoid duplicates
-
+        const filteredKnown = KNOWN_AIRLINES
+            .filter(a => a.toLowerCase().includes(value.toLowerCase()))
+            .filter(a => !filteredDB.find(db => db.name === a));
         const hasSuggestions = filteredDB.length > 0 || filteredKnown.length > 0;
 
         return (
             <div className="relative" ref={dropdownRef}>
                 <div className="relative">
-                    <TextInput
+                    <StudioInput
                         value={value}
-                        onChange={(e: any) => {
-                            onChange(e.target.value);
-                            setShowCustomerDropdown(true);
-                        }}
+                        onChange={(e: any) => { onChange(e.target.value); setShowCustomerDropdown(true); }}
                         onFocus={() => setShowCustomerDropdown(true)}
                         placeholder="Search customer..."
                     />
-                    {/* Add caret to indicate dropdown capability */}
-                    <div className="absolute right-3 top-2.5 text-slate-500 pointer-events-none">
-                        <PiCaretDown />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                        <PiCaretDown className="text-[12px]" />
                     </div>
                 </div>
-
                 {showCustomerDropdown && hasSuggestions && (
-                    <div className="absolute z-50 w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto custom-scrollbar start-0">
-                        {/* DB Results Section */}
+                    <div className="absolute z-50 w-full mt-1 bg-white rounded-[8px] shadow-lg max-h-48 overflow-y-auto" style={{ border: HAIRLINE }}>
                         {filteredDB.length > 0 && (
                             <div className="py-1">
-                                <div className="px-3 py-1 text-[10px] font-bold text-indigo-400 uppercase tracking-wider bg-slate-800/50 sticky top-0 backdrop-blur-sm">
+                                <div className="px-3 py-1.5 text-[9.5px] font-[700] uppercase tracking-[0.1em] text-[#6366F1]" style={{ borderBottom: HAIRLINE }}>
                                     Saved Customers
                                 </div>
-                                {filteredDB.map((c, i) => (
-                                    <button
-                                        key={c.id}
-                                        onClick={() => handleCustomerSelect(c)}
-                                        className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-700 transition-colors flex flex-col"
-                                    >
-                                        <span className="font-medium">{c.name}</span>
-                                        <span className="text-[10px] text-slate-500">{c.city}, {c.country}</span>
+                                {filteredDB.map((c: any) => (
+                                    <button key={c.id} onClick={() => handleCustomerSelect(c)}
+                                        className="w-full text-left px-3 py-2 hover:bg-indigo-50 transition-colors flex flex-col">
+                                        <span className="text-[12px] font-[500] text-gray-900">{c.name}</span>
+                                        <span className="text-[10.5px] text-gray-400">{c.city}, {c.country}</span>
                                     </button>
                                 ))}
                             </div>
                         )}
-
-                        {/* Divider if both exist */}
                         {filteredDB.length > 0 && filteredKnown.length > 0 && (
-                            <div className="border-t border-slate-700 my-1"></div>
+                            <div style={{ borderTop: HAIRLINE }} />
                         )}
-
-                        {/* Known Airlines Section */}
                         {filteredKnown.length > 0 && (
                             <div className="py-1">
-                                <div className="px-3 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-800/50 sticky top-0 backdrop-blur-sm">
+                                <div className="px-3 py-1.5 text-[9.5px] font-[700] uppercase tracking-[0.1em] text-gray-400" style={{ borderBottom: HAIRLINE }}>
                                     Suggestions
                                 </div>
-                                {filteredKnown.map((name, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleCustomerSelect({ name })}
-                                        className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-700 transition-colors"
-                                    >
+                                {filteredKnown.map((name: string, i: number) => (
+                                    <button key={i} onClick={() => handleCustomerSelect({ name })}
+                                        className="w-full text-left px-3 py-2 text-[12px] text-gray-700 hover:bg-gray-50 transition-colors">
                                         {name}
                                     </button>
                                 ))}
@@ -562,223 +411,151 @@ function FinanceStudioContent() {
         );
     };
 
+    // --- RENDER ---
     return (
-        <div className="flex h-screen bg-white overflow-hidden">
-            {/* VERSION INDICATOR - hidden in production/print helpful for debugging */}
-            <div className="fixed top-2 right-2 z-[100] text-[10px] text-slate-600 font-mono opacity-50 pointer-events-none print:hidden">v2.0 - Studio</div>
-
+        <div className="flex h-screen bg-white overflow-hidden" data-theme="light">
             <style jsx global>{`
-                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-                
-                /* FORCE INPUT VISIBILITY */
-                .studio-input {
-                    color: #ffffff !important;
-                    background-color: #1e293b !important; /* slate-800 */
-                    -webkit-text-fill-color: #ffffff !important;
-                    border-color: #334155 !important; /* slate-700 */
-                }
-                .studio-input::placeholder {
-                    color: #94a3b8 !important; /* slate-400 */
-                    -webkit-text-fill-color: #94a3b8 !important;
-                }
-                
-                @media screen {
-                    .studio-workspace {
-                        background-color: #020617;
-                        background-image: radial-gradient(#334155 1px, transparent 1px);
-                        background-size: 20px 20px;
-                    }
-                }
                 @media print {
-                    @page {
-                        size: A4;
-                        margin: 0 !important;
-                    }
-                    * {
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    }
-                    body {
-                        margin: 0 !important;
-                        padding: 0 !important;
-                        visibility: hidden !important;
-                        background: white !important;
-                    }
+                    @page { size: A4; margin: 0 !important; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    body { margin: 0 !important; padding: 0 !important; visibility: hidden !important; background: white !important; }
                     .print-container-wrapper {
                         visibility: visible !important;
                         position: absolute !important;
-                        left: 0 !important;
-                        top: 0 !important;
-                        width: 100% !important; 
-                        margin: 0 !important;
-                        padding: 0 !important;
+                        left: 0 !important; top: 0 !important;
+                        width: 100% !important;
+                        margin: 0 !important; padding: 0 !important;
                         transform: none !important;
                         box-shadow: none !important;
-                        /* Ensure footer isn't cut off */
-                        min-height: 297mm !important; /* Force full A4 height */
-                        height: auto !important; 
+                        min-height: 297mm !important;
+                        height: auto !important;
                         overflow: visible !important;
                     }
-                    .print-container-wrapper * {
-                        visibility: visible !important;
-                    }
+                    .print-container-wrapper * { visibility: visible !important; }
                     .print-container-wrapper .flex { display: flex !important; }
                     .print-container-wrapper .grid { display: grid !important; }
                 }
-                .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-                /* Autofill Fix for Dark Mode */
-                input:-webkit-autofill,
-                input:-webkit-autofill:hover, 
-                input:-webkit-autofill:focus, 
-                input:-webkit-autofill:active {
-                    -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
-                    -webkit-text-fill-color: white !important;
-                    transition: background-color 5000s ease-in-out 0s;
+                .studio-scroll::-webkit-scrollbar { width: 4px; }
+                .studio-scroll::-webkit-scrollbar-track { background: transparent; }
+                .studio-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+                .studio-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.18); }
+                @media screen {
+                    .studio-workspace {
+                        background-color: #F1F0ED;
+                        background-image: radial-gradient(rgba(0,0,0,0.07) 1px, transparent 1px);
+                        background-size: 20px 20px;
+                    }
                 }
             `}</style>
 
-            {/* LEFT PANEL: STUDIO CONTROLS (30%) */}
-            <div className="w-[420px] bg-slate-900 border-r border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.5)] z-20 h-full print:hidden">
+            {/* ── LEFT PANEL ─────────────────────────────────── */}
+            <div className="w-[400px] bg-white flex flex-col h-full shrink-0 print:hidden" style={{ borderRight: HAIRLINE }}>
 
-                {/* STUDIO HEADER */}
-                <div className="p-4 bg-slate-900 shrink-0 border-b border-slate-800">
-                    <button
-                        onClick={() => router.push('/dashboard')}
-                        className="flex items-center gap-2 mb-4 text-[10px] font-bold text-slate-500 hover:text-white transition-colors group"
-                    >
-                        <div className="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:bg-indigo-600 group-hover:border-indigo-500 transition-all">
-                            <PiArrowLeft className="text-sm" />
-                        </div>
-                        Back to Dashboard
+                {/* Panel header */}
+                <div className="px-5 pt-5 pb-4 shrink-0" style={{ borderBottom: HAIRLINE }}>
+                    <button onClick={() => router.push('/dashboard')}
+                        className="flex items-center gap-1.5 mb-4 text-[11px] font-[500] text-gray-400 hover:text-[#6366F1] transition-colors">
+                        <PiArrowLeft className="text-[13px]" /> Back to Dashboard
                     </button>
-
-                    <div className="flex p-1 bg-slate-950/50 rounded-xl border border-slate-800">
-                        <button
-                            onClick={() => setActiveTab('CREDIT_NOTE')}
-                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold rounded-lg transition-all duration-200 
-                            ${activeTab === 'CREDIT_NOTE' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/20' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'}`}
-                        >
-                            <PiFileText className="text-base" /> Credit Note
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('RECEIPT')}
-                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold rounded-lg transition-all duration-200 
-                            ${activeTab === 'RECEIPT' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/20' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'}`}
-                        >
-                            <PiReceipt className="text-base" /> Receipt
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('STATEMENT')}
-                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold rounded-lg transition-all duration-200 
-                            ${activeTab === 'STATEMENT' ? 'bg-violet-600 text-white shadow-md shadow-violet-900/20' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'}`}
-                        >
-                            <PiListBullets className="text-lg" /> Statement
-                        </button>
-                        <button
-                            onClick={async () => {
-                                setActiveTab('SSCAA_REPORT');
-                                setSscaaData(prev => ({ ...prev, isLoading: true }));
-                                const data = await getSSCAAStatementData(
-                                    sscaaData.periodStart ? sscaaData.periodStart.toISOString() : undefined,
-                                    sscaaData.periodEnd ? sscaaData.periodEnd.toISOString() : undefined
-                                );
-                                if (data) {
-                                    setSscaaData(prev => ({
-                                        ...prev,
-                                        isLoading: false,
-                                        customer: data.customer,
-                                        summary: data.summary,
-                                        transactions: data.transactions as SSCAATransaction[]
-                                    }));
-                                } else {
-                                    setSscaaData(prev => ({ ...prev, isLoading: false }));
-                                }
-                            }}
-                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold rounded-lg transition-all duration-200 
-                            ${activeTab === 'SSCAA_REPORT' ? 'bg-red-700 text-white shadow-md shadow-red-900/20' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'}`}
-                        >
-                            <PiBuildings className="text-lg" /> SSCAA
-                        </button>
+                    <div className="flex items-center gap-2.5 mb-4">
+                        <div className="w-[30px] h-[30px] rounded-[7px] bg-[#6366F1] flex items-center justify-center shrink-0">
+                            <PiFileText className="text-white text-[15px]" />
+                        </div>
+                        <div>
+                            <p className="text-[14px] font-[700] text-gray-900 tracking-tight leading-tight">Finance Studio</p>
+                            <p className="text-[10.5px] text-gray-400">Credit notes, receipts &amp; statements</p>
+                        </div>
+                    </div>
+                    {/* Tab switcher */}
+                    <div className="grid grid-cols-3 gap-1.5">
+                        {([
+                            { key: 'CREDIT_NOTE', label: 'Credit Note', icon: PiFileText,    color: '#6366F1' },
+                            { key: 'RECEIPT',     label: 'Receipt',     icon: PiReceipt,     color: '#059669' },
+                            { key: 'STATEMENT',   label: 'Statement',   icon: PiListBullets, color: '#7c3aed' },
+                        ] as const).map(({ key, label, icon: Icon, color }) => {
+                            const isActive = activeTab === key;
+                            return (
+                                <button key={key} onClick={() => setActiveTab(key)}
+                                    className="flex items-center justify-center gap-1.5 py-2 rounded-[7px] text-[11px] font-[600] transition-all"
+                                    style={isActive
+                                        ? { background: color, color: 'white', border: `1px solid ${color}` }
+                                        : { background: 'white', color: '#6b7280', border: HAIRLINE }}>
+                                    <Icon className="text-[13px] shrink-0" />
+                                    <span className="truncate">{label}</span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* SCROLLABLE FORM AREA */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                {/* Scrollable form */}
+                <div className="flex-1 overflow-y-auto px-5 py-5 space-y-7 studio-scroll">
 
-                    {/* --- CREDIT NOTE EDITOR --- */}
+                    {/* ── CREDIT NOTE FORM ── */}
                     {activeTab === 'CREDIT_NOTE' && (
-                        <div className="space-y-8 animate-in slide-in-from-left-4 duration-500 fade-in">
+                        <motion.div key="credit-note" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-7">
                             <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">Document Details</h3>
-                                </div>
-                                <div className="space-y-5">
-                                    <div className="grid grid-cols-2 gap-4">
+                                <SectionHeader title="Document Details" />
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <InputLabel>Date</InputLabel>
                                             <StudioDatePicker value={creditNoteData.date} onChange={(date) => setCreditNoteData({ ...creditNoteData, date })} />
                                         </div>
                                         <div>
                                             <InputLabel>CN Number</InputLabel>
-                                            <TextInput
+                                            <StudioInput
                                                 value={creditNoteData.cnNumber}
                                                 onChange={(e: any) => setCreditNoteData({ ...creditNoteData, cnNumber: e.target.value })}
-                                                className={`w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium shadow-sm hover:border-slate-600 studio-input ${cnNumberError ? 'ring-2 ring-red-500/50 border-red-500' : ''
-                                                    }`}
+                                                className={cnNumberError ? 'ring-2 ring-rose-300' : ''}
                                             />
                                             {cnNumberError && (
-                                                <p className="mt-1 text-[10px] text-red-400 font-bold flex items-center gap-1">
-                                                    <PiWarningCircle className="text-xs" /> {cnNumberError}
+                                                <p className="mt-1 text-[10px] text-rose-500 font-[600] flex items-center gap-1">
+                                                    <PiWarningCircle className="text-[11px]" /> {cnNumberError}
                                                 </p>
                                             )}
                                             {isCnNumberChecking && (
-                                                <p className="mt-1 text-[10px] text-slate-500 font-medium">Checking uniqueness...</p>
+                                                <p className="mt-1 text-[10px] text-gray-400">Checking...</p>
                                             )}
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <InputLabel>Invoice Ref</InputLabel>
-                                            <TextInput value={creditNoteData.invoiceRef} onChange={(e: any) => setCreditNoteData({ ...creditNoteData, invoiceRef: e.target.value })} />
-                                        </div>
+                                    <div>
+                                        <InputLabel>Invoice Ref</InputLabel>
+                                        <StudioInput value={creditNoteData.invoiceRef} onChange={(e: any) => setCreditNoteData({ ...creditNoteData, invoiceRef: e.target.value })} />
                                     </div>
                                     <div>
-                                        <InputLabel>Amount (USD)</InputLabel>
+                                        <InputLabel>Amount (KES)</InputLabel>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-2.5 text-slate-500 text-sm font-bold">$</span>
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] font-[600]">KES</span>
                                             <input
                                                 type="number"
-                                                value={creditNoteData.amount || ""}
+                                                value={creditNoteData.amount || ''}
                                                 onChange={(e) => setCreditNoteData({ ...creditNoteData, amount: parseFloat(e.target.value) || 0 })}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-7 pr-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium font-mono shadow-sm"
+                                                className="w-full rounded-[7px] pl-10 pr-3 py-2.5 text-[12.5px] font-mono tabular-nums text-gray-900 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+                                                style={{ border: HAIRLINE }}
                                                 placeholder="0.00"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <InputLabel>Reason/Description</InputLabel>
+                                        <InputLabel>Reason / Description</InputLabel>
                                         <textarea
-                                            rows={2}
+                                            rows={3}
                                             value={creditNoteData.reason}
                                             onChange={(e) => setCreditNoteData({ ...creditNoteData, reason: e.target.value })}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium resize-none shadow-sm"
+                                            className="w-full rounded-[7px] px-3 py-2.5 text-[12.5px] text-gray-900 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all resize-none"
+                                            style={{ border: HAIRLINE }}
                                         />
                                     </div>
                                 </div>
                             </div>
-
                             <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">Customer Info</h3>
-                                </div>
+                                <SectionHeader title="Customer Info" />
                                 <div className="space-y-4">
                                     <div>
                                         <InputLabel>Customer Name</InputLabel>
-                                        {renderCustomerInput(creditNoteData.customer.name, (val) => setCreditNoteData({ ...creditNoteData, customer: { ...creditNoteData.customer, name: val } }))}
+                                        {renderCustomerInput(creditNoteData.customer.name, (val) =>
+                                            setCreditNoteData({ ...creditNoteData, customer: { ...creditNoteData.customer, name: val } }))}
                                     </div>
                                     <div>
                                         <InputLabel>Address</InputLabel>
@@ -786,27 +563,26 @@ function FinanceStudioContent() {
                                             rows={3}
                                             value={creditNoteData.customer.address}
                                             onChange={(e) => setCreditNoteData({ ...creditNoteData, customer: { ...creditNoteData.customer, address: e.target.value } })}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-medium resize-none shadow-sm"
+                                            className="w-full rounded-[7px] px-3 py-2.5 text-[12.5px] text-gray-900 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all resize-none"
+                                            style={{ border: HAIRLINE }}
                                         />
                                     </div>
                                     <div>
                                         <InputLabel>TIN / Tax ID</InputLabel>
-                                        <TextInput value={creditNoteData.customer.tin} onChange={(e: any) => setCreditNoteData({ ...creditNoteData, customer: { ...creditNoteData.customer, tin: e.target.value } })} />
+                                        <StudioInput value={creditNoteData.customer.tin} onChange={(e: any) => setCreditNoteData({ ...creditNoteData, customer: { ...creditNoteData.customer, tin: e.target.value } })} />
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     )}
 
-                    {/* --- RECEIPT EDITOR --- */}
+                    {/* ── RECEIPT FORM ── */}
                     {activeTab === 'RECEIPT' && (
-                        <div className="space-y-8 animate-in slide-in-from-left-4 duration-500 fade-in">
+                        <motion.div key="receipt" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-7">
                             <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">Receipt Details</h3>
-                                </div>
+                                <SectionHeader title="Receipt Details" />
                                 <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <InputLabel>Receipt Date</InputLabel>
                                             <StudioDatePicker value={receiptData.receiptDate} onChange={(date) => setReceiptData({ ...receiptData, receiptDate: date })} />
@@ -816,101 +592,96 @@ function FinanceStudioContent() {
                                             <StudioDatePicker value={receiptData.paymentDate} onChange={(date) => setReceiptData({ ...receiptData, paymentDate: date })} />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <InputLabel>Receipt No</InputLabel>
-                                            <TextInput value={receiptData.receiptNo} onChange={(e: any) => setReceiptData({ ...receiptData, receiptNo: e.target.value })} />
+                                            <StudioInput value={receiptData.receiptNo} onChange={(e: any) => setReceiptData({ ...receiptData, receiptNo: e.target.value })} />
                                         </div>
                                         <div>
                                             <InputLabel>Currency</InputLabel>
-                                            <TextInput value={receiptData.currency} onChange={(e: any) => setReceiptData({ ...receiptData, currency: e.target.value })} />
+                                            <StudioInput value={receiptData.currency} onChange={(e: any) => setReceiptData({ ...receiptData, currency: e.target.value })} />
                                         </div>
                                     </div>
                                     <div>
                                         <InputLabel>Received From</InputLabel>
                                         {renderCustomerInput(receiptData.receivedFrom, (val) => setReceiptData({ ...receiptData, receivedFrom: val }))}
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <InputLabel>Payment Method</InputLabel>
-                                            <TextInput value={receiptData.paymentMethod} onChange={(e: any) => setReceiptData({ ...receiptData, paymentMethod: e.target.value })} />
+                                            <StudioInput value={receiptData.paymentMethod} onChange={(e: any) => setReceiptData({ ...receiptData, paymentMethod: e.target.value })} />
                                         </div>
                                         <div>
                                             <InputLabel>Transaction Ref</InputLabel>
-                                            <TextInput value={receiptData.transactionRef} onChange={(e: any) => setReceiptData({ ...receiptData, transactionRef: e.target.value })} />
+                                            <StudioInput value={receiptData.transactionRef} onChange={(e: any) => setReceiptData({ ...receiptData, transactionRef: e.target.value })} />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">Invoice Linking</h3>
-                                </div>
+                                <SectionHeader title="Invoice Linking" />
                                 <div className="space-y-4">
                                     <div>
                                         <InputLabel>Invoice Number</InputLabel>
-                                        <TextInput value={receiptData.invoiceNumber} onChange={(e: any) => setReceiptData({ ...receiptData, invoiceNumber: e.target.value })} />
+                                        <StudioInput value={receiptData.invoiceNumber} onChange={(e: any) => setReceiptData({ ...receiptData, invoiceNumber: e.target.value })} />
                                     </div>
                                     <div>
                                         <InputLabel>Service Type</InputLabel>
-                                        <TextInput value={receiptData.serviceType} onChange={(e: any) => setReceiptData({ ...receiptData, serviceType: e.target.value })} />
+                                        <StudioInput value={receiptData.serviceType} onChange={(e: any) => setReceiptData({ ...receiptData, serviceType: e.target.value })} />
                                     </div>
                                     <div>
                                         <InputLabel>Billing Period</InputLabel>
-                                        <TextInput value={receiptData.billingPeriod} onChange={(e: any) => setReceiptData({ ...receiptData, billingPeriod: e.target.value })} />
+                                        <StudioInput value={receiptData.billingPeriod} onChange={(e: any) => setReceiptData({ ...receiptData, billingPeriod: e.target.value })} />
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">Financials</h3>
-                                </div>
+                                <SectionHeader title="Financials" />
                                 <div className="space-y-4">
                                     <div>
                                         <InputLabel>Original Amount</InputLabel>
-                                        <NumberInput value={receiptData.originalAmount || ""} onChange={(e: any) => setReceiptData({ ...receiptData, originalAmount: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
+                                        <StudioNumberInput value={receiptData.originalAmount || ''} onChange={(e: any) => setReceiptData({ ...receiptData, originalAmount: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
                                     </div>
                                     <div>
                                         <InputLabel>Credit Note Applied</InputLabel>
-                                        <NumberInput value={receiptData.creditNoteApplied || ""} onChange={(e: any) => setReceiptData({ ...receiptData, creditNoteApplied: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
+                                        <StudioNumberInput value={receiptData.creditNoteApplied || ''} onChange={(e: any) => setReceiptData({ ...receiptData, creditNoteApplied: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
                                     </div>
                                     <div>
                                         <InputLabel>Adjusted Amount Due</InputLabel>
-                                        <NumberInput value={receiptData.adjustedAmountDue || ""} onChange={(e: any) => setReceiptData({ ...receiptData, adjustedAmountDue: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
+                                        <StudioNumberInput value={receiptData.adjustedAmountDue || ''} onChange={(e: any) => setReceiptData({ ...receiptData, adjustedAmountDue: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
                                     </div>
                                     <div>
                                         <InputLabel>Total Amount Paid</InputLabel>
-                                        <NumberInput value={receiptData.amountPaid || ""} onChange={(e: any) => setReceiptData({ ...receiptData, amountPaid: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
+                                        <StudioNumberInput value={receiptData.amountPaid || ''} onChange={(e: any) => setReceiptData({ ...receiptData, amountPaid: parseFloat(e.target.value) || 0 })} placeholder="0.00" />
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     )}
 
-                    {/* --- STATEMENT EDITOR --- */}
+                    {/* ── STATEMENT FORM ── */}
                     {activeTab === 'STATEMENT' && (
-                        <div className="space-y-8 animate-in slide-in-from-left-4 duration-500 fade-in">
+                        <motion.div key="statement" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-7">
+                            {/* Info callout */}
+                            <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-[7px]"
+                                style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.13)' }}>
+                                <PiInfo className="text-[#6366F1] text-[14px] shrink-0 mt-0.5" />
+                                <p className="text-[11px] text-gray-600 leading-relaxed">
+                                    Select a <span className="font-[600] text-[#6366F1]">Date Range</span> below to generate a complete transaction history for the customer.
+                                </p>
+                            </div>
+
                             <div>
-                                <div className="flex flex-col gap-2 p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent border border-indigo-500/10 mb-6 relative overflow-hidden group">
-                                    <div className="flex items-center gap-2 relative z-10">
-                                        <h3 className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2">
-                                            Statement Settings
-                                        </h3>
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 leading-relaxed relative z-10 flex items-start gap-2">
-                                        <PiInfo className="text-indigo-400 text-sm shrink-0 mt-0.5" />
-                                        <span>To generate a complete history, please ensure you have selected a valid <strong className="text-indigo-300">Date Range</strong> below.</span>
-                                    </p>
-                                </div>
+                                <SectionHeader title="Statement Settings" />
                                 <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <InputLabel>Statement Date</InputLabel>
                                             <StudioDatePicker value={statementData.date} onChange={(date) => setStatementData({ ...statementData, date })} />
                                         </div>
                                         <div>
                                             <InputLabel>Statement No</InputLabel>
-                                            <TextInput value={statementData.statementNo} onChange={(e: any) => setStatementData({ ...statementData, statementNo: e.target.value })} />
+                                            <StudioInput value={statementData.statementNo} onChange={(e: any) => setStatementData({ ...statementData, statementNo: e.target.value })} />
                                         </div>
                                     </div>
                                     <div>
@@ -926,283 +697,214 @@ function FinanceStudioContent() {
                             </div>
 
                             <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">Customer Details</h3>
-                                </div>
+                                <SectionHeader title="Customer Details" />
                                 <div className="space-y-4">
                                     <div>
                                         <InputLabel>Customer Name</InputLabel>
-                                        {renderCustomerInput(statementData.customer.name, (val) => setStatementData({ ...statementData, customer: { ...statementData.customer, name: val } }))}
+                                        {renderCustomerInput(statementData.customer.name, (val) =>
+                                            setStatementData({ ...statementData, customer: { ...statementData.customer, name: val } }))}
                                     </div>
                                     <div>
                                         <InputLabel>Group</InputLabel>
-                                        <TextInput value={statementData.customer.group} onChange={(e: any) => setStatementData({ ...statementData, customer: { ...statementData.customer, group: e.target.value } })} />
+                                        <StudioInput value={statementData.customer.group} onChange={(e: any) => setStatementData({ ...statementData, customer: { ...statementData.customer, group: e.target.value } })} />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <InputLabel>Country</InputLabel>
-                                            <TextInput value={statementData.customer.country} onChange={(e: any) => setStatementData({ ...statementData, customer: { ...statementData.customer, country: e.target.value } })} />
+                                            <StudioInput value={statementData.customer.country} onChange={(e: any) => setStatementData({ ...statementData, customer: { ...statementData.customer, country: e.target.value } })} />
                                         </div>
                                         <div>
                                             <InputLabel>Account Type</InputLabel>
-                                            <TextInput value={statementData.customer.accountType} onChange={(e: any) => setStatementData({ ...statementData, customer: { ...statementData.customer, accountType: e.target.value } })} />
+                                            <StudioInput value={statementData.customer.accountType} onChange={(e: any) => setStatementData({ ...statementData, customer: { ...statementData.customer, accountType: e.target.value } })} />
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* ... Transactions and Summary sections remain the same ... */}
+                            {/* Transactions */}
                             <div>
-                                <div className="flex justify-between items-center border-b border-slate-700/50 pb-2 mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="text-xs font-bold text-slate-300">Transactions</h3>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={sortTransactions}
-                                            className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white bg-slate-800 hover:bg-indigo-600 rounded-lg transition-all"
-                                            title="Sort Chronologically"
-                                        >
-                                            <PiSortAscending className="text-sm" />
+                                <div className="flex items-center justify-between pb-2 mb-4" style={{ borderBottom: HAIRLINE }}>
+                                    <p className="text-[10px] font-[700] uppercase tracking-[0.09em] text-gray-400">
+                                        Transactions
+                                        <span className="ml-2 text-gray-300 font-[600]">({statementData.transactions.length})</span>
+                                    </p>
+                                    <div className="flex items-center gap-1.5">
+                                        <button onClick={sortTransactions}
+                                            className="w-[26px] h-[26px] flex items-center justify-center rounded-[5px] text-gray-400 hover:text-[#6366F1] hover:bg-indigo-50 transition-colors"
+                                            style={{ border: HAIRLINE }} title="Sort Chronologically">
+                                            <PiSortAscending className="text-[13px]" />
                                         </button>
-                                        <button
-                                            onClick={addStatementTransaction}
-                                            className="w-6 h-6 flex items-center justify-center text-white bg-cyan-500 rounded-full transition-all hover:scale-110 active:scale-95 shadow-[0_0_10px_rgba(6,182,212,0.6)] animate-pulse hover:shadow-[0_0_15px_rgba(6,182,212,0.8)]"
-                                            title="Add Line"
-                                        >
-                                            <PiPlus className="text-sm font-bold" />
+                                        <button onClick={handleDownloadTemplate}
+                                            className="flex items-center gap-1 px-2.5 py-1 rounded-[5px] text-[10px] font-[600] text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                                            style={{ border: HAIRLINE }}>
+                                            Template
                                         </button>
-                                        <button onClick={handleDownloadTemplate} className="text-[10px] flex items-center gap-1.5 text-slate-400 font-bold bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider" title="Download Template">
-                                            <img src="/logo (2).png" alt="Template" className="w-3.5 h-3.5 object-contain" /> Template
-                                        </button>
-                                        <label className="text-[10px] flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider cursor-pointer">
-                                            <PiUpload /> Upload
-                                            <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleUploadTemplate} />
+                                        <label className="flex items-center gap-1 px-2.5 py-1 rounded-[5px] text-[10px] font-[600] cursor-pointer transition-colors"
+                                            style={{ border: '1px solid rgba(5,150,105,0.2)', color: '#059669', background: 'rgba(5,150,105,0.05)' }}>
+                                            <PiUpload className="text-[11px]" /> Upload
+                                            <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadTemplate} />
                                         </label>
+                                        <button onClick={addStatementTransaction}
+                                            className="w-[26px] h-[26px] flex items-center justify-center rounded-[5px] text-white transition-colors"
+                                            style={{ background: '#6366F1' }} title="Add Line">
+                                            <PiPlus className="text-[13px]" />
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    {statementData.transactions.map((tx, idx) => (
-                                        <div key={tx.id || idx} className="bg-slate-800 p-4 rounded-xl border border-cyan-500/30 shadow-sm relative group hover:border-cyan-400/60 transition-all">
-                                            <button
-                                                onClick={() => removeStatementTransaction(idx)}
-                                                className="absolute top-2 right-2 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-white/5 rounded-lg"
-                                            >
-                                                <PiTrash />
-                                            </button>
+                                {statementData.transactions.length === 0 ? (
+                                    <div className="py-8 text-center rounded-[7px]" style={{ border: `1px dashed rgba(0,0,0,0.1)` }}>
+                                        <p className="text-[11.5px] text-gray-400">No transactions yet</p>
+                                        <p className="text-[10.5px] text-gray-300 mt-0.5">Click + to add a line or upload an Excel file</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {statementData.transactions.map((tx, idx) => (
+                                            <div key={tx.id || idx}
+                                                className="rounded-[7px] p-3.5 group relative"
+                                                style={{ border: HAIRLINE }}>
+                                                <button onClick={() => removeStatementTransaction(idx)}
+                                                    className="absolute top-2.5 right-2.5 text-gray-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all p-1 rounded-[4px] hover:bg-rose-50"
+                                                    title="Remove">
+                                                    <PiTrash className="text-[12px]" />
+                                                </button>
+                                                <div className="grid grid-cols-2 gap-2 mb-2">
+                                                    <div>
+                                                        <p className="text-[9.5px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-1">Description</p>
+                                                        <input type="text" value={tx.operator}
+                                                            onChange={(e) => handleStatementTransactionChange(idx, 'operator', e.target.value)}
+                                                            className="w-full rounded-[5px] px-2.5 py-1.5 text-[11.5px] text-gray-900 bg-gray-50 outline-none focus:ring-1 focus:ring-[#6366F1]/20 transition-all"
+                                                            style={{ border: HAIRLINE }} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[9.5px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-1">Reference</p>
+                                                        <input type="text" value={tx.invoiceRef}
+                                                            onChange={(e) => handleStatementTransactionChange(idx, 'invoiceRef', e.target.value)}
+                                                            className="w-full rounded-[5px] px-2.5 py-1.5 text-[11.5px] text-gray-900 bg-gray-50 outline-none focus:ring-1 focus:ring-[#6366F1]/20 transition-all"
+                                                            style={{ border: HAIRLINE }} />
+                                                    </div>
+                                                </div>
+                                                <div className="mb-2">
+                                                    <p className="text-[9.5px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-1">Period</p>
+                                                    <input type="text" value={tx.period}
+                                                        onChange={(e) => handleStatementTransactionChange(idx, 'period', e.target.value)}
+                                                        className="w-full rounded-[5px] px-2.5 py-1.5 text-[11.5px] text-gray-900 bg-gray-50 outline-none focus:ring-1 focus:ring-[#6366F1]/20 transition-all"
+                                                        style={{ border: HAIRLINE }} />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <p className="text-[9.5px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-1">Debit</p>
+                                                        <input type="number" value={tx.debit || ''}
+                                                            onChange={(e) => handleStatementTransactionChange(idx, 'debit', e.target.value ? parseFloat(e.target.value) : 0)}
+                                                            className="w-full rounded-[5px] px-2.5 py-1.5 text-[11.5px] font-mono text-gray-900 bg-gray-50 outline-none focus:ring-1 focus:ring-[#6366F1]/20 transition-all"
+                                                            style={{ border: HAIRLINE }} placeholder="0.00" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[9.5px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-1">Credit</p>
+                                                        <input type="number" value={tx.credit || ''}
+                                                            onChange={(e) => handleStatementTransactionChange(idx, 'credit', e.target.value ? parseFloat(e.target.value) : 0)}
+                                                            className="w-full rounded-[5px] px-2.5 py-1.5 text-[11.5px] font-mono text-gray-900 bg-gray-50 outline-none focus:ring-1 focus:ring-[#6366F1]/20 transition-all"
+                                                            style={{ border: HAIRLINE }} placeholder="0.00" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
-                                            <div className="grid grid-cols-2 gap-3 mb-3">
-                                                <div>
-                                                    <InputLabel>Description</InputLabel>
-                                                    <input type="text" value={tx.operator} onChange={(e) => handleStatementTransactionChange(idx, 'operator', e.target.value)} className="w-full text-xs bg-slate-700/50 border border-slate-600/50 rounded-lg px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-violet-500/50 focus:border-violet-500 outline-none" />
-                                                </div>
-                                                <div>
-                                                    <InputLabel>Reference</InputLabel>
-                                                    <input type="text" value={tx.invoiceRef} onChange={(e) => handleStatementTransactionChange(idx, 'invoiceRef', e.target.value)} className="w-full text-xs bg-slate-700/50 border border-slate-600/50 rounded-lg px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-violet-500/50 focus:border-violet-500 outline-none" />
-                                                </div>
-                                            </div>
-                                            <div className="mb-3">
-                                                <InputLabel>Period</InputLabel>
-                                                <input type="text" value={tx.period} onChange={(e) => handleStatementTransactionChange(idx, 'period', e.target.value)} className="w-full text-xs bg-slate-700/50 border border-slate-600/50 rounded-lg px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-violet-500/50 focus:border-violet-500 outline-none" />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div>
-                                                    <InputLabel>Debit</InputLabel>
-                                                    <input type="number" value={tx.debit || ''} onChange={(e) => handleStatementTransactionChange(idx, 'debit', e.target.value ? parseFloat(e.target.value) : 0)} className="w-full text-xs bg-slate-700/50 border border-slate-600/50 rounded-lg px-2.5 py-2 font-mono text-slate-300 focus:ring-1 focus:ring-violet-500/50 focus:border-violet-500 outline-none" placeholder="0.00" />
-                                                </div>
-                                                <div>
-                                                    <InputLabel>Credit</InputLabel>
-                                                    <input type="number" value={tx.credit || ''} onChange={(e) => handleStatementTransactionChange(idx, 'credit', e.target.value ? parseFloat(e.target.value) : 0)} className="w-full text-xs bg-slate-700/50 border border-slate-600/50 rounded-lg px-2.5 py-2 font-mono text-slate-300 focus:ring-1 focus:ring-violet-500/50 focus:border-violet-500 outline-none" placeholder="0.00" />
-                                                </div>
-                                            </div>
+                            {/* Summary Override */}
+                            <div>
+                                <SectionHeader title="Summary Override" />
+                                <div>
+                                    <InputLabel>Opening Balance</InputLabel>
+                                    <StudioNumberInput
+                                        value={statementData.summary.openingBalance || ''}
+                                        onChange={(e: any) => {
+                                            const newOpening = parseFloat(e.target.value) || 0;
+                                            setStatementData({ ...statementData, summary: recalculateStatementSummary(statementData.transactions, newOpening) });
+                                        }}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Notes */}
+                            <div>
+                                <div className="flex items-center justify-between pb-2 mb-4" style={{ borderBottom: HAIRLINE }}>
+                                    <p className="text-[10px] font-[700] uppercase tracking-[0.09em] text-gray-400">Notes to Customer</p>
+                                    <button onClick={() => setStatementData({ ...statementData, notes: [...statementData.notes, 'New note line...'] })}
+                                        className="flex items-center gap-1 px-2.5 py-1 rounded-[5px] text-[10px] font-[600] text-[#6366F1] transition-colors"
+                                        style={{ border: '1px solid rgba(99,102,241,0.2)', background: 'rgba(99,102,241,0.05)' }}>
+                                        <PiPlus className="text-[11px]" /> Add Note
+                                    </button>
+                                </div>
+                                <div className="space-y-2">
+                                    {statementData.notes.map((note, idx) => (
+                                        <div key={idx} className="relative group">
+                                            <textarea
+                                                value={note}
+                                                rows={2}
+                                                onChange={(e) => {
+                                                    const newNotes = [...statementData.notes];
+                                                    newNotes[idx] = e.target.value;
+                                                    setStatementData({ ...statementData, notes: newNotes });
+                                                }}
+                                                className="w-full rounded-[7px] px-3 py-2.5 text-[11.5px] text-gray-700 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all resize-none pr-8"
+                                                style={{ border: HAIRLINE }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const newNotes = [...statementData.notes];
+                                                    newNotes.splice(idx, 1);
+                                                    setStatementData({ ...statementData, notes: newNotes });
+                                                }}
+                                                className="absolute top-2 right-2 text-gray-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all p-0.5">
+                                                <PiTrash className="text-[12px]" />
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-
-                            <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">Summary Override</h3>
-                                </div>
-                                <div className="space-y-4">
-                                    <div>
-                                        <InputLabel>Opening Balance</InputLabel>
-                                        <NumberInput value={statementData.summary.openingBalance || ""} onChange={(e: any) => {
-                                            const newOpening = parseFloat(e.target.value) || 0;
-                                            const newSummary = recalculateStatementSummary(statementData.transactions, newOpening);
-                                            setStatementData({ ...statementData, summary: newSummary });
-                                        }} placeholder="0.00" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div className="flex justify-between items-center border-b border-slate-700/50 pb-2 mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="text-xs font-bold text-slate-300">Notes to Customer</h3>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {statementData.notes.map((note, idx) => (
-                                            <div key={idx} className="relative group">
-                                                <textarea
-                                                    value={note}
-                                                    onChange={(e) => {
-                                                        const newNotes = [...statementData.notes];
-                                                        newNotes[idx] = e.target.value;
-                                                        setStatementData({ ...statementData, notes: newNotes });
-                                                    }}
-                                                    className="w-full text-xs bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 font-medium resize-none shadow-sm"
-                                                    rows={2}
-                                                />
-                                                <button
-                                                    onClick={() => {
-                                                        const newNotes = [...statementData.notes];
-                                                        newNotes.splice(idx, 1);
-                                                        setStatementData({ ...statementData, notes: newNotes });
-                                                    }}
-                                                    className="absolute top-1 right-1 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                                                >
-                                                    <PiTrash />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <button onClick={() => setStatementData({ ...statementData, notes: [...statementData.notes, 'New note line...'] })} className="text-[10px] flex items-center gap-1.5 text-indigo-400 font-bold bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider">
-                                        <PiPlus /> Add Note
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- SSCAA REPORT EDITOR --- */}
-                    {activeTab === 'SSCAA_REPORT' && (
-                        <div className="space-y-8 animate-in slide-in-from-left-4 duration-500 fade-in">
-                            <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-xs font-bold text-slate-300">SSCAA Report Info</h3>
-                                </div>
-                                <div className="space-y-5">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <InputLabel>Report No.</InputLabel>
-                                            <TextInput value={sscaaData.statementNo} onChange={(e: any) => setSscaaData({ ...sscaaData, statementNo: e.target.value })} />
-                                        </div>
-                                        <div>
-                                            <InputLabel>Report Date</InputLabel>
-                                            <StudioDatePicker value={sscaaData.date} onChange={(date) => setSscaaData({ ...sscaaData, date })} />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <InputLabel>Date Range (Filter)</InputLabel>
-                                        <StudioDateRangePicker
-                                            startDate={sscaaData.periodStart}
-                                            endDate={sscaaData.periodEnd}
-                                            onChange={(start, end) => setSscaaData({ ...sscaaData, periodStart: start, periodEnd: end })}
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={async () => {
-                                            setSscaaData(prev => ({ ...prev, isLoading: true }));
-                                            const data = await getSSCAAStatementData(
-                                                sscaaData.periodStart ? sscaaData.periodStart.toISOString() : undefined,
-                                                sscaaData.periodEnd ? sscaaData.periodEnd.toISOString() : undefined
-                                            );
-                                            if (data) {
-                                                setSscaaData(prev => ({
-                                                    ...prev,
-                                                    isLoading: false,
-                                                    customer: data.customer,
-                                                    summary: data.summary,
-                                                    transactions: data.transactions as SSCAATransaction[]
-                                                }));
-                                            } else {
-                                                setSscaaData(prev => ({ ...prev, isLoading: false }));
-                                            }
-                                        }}
-                                        className="w-full flex items-center justify-center gap-2 bg-red-700 text-white font-bold py-2.5 rounded-lg border border-red-600 hover:bg-red-600 transition-all text-xs"
-                                    >
-                                        {sscaaData.isLoading ? 'Loading from Database...' : '↻  Refresh from Database'}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div className="flex items-center gap-2 mb-3">
-                                    <h3 className="text-xs font-bold text-slate-300">Transactions ({sscaaData.transactions.length})</h3>
-                                </div>
-                                <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700 text-[10px] text-slate-400">
-                                    {sscaaData.transactions.length === 0 ? (
-                                        <p>No SSCAA transactions found. Click "Refresh from Database" to load.</p>
-                                    ) : (
-                                        <p className="text-emerald-400 font-bold">✓ {sscaaData.transactions.length} transactions loaded from database.</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        </motion.div>
                     )}
                 </div>
 
-                {/* BOTTOM ACTIONS */}
-                <div className="p-5 border-t border-slate-800 bg-slate-900 shrink-0 grid grid-cols-2 gap-3 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.2)] print:hidden">
+                {/* Bottom actions */}
+                <div className="px-5 py-4 grid grid-cols-2 gap-3 shrink-0" style={{ borderTop: HAIRLINE }}>
                     <button
                         onClick={async () => {
                             try {
                                 let key = '';
                                 let value = '';
-                                if (activeTab === 'STATEMENT') {
-                                    key = 'studio_draft_statement';
-                                    value = JSON.stringify(statementData);
-                                } else if (activeTab === 'CREDIT_NOTE') {
-                                    key = 'studio_draft_credit_note';
-                                    value = JSON.stringify(creditNoteData);
-                                } else if (activeTab === 'RECEIPT') {
-                                    key = 'studio_draft_receipt';
-                                    value = JSON.stringify(receiptData);
-                                } else if (activeTab === 'SSCAA_REPORT') {
-                                    key = 'studio_draft_sscaa';
-                                    value = JSON.stringify(sscaaData);
-                                }
+                                if (activeTab === 'STATEMENT') { key = 'studio_draft_statement'; value = JSON.stringify(statementData); }
+                                else if (activeTab === 'CREDIT_NOTE') { key = 'studio_draft_credit_note'; value = JSON.stringify(creditNoteData); }
+                                else if (activeTab === 'RECEIPT') { key = 'studio_draft_receipt'; value = JSON.stringify(receiptData); }
                                 if (!key) return;
                                 const res = await fetch('/api/settings', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ updates: [{ key, value, description: 'Finance Studio draft' }] })
                                 });
-                                if (res.ok) {
-                                    setDraftSaved(true);
-                                    setTimeout(() => setDraftSaved(false), 2500);
-                                } else {
-                                    throw new Error('Server error');
-                                }
-                            } catch (e) {
-                                alert('Could not save draft. Please try again.');
-                            }
+                                if (res.ok) { setDraftSaved(true); setTimeout(() => setDraftSaved(false), 2500); }
+                                else throw new Error('Server error');
+                            } catch { alert('Could not save draft. Please try again.'); }
                         }}
-                        className="flex items-center justify-center gap-2 font-bold py-2.5 rounded-lg border transition-all text-xs hover:-translate-y-0.5"
-                        style={{
-                            backgroundColor: draftSaved ? '#16a34a' : '#1e293b',
-                            borderColor: draftSaved ? '#15803d' : '#334155',
-                            color: '#ffffff'
-                        }}
-                    >
-                        <PiFloppyDisk className="text-base" />
-                        {draftSaved ? '✓ Saved to Cloud!' : 'Save Draft'}
+                        className="flex items-center justify-center gap-2 py-2.5 rounded-[7px] text-[12px] font-[600] transition-all"
+                        style={draftSaved
+                            ? { background: 'rgba(5,150,105,0.08)', color: '#059669', border: '1px solid rgba(5,150,105,0.2)' }
+                            : { background: 'white', color: '#374151', border: HAIRLINE }}>
+                        <PiFloppyDisk className="text-[15px]" />
+                        {draftSaved ? 'Saved!' : 'Save Draft'}
                     </button>
                     <button
                         onClick={async (e) => {
                             const btn = e.currentTarget;
-                            const originalText = btn.innerHTML;
-
+                            const originalContent = btn.innerHTML;
                             try {
-                                btn.innerHTML = 'Generating High-Fidelity PDF...';
+                                btn.innerHTML = 'Generating PDF…';
                                 btn.disabled = true;
-
-                                // Prepare data with safe fallbacks and absolute URLs for images
                                 const origin = typeof window !== 'undefined' ? window.location.origin : '';
-
-                                // Select and render the correct Vector PDF
                                 let MyDocument;
                                 if (activeTab === 'STATEMENT') {
                                     const { periodStart: ps, periodEnd: pe, ...stmtRest } = statementData;
@@ -1210,84 +912,80 @@ function FinanceStudioContent() {
                                     MyDocument = <StatementPDF data={{ ...stmtRest, period: stmtPeriod }} baseUrl={origin} settings={settings} />;
                                 } else if (activeTab === 'CREDIT_NOTE') {
                                     MyDocument = <CreditNotePDF data={creditNoteData} baseUrl={origin} settings={settings} />;
-                                } else if (activeTab === 'SSCAA_REPORT') {
-                                    const { periodStart: ps, periodEnd: pe, isLoading: _il, ...sscaaRest } = sscaaData;
-                                    const sscaaPeriod = ps && pe ? `${format(ps, 'dd MMM yyyy')} - ${format(pe, 'dd MMM yyyy')}` : 'All Time';
-                                    MyDocument = <SSCAAReportPDF data={{ ...sscaaRest, period: sscaaPeriod }} baseUrl={origin} settings={settings} />;
                                 } else {
                                     MyDocument = <ReceiptPDF data={receiptData} baseUrl={origin} settings={settings} />;
                                 }
-
-                                // Generate the PDF Blob
                                 const blob = await pdf(MyDocument).toBlob();
-                                if (!blob) throw new Error('PDF Generation returned empty blob');
-
-                                const url = URL.createObjectURL(blob);
-
-                                // Open the professional PDF viewer
-                                window.open(url, '_blank');
-
-                                btn.innerHTML = originalText;
+                                if (!blob) throw new Error('Empty PDF blob');
+                                window.open(URL.createObjectURL(blob), '_blank');
+                                btn.innerHTML = originalContent;
                                 btn.disabled = false;
                             } catch (err: any) {
                                 console.error('PDF Error:', err);
-                                alert(`Failed to generate high-fidelity PDF: ${err.message || 'Unknown Error'}. Falling back to native print.`);
+                                alert(`PDF generation failed: ${err.message || 'Unknown error'}. Falling back to print.`);
                                 window.print();
-                                btn.innerHTML = originalText;
+                                btn.innerHTML = originalContent;
                                 btn.disabled = false;
                             }
                         }}
-                        className="flex items-center justify-center gap-2 bg-indigo-600 text-white font-bold py-2.5 rounded-lg shadow-lg border border-indigo-500 hover:bg-indigo-700 hover:border-indigo-400 hover:shadow-indigo-600/30 hover:-translate-y-0.5 transition-all text-xs"
-                    >
-                        <img src="/adobe.png" alt="PDF" className="w-4 h-4 object-contain" /> Download PDF
+                        className="flex items-center justify-center gap-2 py-2.5 rounded-[7px] text-[12px] font-[600] text-white hover:opacity-90 transition-opacity"
+                        style={{ background: '#6366F1' }}>
+                        <img src="/adobe.png" alt="PDF" className="w-4 h-4 object-contain" />
+                        Download PDF
                     </button>
                 </div>
             </div>
 
-            {/* RIGHT PANEL: LIVE PREVIEW (Original Studio Aesthetic) */}
+            {/* ── RIGHT PANEL: DOCUMENT PREVIEW ─────────────── */}
             <div className="flex-1 overflow-auto studio-workspace relative print:bg-white flex flex-col items-center print:block print:overflow-visible">
                 <div className="w-full h-full p-12 flex justify-center items-start print:p-0 print:m-0 overflow-y-auto print:overflow-visible">
-                    <div className="preview-canvas bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] z-10 print:shadow-none print:m-0 print-container-wrapper rounded-sm transition-transform duration-300 print:w-full print:h-full print:transform-none"
+                    <div
+                        className="preview-canvas bg-white shadow-[0_8px_40px_-12px_rgba(0,0,0,0.18)] z-10 print:shadow-none print:m-0 print-container-wrapper rounded-[2px] transition-transform duration-300 print:w-full print:h-full print:transform-none"
                         style={{
                             width: '210mm',
                             minHeight: '297mm',
-                            transform: activeTab === 'STATEMENT' ? 'scale(0.85)' : 'scale(0.85)',
-                            transformOrigin: 'top center'
+                            transform: 'scale(0.85)',
+                            transformOrigin: 'top center',
                         }}>
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab}
-                                initial={{ opacity: 0, scale: 0.98 }}
+                                initial={{ opacity: 0, scale: 0.99 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.98 }}
-                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                exit={{ opacity: 0, scale: 0.99 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
                                 className="print:h-full flex flex-col"
                             >
                                 {activeTab === 'CREDIT_NOTE' && <CreditNoteTemplate {...creditNoteData} />}
                                 {activeTab === 'RECEIPT' && <PaymentReceiptTemplate {...receiptData} />}
                                 {activeTab === 'STATEMENT' && (() => {
                                     const { periodStart, periodEnd, ...rest } = statementData;
-                                    const period = periodStart && periodEnd ? `${format(periodStart, 'dd MMM yyyy')} - ${format(periodEnd, 'dd MMM yyyy')}` : '';
+                                    const period = periodStart && periodEnd
+                                        ? `${format(periodStart, 'dd MMM yyyy')} - ${format(periodEnd, 'dd MMM yyyy')}`
+                                        : '';
                                     return <CustomerStatementTemplate {...rest} period={period} />;
-                                })()}
-                                {activeTab === 'SSCAA_REPORT' && (() => {
-                                    const { periodStart, periodEnd, isLoading, ...rest } = sscaaData;
-                                    const period = periodStart && periodEnd ? `${format(periodStart, 'dd MMM yyyy')} - ${format(periodEnd, 'dd MMM yyyy')}` : 'All Time';
-                                    return <SSCAAStatementTemplate {...rest} period={period} />;
                                 })()}
                             </motion.div>
                         </AnimatePresence>
                     </div>
                 </div>
             </div>
-
-        </div >
+        </div>
     );
 }
 
 export default function FinanceStudioPage() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center h-screen bg-slate-950 text-slate-400">Loading Studio...</div>}>
+        <Suspense fallback={
+            <div className="flex items-center justify-center h-screen bg-white">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-[30px] h-[30px] rounded-[7px] bg-[#6366F1] flex items-center justify-center">
+                        <PiFileText className="text-white text-[15px]" />
+                    </div>
+                    <p className="text-[12px] text-gray-400">Loading Finance Studio…</p>
+                </div>
+            </div>
+        }>
             <FinanceStudioContent />
         </Suspense>
     );

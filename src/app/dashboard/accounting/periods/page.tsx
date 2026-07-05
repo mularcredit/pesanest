@@ -7,19 +7,12 @@ export default async function PeriodsPage() {
     const session = await auth();
     if (!session?.user) return redirect("/login");
 
-    // Fetch all fiscal years with their periods
     const fiscalYears = await (prisma as any).fiscalYear.findMany({
         include: {
-            periods: {
-                orderBy: { startDate: 'asc' }
-            }
+            periods: { orderBy: { startDate: 'asc' } }
         },
         orderBy: { startDate: 'desc' }
     });
 
-    return (
-        <div className="animate-fade-in-up">
-            <PeriodManagement fiscalYears={fiscalYears} />
-        </div>
-    );
+    return <PeriodManagement fiscalYears={fiscalYears} />;
 }

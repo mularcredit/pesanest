@@ -55,7 +55,7 @@ export function BaseModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-white/40 backdrop-blur-xl"
+                        className="fixed inset-0 bg-black/25 backdrop-blur-md"
                     />
 
                     {/* Modal Card */}
@@ -63,12 +63,12 @@ export function BaseModal({
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className={`relative bg-white border border-gray-200 w-full ${maxWidthClasses[maxWidth]} rounded-xl shadow-2xl overflow-hidden`}
+                        className={`relative bg-[var(--sidebar)] border border-[var(--p-line)] w-full ${maxWidthClasses[maxWidth]} rounded-xl overflow-hidden`} style={{ boxShadow: '0 0 0 1px rgba(219,39,119,0.15), 0 24px 64px rgba(0,0,0,0.4), 0 0 40px rgba(219,39,119,0.12)' }}
                     >
                         {showCloseButton && (
                             <button
                                 onClick={onClose}
-                                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-colors z-10"
+                                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-[var(--glass-h)] text-[var(--t-muted)] hover:text-[var(--t1)] transition-colors z-10"
                             >
                                 <PiX className="text-xl" />
                             </button>
@@ -129,19 +129,19 @@ export function ConfirmationModal({
 
     const variantStyles = {
         danger: {
-            iconBg: "bg-rose-50",
-            iconColor: "text-rose-500",
-            buttonBg: "bg-rose-600 hover:bg-rose-700"
+            iconBg: "bg-[rgba(255,90,54,0.12)]",
+            iconColor: "text-[var(--red)]",
+            buttonBg: "bg-[var(--red)] hover:bg-[var(--red)]/80"
         },
         warning: {
-            iconBg: "bg-amber-50",
-            iconColor: "text-amber-500",
-            buttonBg: "bg-amber-600 hover:bg-amber-700"
+            iconBg: "bg-[rgba(219,39,119,0.12)]",
+            iconColor: "text-[var(--amber)]",
+            buttonBg: "bg-[var(--amber)] hover:bg-[var(--amber)]/80"
         },
         info: {
-            iconBg: "bg-blue-50",
-            iconColor: "text-blue-500",
-            buttonBg: "bg-blue-600 hover:bg-blue-700"
+            iconBg: "bg-[var(--p-dim)]",
+            iconColor: "text-[var(--p)]",
+            buttonBg: "bg-[var(--p)] hover:bg-[var(--p-bright)]"
         }
     };
 
@@ -156,25 +156,26 @@ export function ConfirmationModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-white/40 backdrop-blur-xl"
+                        className="fixed inset-0 bg-black/25 backdrop-blur-md"
                     />
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative bg-white border border-gray-200 w-full max-w-md rounded-xl shadow-2xl overflow-hidden"
+                        className="relative bg-[var(--sidebar)] border border-[var(--p-line)] w-full max-w-md rounded-xl overflow-hidden"
+                        style={{ boxShadow: '0 0 0 1px rgba(219,39,119,0.15), 0 24px 64px rgba(0,0,0,0.4), 0 0 40px rgba(219,39,119,0.12)' }}
                     >
                         <div className="p-8 text-center">
                             <div className={`w-14 h-14 rounded-full ${styles.iconBg} ${styles.iconColor} flex items-center justify-center mx-auto mb-4`}>
                                 <PiWarning className="text-3xl" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
-                            <p className="text-sm text-gray-500 mb-8">
+                            <h3 className="text-xl font-bold text-[var(--t1)] mb-2">{title}</h3>
+                            <p className="text-sm text-[var(--t3)] mb-8">
                                 {entityName ? (
                                     <>
                                         {description.split(entityName)[0]}
-                                        <span className="font-semibold text-gray-900">{entityName}</span>
+                                        <span className="font-semibold text-[var(--t1)]">{entityName}</span>
                                         {description.split(entityName)[1]}
                                     </>
                                 ) : (
@@ -186,7 +187,7 @@ export function ConfirmationModal({
                                 <button
                                     onClick={onCancel || onClose}
                                     disabled={isLoading}
-                                    className="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-6 py-2.5 text-sm font-semibold text-[var(--t2)] bg-[var(--glass-h)] hover:bg-transparent rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     {cancelText}
                                 </button>
@@ -265,42 +266,43 @@ export function FormModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-white/40 backdrop-blur-xl"
+                        className="fixed inset-0 bg-black/25 backdrop-blur-md"
                     />
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className={`relative bg-white border border-gray-200 w-full ${maxWidthClasses[maxWidth]} rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col`}
+                        className={`relative bg-[var(--sidebar)] border border-[var(--p-line)] w-full ${maxWidthClasses[maxWidth]} rounded-xl overflow-hidden max-h-[90vh] flex flex-col`}
+                        style={{ boxShadow: '0 0 0 1px rgba(219,39,119,0.15), 0 24px 64px rgba(0,0,0,0.4), 0 0 40px rgba(219,39,119,0.12)' }}
                     >
                         {/* Header */}
-                        <div className="h-[72px] px-8 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
+                        <div className="h-[72px] px-8 border-b border-[var(--p-line)] flex justify-between items-center bg-[var(--sidebar)] shrink-0">
                             <div className="flex items-center gap-4">
                                 {icon && (
                                     <div className={cn(
-                                        !hideIconBackground && "p-2.5 rounded-lg bg-[#F6F6F6] text-[#29258D]"
+                                        !hideIconBackground && "p-2.5 rounded-lg bg-[var(--p-dim)] text-[var(--p)]"
                                     )}>
                                         {icon}
                                     </div>
                                 )}
                                 <div>
-                                    <h3 className="text-base font-semibold text-gray-900">{title}</h3>
+                                    <h3 className="text-base font-semibold text-[var(--t1)]">{title}</h3>
                                     {subtitle && (
-                                        <p className="text-gray-500 text-xs mt-0.5 font-medium">{subtitle}</p>
+                                        <p className="text-[var(--t3)] text-xs mt-0.5 font-medium">{subtitle}</p>
                                     )}
                                 </div>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 rounded-full hover:bg-gray-50 text-gray-400 hover:text-gray-900 transition-all"
+                                className="p-2 rounded-full hover:bg-[var(--glass)] text-[var(--t-muted)] hover:text-[var(--t1)] transition-all"
                             >
                                 <PiX className="text-xl" />
                             </button>
                         </div>
 
                         {/* Body with gray background */}
-                        <div className="flex-1 overflow-y-auto bg-[#f8f9fa]">
+                        <div className="flex-1 overflow-y-auto bg-[var(--card)]">
                             {children}
                         </div>
                     </motion.div>

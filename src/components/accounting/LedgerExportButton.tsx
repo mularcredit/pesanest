@@ -214,12 +214,12 @@ export function LedgerExportButton() {
                 id="ledger-export-btn"
                 onClick={() => setModalOpen(true)}
                 disabled={!!loading}
-                className="relative flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all shadow-sm disabled:opacity-60"
+                className="relative flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all shadow-sm disabled:opacity-60"
             >
                 {loading ? <PiSpinner className="text-base animate-spin" /> : <PiDownloadSimple className="text-base" />}
                 {loading ? "Exporting..." : "Export Report"}
                 {activeFilterCount > 0 && !loading && (
-                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#29258D] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#6366F1] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
                         {activeFilterCount}
                     </span>
                 )}
@@ -233,8 +233,8 @@ export function LedgerExportButton() {
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
                             <div>
-                                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                                    <PiFunnel className="text-[#29258D]" /> Export General Ledger
+                                <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                                    <PiFunnel className="text-[#6366F1]" /> Export General Ledger
                                 </h2>
                                 <p className="text-[11px] text-gray-400 mt-0.5">Filter entries, then choose your format</p>
                             </div>
@@ -249,7 +249,7 @@ export function LedgerExportButton() {
                             {/* Search */}
                             <div className="grid grid-cols-2 gap-3 z-50">
                                 <div className="z-50 border-gray-200">
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                                    <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">
                                         Account
                                     </label>
                                     <Select
@@ -265,7 +265,7 @@ export function LedgerExportButton() {
                                     />
                                 </div>
                                 <div className="z-40">
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                                    <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">
                                         Search (Keyword)
                                     </label>
                                     <input
@@ -273,21 +273,21 @@ export function LedgerExportButton() {
                                         value={searchQ}
                                         onChange={e => setSearchQ(e.target.value)}
                                         placeholder="Ref, Description..."
-                                        className="w-full h-[42px] px-3 py-2 border border-gray-200 bg-white rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/30"
+                                        className="w-full h-[42px] px-3 py-2 border border-gray-200 bg-white rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
                                     />
                                 </div>
                             </div>
 
                             {/* Status toggles */}
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Entry Status</label>
+                                <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Entry Status</label>
                                 <div className="flex gap-2">
                                     {ALL_STATUSES.map(s => {
                                         const on = selStatuses.includes(s);
                                         return (
                                             <button key={s} onClick={() => toggle(selStatuses, setSelStatuses, s)}
-                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${on
-                                                    ? "bg-[#29258D] text-white border-[#29258D]"
+                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${on
+                                                    ? "bg-[#6366F1] text-white border-[#6366F1]"
                                                     : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-400"}`}>
                                                 {on ? <PiCheckSquare className="text-sm" /> : <PiSquare className="text-sm" />}
                                                 {s}
@@ -299,7 +299,7 @@ export function LedgerExportButton() {
 
                             {/* Date range */}
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Date Range (Entry Date)</label>
+                                <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Date Range (Entry Date)</label>
                                 <div className="grid grid-cols-2 gap-3 z-30 relative">
                                     <DatePicker
                                         value={dateFrom}
@@ -319,10 +319,10 @@ export function LedgerExportButton() {
                             {/* Active filter summary */}
                             {activeFilterCount > 0 && (
                                 <div className="flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-lg px-4 py-2.5">
-                                    <p className="text-[11px] font-bold text-indigo-700">
+                                    <p className="text-[11px] font-semibold text-indigo-700">
                                         {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active
                                     </p>
-                                    <button onClick={resetFilters} className="text-[11px] font-bold text-indigo-400 hover:text-indigo-700 underline underline-offset-2 transition-colors">
+                                    <button onClick={resetFilters} className="text-[11px] font-semibold text-indigo-400 hover:text-indigo-700 underline underline-offset-2 transition-colors">
                                         Reset all
                                     </button>
                                 </div>
@@ -332,15 +332,15 @@ export function LedgerExportButton() {
                         {/* Footer */}
                         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-3 rounded-b-2xl">
                             <p className="text-[11px] text-gray-400 font-medium">
-                                Exports will include <span className="font-bold text-gray-700">all matching entries</span> across all pages
+                                Exports will include <span className="font-semibold text-gray-700">all matching entries</span> across all pages
                             </p>
                             <div className="flex items-center gap-2">
                                 <button onClick={handleCSV}
-                                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all">
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all">
                                     <PiFileCsv className="text-base text-emerald-500" /> CSV
                                 </button>
                                 <button onClick={handlePDF}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-[#29258D] hover:bg-[#29258D]/90 transition-all shadow-sm shadow-[#29258D]/20">
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold text-white bg-[#6366F1] hover:bg-[#6366F1]/90 transition-all shadow-sm shadow-[#6366F1]/20">
                                     <PiFilePdf className="text-base" /> Download PDF
                                 </button>
                             </div>

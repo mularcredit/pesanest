@@ -131,7 +131,7 @@ export const PaymentReceiptTemplate: React.FC<PaymentReceiptProps> = ({
                     <div className="flex justify-between items-center mb-[20px] pb-[8px] border-b border-[#eee] text-[8px] text-[#555]">
                         <div className="flex-1 text-left font-bold text-[#333]">
                             <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Site</strong>
-                            https://sscaa.eservices.gov.ss
+                            www.pesanest.com
                         </div>
                         <div className="flex-1 text-center font-bold text-[#333]">
                             <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Contact Number</strong>
@@ -139,7 +139,7 @@ export const PaymentReceiptTemplate: React.FC<PaymentReceiptProps> = ({
                         </div>
                         <div className="flex-1 text-right font-bold text-[#333]">
                             <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Email</strong>
-                            ans-sscaa@eservices.gov.ss
+                            support@pesanest.com
                         </div>
                     </div>
 

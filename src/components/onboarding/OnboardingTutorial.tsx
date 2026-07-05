@@ -28,7 +28,7 @@ const tutorialSteps = [
                     {appName} helps you manage expenses, track finances, and maintain accurate accounting records—all in one place.
                 </p>
                 <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
-                    <h4 className="font-bold text-slate-200 mb-2 text-xs">What you can do:</h4>
+                    <h4 className="font-semibold text-slate-200 mb-2 text-xs">What you can do:</h4>
                     <ul className="space-y-1.5 text-xs text-slate-400">
                         <li className="flex items-start gap-2">
                             <PiCheckCircle className="text-indigo-400 mt-0.5 flex-shrink-0 text-sm" />
@@ -61,26 +61,26 @@ const tutorialSteps = [
                     The <strong className="text-white">Chart of Accounts</strong> is a list of all accounts used to categorize your financial transactions.
                 </p>
                 <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
-                    <h4 className="font-bold text-slate-200 mb-2 text-xs">Account Types:</h4>
+                    <h4 className="font-semibold text-slate-200 mb-2 text-xs">Account Types:</h4>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="bg-slate-900/50 rounded p-2 border border-slate-700/30">
-                            <p className="font-bold text-blue-400 text-xs">Assets</p>
+                            <p className="font-semibold text-blue-400 text-xs">Assets</p>
                             <p className="text-[10px] text-slate-500">What you own (Cash, AR)</p>
                         </div>
                         <div className="bg-slate-900/50 rounded p-2 border border-slate-700/30">
-                            <p className="font-bold text-blue-400 text-xs">Liabilities</p>
+                            <p className="font-semibold text-blue-400 text-xs">Liabilities</p>
                             <p className="text-[10px] text-slate-500">What you owe (AP, Loans)</p>
                         </div>
                         <div className="bg-slate-900/50 rounded p-2 border border-slate-700/30">
-                            <p className="font-bold text-blue-400 text-xs">Equity</p>
+                            <p className="font-semibold text-blue-400 text-xs">Equity</p>
                             <p className="text-[10px] text-slate-500">Owner's stake</p>
                         </div>
                         <div className="bg-slate-900/50 rounded p-2 border border-slate-700/30">
-                            <p className="font-bold text-blue-400 text-xs">Revenue</p>
+                            <p className="font-semibold text-blue-400 text-xs">Revenue</p>
                             <p className="text-[10px] text-slate-500">Income from sales</p>
                         </div>
                         <div className="bg-slate-900/50 rounded p-2 border border-slate-700/30 col-span-2">
-                            <p className="font-bold text-blue-400 text-xs">Expenses</p>
+                            <p className="font-semibold text-blue-400 text-xs">Expenses</p>
                             <p className="text-[10px] text-slate-500">Costs of doing business</p>
                         </div>
                     </div>
@@ -101,23 +101,23 @@ const tutorialSteps = [
                     The <strong className="text-white">General Ledger</strong> records every financial transaction using double-entry bookkeeping.
                 </p>
                 <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
-                    <h4 className="font-bold text-slate-200 mb-2 text-xs">How it works:</h4>
+                    <h4 className="font-semibold text-slate-200 mb-2 text-xs">How it works:</h4>
                     <div className="space-y-2 text-xs">
                         <div className="bg-slate-900/50 rounded p-2 border border-slate-700/30">
-                            <p className="font-bold text-emerald-400 mb-1 text-xs">Every transaction has two sides:</p>
+                            <p className="font-semibold text-emerald-400 mb-1 text-xs">Every transaction has two sides:</p>
                             <div className="flex gap-3 mt-1.5">
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-bold text-slate-400">DEBIT</p>
+                                    <p className="text-[10px] font-semibold text-slate-400">DEBIT</p>
                                     <p className="text-[10px] text-slate-500">Increases assets/expenses</p>
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-bold text-slate-400">CREDIT</p>
+                                    <p className="text-[10px] font-semibold text-slate-400">CREDIT</p>
                                     <p className="text-[10px] text-slate-500">Increases liabilities/revenue</p>
                                 </div>
                             </div>
                         </div>
                         <div className="bg-slate-900/50 rounded p-2 border border-slate-700/30">
-                            <p className="font-bold text-emerald-400 mb-1 text-xs">Example: Expense Payment</p>
+                            <p className="font-semibold text-emerald-400 mb-1 text-xs">Example: Expense Payment</p>
                             <div className="text-[10px] text-slate-400 space-y-0.5">
                                 <p>DEBIT: Operating Expenses $500</p>
                                 <p>CREDIT: Cash & Bank $500</p>
@@ -141,7 +141,7 @@ const tutorialSteps = [
                     {appName} uses a <strong className="text-white">maker-checker workflow</strong> to ensure proper expense control.
                 </p>
                 <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
-                    <h4 className="font-bold text-slate-200 mb-2 text-xs">Workflow Steps:</h4>
+                    <h4 className="font-semibold text-slate-200 mb-2 text-xs">Workflow Steps:</h4>
                     <div className="space-y-1.5">
                         {[
                             { step: '1', label: 'Submit', desc: 'Employee submits expense with receipt' },
@@ -151,11 +151,11 @@ const tutorialSteps = [
                             { step: '5', label: 'Disburse', desc: 'Payment sent & posted to GL' }
                         ].map((item, idx) => (
                             <div key={idx} className="flex items-start gap-2 bg-slate-900/50 rounded p-2 border border-slate-700/30">
-                                <div className="w-5 h-5 rounded-full bg-purple-600/80 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                                <div className="w-5 h-5 rounded-full bg-purple-600/80 text-white flex items-center justify-center text-[10px] font-semibold flex-shrink-0">
                                     {item.step}
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-bold text-purple-400 text-xs">{item.label}</p>
+                                    <p className="font-semibold text-purple-400 text-xs">{item.label}</p>
                                     <p className="text-[10px] text-slate-500">{item.desc}</p>
                                 </div>
                             </div>
@@ -176,7 +176,7 @@ const tutorialSteps = [
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
-                        <h4 className="font-bold text-cyan-400 mb-1.5 text-xs">Customers</h4>
+                        <h4 className="font-semibold text-cyan-400 mb-1.5 text-xs">Customers</h4>
                         <ul className="space-y-0.5 text-[10px] text-slate-400">
                             <li>• Create sales invoices</li>
                             <li>• Track payments</li>
@@ -185,7 +185,7 @@ const tutorialSteps = [
                         </ul>
                     </div>
                     <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
-                        <h4 className="font-bold text-orange-400 mb-1.5 text-xs">Vendors</h4>
+                        <h4 className="font-semibold text-orange-400 mb-1.5 text-xs">Vendors</h4>
                         <ul className="space-y-0.5 text-[10px] text-slate-400">
                             <li>• Record invoices</li>
                             <li>• Schedule payments</li>
@@ -288,7 +288,7 @@ export function OnboardingTutorial() {
                                         <PiX className="text-lg" />
                                     </button>
                                     <div>
-                                        <h2 className="text-lg font-bold mb-0.5 text-white">{step.title}</h2>
+                                        <h2 className="text-lg font-semibold mb-0.5 text-white">{step.title}</h2>
                                         <p className="text-slate-400 text-xs">{step.description}</p>
                                     </div>
                                 </div>

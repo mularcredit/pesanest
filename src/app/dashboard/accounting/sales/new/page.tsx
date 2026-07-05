@@ -1,16 +1,14 @@
-
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { SalesForm } from "@/components/accounting/SalesForm";
-import { PiArrowLeft } from "react-icons/pi";
 import Link from "next/link";
+import { PiCaretLeft } from "react-icons/pi";
 
 export default async function NewSalePage() {
     const session = await auth();
     if (!session?.user) return redirect("/login");
 
-    // Fetch customers for the dropdown
     const customers = await prisma.customer.findMany({
         where: { isActive: true },
         orderBy: { name: 'asc' },
@@ -18,18 +16,14 @@ export default async function NewSalePage() {
     });
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 animate-fade-in-up pb-20">
-            <div className="flex items-center gap-4">
-                <Link
-                    href="/dashboard/accounting/sales"
-                    className="p-2 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-500 transition-colors"
-                >
-                    <PiArrowLeft />
+        <div className="space-y-6 pb-24">
+            <div>
+                <Link href="/dashboard/accounting/sales"
+                    className="inline-flex items-center gap-1 text-[11.5px] text-gray-400 hover:text-gray-700 transition-colors mb-3">
+                    <PiCaretLeft className="text-[12px]" /> Back to sales
                 </Link>
-                <div>
-                    <h1 className="text-3xl font-heading font-bold text-gds-text-main">Record New Sale</h1>
-                    <p className="text-gds-text-muted">Create a new invoice for a customer.</p>
-                </div>
+                <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Record New Sale</h1>
+                <p className="text-[12.5px] text-gray-400 mt-0.5">Create a new invoice for a customer</p>
             </div>
 
             <SalesForm customers={customers} />

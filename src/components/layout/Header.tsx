@@ -1,16 +1,11 @@
 "use client";
 
 import {
-    PiMagnifyingGlass,
     PiEnvelope,
     PiQuestion,
     PiSquaresFour,
-    PiCommand,
-    PiPlus,
-    PiDownloadSimple,
     PiList,
     PiReceipt,
-    PiWallet,
     PiCheckCircle,
     PiBell
 } from "react-icons/pi";
@@ -18,7 +13,6 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/components/ui/ToastProvider";
-import { GlobalNewRequisitionButton } from "./GlobalNewRequisitionButton";
 import { ConfirmationModal } from "@/components/ui/Modal";
 
 interface Notification {
@@ -32,7 +26,6 @@ interface Notification {
 }
 
 export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
-    const [searchFocused, setSearchFocused] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -40,7 +33,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
     const pathname = usePathname();
     const router = useRouter();
     const { showToast } = useToast();
-    const [showEmergencyAlert, setShowEmergencyAlert] = useState(false);
+    
     
     const notificationsRef = useRef<HTMLDivElement>(null);
 
@@ -61,10 +54,13 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
 
     const getBreadcrumbs = () => {
         const paths = pathname.split('/').filter(Boolean);
-        return paths.map((path, index) => ({
-            name: path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' '),
-            isLast: index === paths.length - 1
-        }));
+        return paths.map((path, index) => {
+            const decoded = decodeURIComponent(path).replace(/-/g, ' ');
+            return {
+                name: decoded.charAt(0).toUpperCase() + decoded.slice(1),
+                isLast: index === paths.length - 1
+            };
+        });
     };
 
     const breadcrumbs = getBreadcrumbs();
@@ -152,10 +148,6 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
         showToast(`${feature} feature coming soon!`, 'info');
     };
 
-    const handleExport = () => {
-        showToast("Generating report... Download will start shortly.", 'success');
-    };
-
     const getNotificationColor = (type: string) => {
         switch (type) {
             case 'APPROVAL': return 'bg-blue-500';
@@ -180,11 +172,12 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
     };
 
     return (
-        <header className="sticky top-0 z-40 h-[72px] px-4 md:px-8 flex items-center justify-between border-b border-white/20 backdrop-blur-md transition-all duration-300 bg-white/60">
+        <div className="flex-shrink-0 sticky top-0 z-40" style={{ background: 'var(--page)' }}>
+        <header className="topbar px-4 md:px-8">
             {/* Left: Breadcrumbs & Search */}
             <div className="flex items-center gap-4 md:gap-6 flex-1">
                 {/* Mobile Menu Toggle */}
-                <button onClick={onMenuClick} className="lg:hidden p-2 -ml-2 text-2xl transition-colors hover:bg-black/5 rounded-lg text-gray-500">
+                <button onClick={onMenuClick} className="lg:hidden p-2 -ml-2 text-2xl transition-colors hover:bg-[var(--glass-h)] rounded-lg text-[var(--t3)]">
                     <PiList />
                 </button>
 
@@ -192,75 +185,21 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                 <div className="flex items-center gap-2 text-sm">
                     {breadcrumbs.map((crumb, index) => (
                         <div key={index} className="flex items-center gap-2">
-                            {index > 0 && <span className="text-gray-400">/</span>}
-                            <span className={crumb.isLast ? "font-bold text-gray-900" : "text-gray-500"}>
+                            {index > 0 && <span className="text-[var(--t4)]">/</span>}
+                            <span className={crumb.isLast ? "font-semibold text-[var(--t1)]" : "text-[var(--t3)]"}>
                                 {crumb.name}
                             </span>
                         </div>
                     ))}
                 </div>
-
-                {/* Search Bar */}
-                <div className="flex-1 max-w-xl hidden md:block">
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <PiMagnifyingGlass className={`transition-all duration-200 ${searchFocused ? 'text-purple-600 scale-110' : 'text-gray-400'}`} />
-                        </div>
-                        <input
-                            type="text"
-                            onFocus={() => setSearchFocused(true)}
-                            onBlur={() => setSearchFocused(false)}
-                            className={`w-full border rounded-full pl-11 pr-20 py-2.5 text-sm focus:outline-none transition-all duration-300 font-sans placeholder:opacity-50 ${searchFocused
-                                ? 'bg-white border-purple-500 ring-4 ring-purple-500/10'
-                                : 'bg-white/50 border-transparent hover:bg-white/80 hover:border-white/40'
-                                }`}
-                            placeholder="Search accounts, expenses, or ..."
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-2 pointer-events-none">
-                            <span className="text-[10px] border border-gray-200 px-2 py-0.5 rounded-full font-mono flex items-center gap-1 font-bold  bg-white/50 text-gray-400">
-                                <PiCommand className="text-xs" />K
-                            </span>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* Right: Actions & Status */}
             <div className="flex items-center gap-3 ml-6">
-                {/* Quick Actions */}
-                <div className="flex items-center gap-2">
-                    <button 
-                        onClick={() => setShowEmergencyAlert(true)}
-                        className="px-3 py-2 rounded-lg border border-transparent transition-all group flex items-center gap-2 hover:border-purple-500/30 hover:bg-purple-500/5 hover:scale-105 bg-white/50"
-                        title="New Emergency">
-                        <PiWallet className="text-lg transition-colors text-gray-500 group-hover:text-purple-600" />
-                        <span className="text-xs font-bold transition-colors text-gray-500 group-hover:text-purple-600 hidden lg:inline">Emergency</span>
-                    </button>
-
-                    <GlobalNewRequisitionButton />
-
-                    <Link href="/dashboard/requisitions/monthly"
-                        className="px-3 py-2 rounded-lg border border-transparent transition-all group flex items-center gap-2 hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:scale-105 bg-white/50"
-                        title="New Monthly Budget">
-                        <PiPlus className="text-lg transition-colors text-gray-500 group-hover:text-emerald-500" />
-                        <span className="text-xs font-bold transition-colors text-gray-500 group-hover:text-emerald-500 hidden lg:inline">Budget</span>
-                    </Link>
-
-                    <button
-                        onClick={handleExport}
-                        className="px-3 py-2 rounded-lg border border-transparent transition-all group flex items-center gap-2 hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:scale-105 active:scale-95 bg-white/50"
-                        title="Export Data">
-                        <PiDownloadSimple className="text-lg transition-colors text-gray-500 group-hover:text-emerald-500" />
-                    </button>
-                </div>
-
-                {/* Divider */}
-                <div className="w-px h-8 bg-gray-200"></div>
-
                 {/* System Status */}
                 <div className="hidden xl:flex items-center gap-1 border rounded-full px-4 py-1.5 bg-emerald-500/10 border-emerald-500/20">
                     <div className="w-2 h-2 rounded-full animate-pulse bg-emerald-500"></div>
-                    <span className="text-[10px] font-bold  text-emerald-600">System Live</span>
+                    <span className="text-[10px] font-semibold  text-emerald-600">System Live</span>
                 </div>
 
                 {/* Help */}
@@ -274,12 +213,12 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                 <div className="relative" ref={notificationsRef}>
                     <button
                         onClick={() => setNotificationsOpen(!notificationsOpen)}
-                        className="relative w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 group hover:bg-white/80 text-gray-500">
+                        className="relative w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 group hover:bg-[var(--glass-h)] text-[var(--t3)]">
                         <PiEnvelope className="text-[22px] group-hover:text-purple-600 transition-colors" />
                         {unreadCount > 0 && (
                             <>
                                 <span className="absolute top-2 right-2.5 w-2 h-2 rounded-full shadow-[0_0_8px_rgba(147,51,234,0.6)] animate-pulse bg-purple-600"></span>
-                                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[9px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
+                                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[9px] font-semibold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
                                     {unreadCount > 9 ? '9+' : unreadCount}
                                 </span>
                             </>
@@ -288,19 +227,19 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
 
                     {notificationsOpen && (
                         <>
-                            <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-xl shadow-xl border border-gray-100 z-40 overflow-hidden animate-fade-in-up">
-                                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                                    <h3 className="text-sm font-bold text-gray-900">System Messages</h3>
+                            <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-xl shadow-xl border border-[var(--p-line)] z-40 overflow-hidden animate-fade-in-up">
+                                <div className="p-4 border-b border-[var(--p-line)] flex justify-between items-center bg-[var(--glass)]">
+                                    <h3 className="text-sm font-semibold text-gray-900">System Messages</h3>
                                     <div className="flex items-center gap-2">
                                         {unreadCount > 0 && (
-                                            <span className="text-[10px] text-purple-600 font-bold bg-purple-50 px-2 py-1 rounded-full border border-purple-100">
+                                            <span className="text-[10px] text-purple-600 font-semibold bg-purple-50 px-2 py-1 rounded-full border border-purple-100">
                                                 {unreadCount} New
                                             </span>
                                         )}
                                         {notifications.length > 0 && (
                                             <button
                                                 onClick={markAllAsRead}
-                                                className="text-[10px] font-bold text-gray-500 hover:text-purple-600 transition-colors flex items-center gap-1"
+                                                className="text-[10px] font-semibold text-gray-500 hover:text-purple-600 transition-colors flex items-center gap-1"
                                             >
                                                 <PiCheckCircle />
                                                 Mark all read
@@ -314,9 +253,9 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                                             Loading notifications...
                                         </div>
                                     ) : notifications.length === 0 ? (
-                                        <div className="p-8 text-center border border-gray-100 rounded-xl bg-gray-50/50 my-6 mx-4">
+                                        <div className="p-8 text-center border border-[var(--p-line)] rounded-xl bg-[var(--glass)] my-6 mx-4">
                                             <PiEnvelope className="text-4xl text-gray-300 mx-auto mb-3" />
-                                            <p className="text-sm font-bold text-gray-500">No messages yet</p>
+                                            <p className="text-sm font-semibold text-gray-500">No messages yet</p>
                                         </div>
                                     ) : (
                                         notifications.map((notification) => (
@@ -330,7 +269,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                                                     <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${getNotificationColor(notification.type)} ${!notification.isRead ? 'animate-pulse' : 'opacity-50'
                                                         }`}></div>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className={`text-sm group-hover:text-purple-600 transition-colors ${!notification.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-700'
+                                                        <p className={`text-sm group-hover:text-purple-600 transition-colors ${!notification.isRead ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'
                                                             }`}>
                                                             {notification.title}
                                                         </p>
@@ -347,11 +286,11 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                                     )}
                                 </div>
                                 {notifications.length > 0 && (
-                                    <div className="p-3 border-t border-gray-100 bg-gray-50/50 text-center">
+                                    <div className="p-3 border-t border-[var(--p-line)] bg-[var(--glass)] text-center">
                                         <Link
                                             href="/dashboard/notifications"
                                             onClick={() => setNotificationsOpen(false)}
-                                            className="text-xs font-bold text-gray-600 hover:text-purple-600 transition-colors"
+                                            className="text-xs font-semibold text-gray-600 hover:text-purple-600 transition-colors"
                                         >
                                             View All Notifications
                                         </Link>
@@ -370,22 +309,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                 </button>
             </div>
 
-            <ConfirmationModal
-                isOpen={showEmergencyAlert}
-                onClose={() => setShowEmergencyAlert(false)}
-                onConfirm={() => {
-                    setShowEmergencyAlert(false);
-                    router.push('/dashboard/expenses/new');
-                }}
-                onCancel={() => {
-                    window.location.href = '/dashboard/requisitions/new';
-                }}
-                title="Emergency Form Confirmation"
-                description="Note: The Emergency form is specifically for urgent requests that require immediate action. For all non-urgent business expenditures, please use the standard Requisition form."
-                confirmText="Yes, Proceed to Emergency"
-                cancelText="Use Standard Requisition"
-                variant="info"
-            />
         </header>
+        </div>
     );
 }

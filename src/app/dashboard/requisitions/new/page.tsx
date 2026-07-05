@@ -1,302 +1,190 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/ToastProvider";
+import { Select } from "@/components/ui/Select";
 import {
     PiCaretLeft,
     PiCheckCircle,
-    PiCaretDown,
-    PiMagnifyingGlass,
+    PiInfo,
     PiPlus,
+    PiPaperPlaneRight,
+    PiUploadSimple,
+    PiFile,
+    PiX,
+    PiTag,
+    PiCreditCard,
     PiCalendarBlank,
     PiStorefront,
-    PiTrash,
-    PiX,
-    PiArrowsClockwise,
-    PiPencil
+    PiPaperclip,
 } from "react-icons/pi";
 import { DatePicker } from "@/components/ui/DatePicker";
-import { 
-    createRequisitionWithItems, 
-    getCategoriesAction, 
+import {
+    createRequisitionWithItems,
+    getCategoriesAction,
     getVendorsAction,
     getUserBranchAndDepartmentAction,
     getExpenseAccountsAction,
-    createExpenseAccountAction
+    createExpenseAccountAction,
 } from "./multi-item-actions";
-import Image from "next/image";
 
-interface RequisitionItem {
-    id: string;
-    title: string;
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    category: string;
-    isRecurring?: boolean;
-    frequency?: string;
-    startDate?: string;
+const INPUT_CLASS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLASS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
+
+function SectionDivider({ title, optional }: { title: string; optional?: boolean }) {
+    return (
+        <div className="flex items-center gap-2 px-6 py-3.5 bg-gray-50/60" style={{ borderTop: '1px solid rgba(0,0,0,0.07)', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+            <span className="text-[10.5px] font-[600] uppercase tracking-[0.08em] text-gray-400">{title}</span>
+            {optional && <span className="text-[10px] text-gray-300">(optional)</span>}
+        </div>
+    );
 }
 
-export default function NewRequisitionPage() {
-    const { data: session } = useSession();
-    const [showAccessDenied, setShowAccessDenied] = useState(false);
-    const [errors, setErrors] = useState<any>({});
-    const [formMessage, setFormMessage] = useState("");
+function NewRequisitionForm() {
+    const { showToast } = useToast();
+    const searchParams = useSearchParams();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
-    // Quick vs Itemized mode
-    const [formMode, setFormMode] = useState<"quick" | "itemized">("quick");
-    const [quickAmount, setQuickAmount] = useState("");
-    const [quickCategory, setQuickCategory] = useState("");
-    const [isQuickCategoryOpen, setIsQuickCategoryOpen] = useState(false);
-    const [quickCategorySearch, setQuickCategorySearch] = useState("");
-
-    // Form fields
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [currency, setCurrency] = useState("USD");
+    const [amount, setAmount] = useState("");
+    const [category, setCategory] = useState(searchParams.get("category") ?? "");
+    const [currency, setCurrency] = useState("KES");
     const [branch, setBranch] = useState("");
     const [department, setDepartment] = useState("");
     const [expectedDate, setExpectedDate] = useState<Date | undefined>(undefined);
     const [vendor, setVendor] = useState("");
-    const [isSSCAEnabled, setIsSSCAEnabled] = useState(false);
-    const [isStrictApproval, setIsStrictApproval] = useState(false);
 
-    // Payment method state
-    const [paymentMethod, setPaymentMethod] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState("MPESA_TILL");
     const [paymentReference, setPaymentReference] = useState("");
-    
-    // Custom Ledger
+    const [paybillNumber, setPaybillNumber] = useState("");
+    const [paybillAccountNumber, setPaybillAccountNumber] = useState("");
+
     const [customAccountId, setCustomAccountId] = useState("");
     const [expenseAccounts, setExpenseAccounts] = useState<any[]>([]);
-    
-    // Inline account creation
     const [isCreatingAccount, setIsCreatingAccount] = useState(false);
     const [newAccountName, setNewAccountName] = useState("");
     const [newAccountCode, setNewAccountCode] = useState("");
     const [accountCreateError, setAccountCreateError] = useState("");
     const [isSavingAccount, setIsSavingAccount] = useState(false);
-    const [isAccountOpen, setIsAccountOpen] = useState(false);
-    const [accountSearch, setAccountSearch] = useState("");
-    const [isTypeOpen, setIsTypeOpen] = useState(false);
 
-    // Currency dropdown
-    const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
-    const [currencySearch, setCurrencySearch] = useState("");
+    const [receiptFile, setReceiptFile] = useState<File | null>(null);
+    const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+    const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
+
+    const [allCategories, setAllCategories] = useState<string[]>([]);
+    const [vendors, setVendors] = useState<any[]>([]);
 
     const CURRENCIES = [
-        // East Africa (prioritized)
-        { code: 'KES', name: 'Kenyan Shilling', symbol: 'KSh', flag: '🇰🇪' },
-        { code: 'UGX', name: 'Ugandan Shilling', symbol: 'USh', flag: '🇺🇬' },
-        { code: 'TZS', name: 'Tanzanian Shilling', symbol: 'TSh', flag: '🇹🇿' },
-        { code: 'RWF', name: 'Rwandan Franc', symbol: 'Fr', flag: '🇷🇼' },
-        { code: 'ETB', name: 'Ethiopian Birr', symbol: 'Br', flag: '🇪🇹' },
-        { code: 'SSP', name: 'South Sudan Pound', symbol: 'SSP', flag: '🇸🇸' },
-        { code: 'SOS', name: 'Somali Shilling', symbol: 'Sh', flag: '🇸🇴' },
-        { code: 'BIF', name: 'Burundian Franc', symbol: 'Fr', flag: '🇧🇮' },
-        { code: 'DJF', name: 'Djiboutian Franc', symbol: 'Fr', flag: '🇩🇯' },
-        // Rest of Africa
-        { code: 'NGN', name: 'Nigerian Naira', symbol: '₦', flag: '🇳🇬' },
-        { code: 'GHS', name: 'Ghanaian Cedi', symbol: '₵', flag: '🇬🇭' },
-        { code: 'ZAR', name: 'South African Rand', symbol: 'R', flag: '🇿🇦' },
-        { code: 'EGP', name: 'Egyptian Pound', symbol: 'E£', flag: '🇪🇬' },
-        { code: 'XOF', name: 'West African CFA Franc', symbol: 'Fr', flag: '🌍' },
-        // Major World
-        { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸' },
-        { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺' },
-        { code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧' },
-        { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪' },
-        { code: 'CNY', name: 'Chinese Yuan', symbol: '¥', flag: '🇨🇳' },
-        { code: 'INR', name: 'Indian Rupee', symbol: '₹', flag: '🇮🇳' },
-        { code: 'JPY', name: 'Japanese Yen', symbol: '¥', flag: '🇯🇵' },
-        { code: 'CAD', name: 'Canadian Dollar', symbol: 'CA$', flag: '🇨🇦' },
-        { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', flag: '🇦🇺' },
-        { code: 'CHF', name: 'Swiss Franc', symbol: 'Fr', flag: '🇨🇭' },
-        { code: 'SAR', name: 'Saudi Riyal', symbol: '﷼', flag: '🇸🇦' },
+        { code: 'KES', symbol: 'KSh', flag: '🇰🇪' },
+        { code: 'UGX', symbol: 'USh', flag: '🇺🇬' },
+        { code: 'TZS', symbol: 'TSh', flag: '🇹🇿' },
+        { code: 'RWF', symbol: 'Fr',  flag: '🇷🇼' },
+        { code: 'USD', symbol: '$',   flag: '🇺🇸' },
+        { code: 'EUR', symbol: '€',   flag: '🇪🇺' },
+        { code: 'GBP', symbol: '£',   flag: '🇬🇧' },
+        { code: 'NGN', symbol: '₦',   flag: '🇳🇬' },
+        { code: 'GHS', symbol: '₵',   flag: '🇬🇭' },
+        { code: 'ZAR', symbol: 'R',   flag: '🇿🇦' },
+        { code: 'AED', symbol: 'د.إ', flag: '🇦🇪' },
+        { code: 'ETB', symbol: 'Br',  flag: '🇪🇹' },
+        { code: 'SSP', symbol: 'SSP', flag: '🇸🇸' },
+        { code: 'SOS', symbol: 'Sh',  flag: '🇸🇴' },
+        { code: 'BIF', symbol: 'Fr',  flag: '🇧🇮' },
+        { code: 'DJF', symbol: 'Fr',  flag: '🇩🇯' },
+        { code: 'XOF', symbol: 'Fr',  flag: '🌍' },
+        { code: 'CNY', symbol: '¥',   flag: '🇨🇳' },
+        { code: 'INR', symbol: '₹',   flag: '🇮🇳' },
+        { code: 'JPY', symbol: '¥',   flag: '🇯🇵' },
+        { code: 'CAD', symbol: 'CA$', flag: '🇨🇦' },
+        { code: 'AUD', symbol: 'A$',  flag: '🇦🇺' },
+        { code: 'CHF', symbol: 'Fr',  flag: '🇨🇭' },
+        { code: 'SAR', symbol: '﷼',   flag: '🇸🇦' },
     ];
 
-    const getCurrencySymbol = (code: string) => {
-        return CURRENCIES.find(c => c.code === code)?.symbol ?? code;
-    };
-    const selectedCurrency = CURRENCIES.find(c => c.code === currency) ?? CURRENCIES[14]; // USD fallback
-    const filteredCurrencies = CURRENCIES.filter(c =>
-        c.code.toLowerCase().includes(currencySearch.toLowerCase()) ||
-        c.name.toLowerCase().includes(currencySearch.toLowerCase())
-    );
-
-    // Vendor list
-    const [vendors, setVendors] = useState<any[]>([]);
-    const [vendorSearch, setVendorSearch] = useState("");
-    const [isVendorOpen, setIsVendorOpen] = useState(false);
-    const [selectedVendorId, setSelectedVendorId] = useState("");
-
-    // Items management
-    const [items, setItems] = useState<RequisitionItem[]>([]);
-    const [showItemForm, setShowItemForm] = useState(false);
-
-    // Current item being added
-    const [itemTitle, setItemTitle] = useState("");
-    const [itemDescription, setItemDescription] = useState("");
-    const [itemQuantity, setItemQuantity] = useState("1");
-    const [itemUnitPrice, setItemUnitPrice] = useState("");
-    const [itemCategory, setItemCategory] = useState("");
-    const [itemIsRecurring, setItemIsRecurring] = useState(false);
-    const [itemFrequency, setItemFrequency] = useState("MONTHLY");
-    const [itemStartDate, setItemStartDate] = useState<Date | undefined>(undefined);
-
-    // Categories
-    const [allCategories, setAllCategories] = useState<string[]>([]);
-    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-    const [categorySearch, setCategorySearch] = useState("");
-
-    const [quickCustomCategory, setQuickCustomCategory] = useState("");
-    const [itemCustomCategory, setItemCustomCategory] = useState("");
+    const getCurrencySymbol = (code: string) => CURRENCIES.find(c => c.code === code)?.symbol ?? code;
 
     const CATEGORY_GROUPS = [
+        { group: "Fixed Recurring", items: ["Rent", "Internet & Connectivity", "Airtime & Communication", "Fuel Allocation", "Hired Bike Payments"] },
+        { group: "Operational", items: ["Stationery", "Office Supplies", "Meetings & Conferences", "Accommodation", "Emergency Field Expenses"] },
+        { group: "Petty Cash", items: ["Electricity", "Fuel", "Repairs", "Maintenance", "Water"] },
+        { group: "Procurement", items: ["ICT Equipment", "Furniture", "Hardware"] },
         {
-            label: "✨ Custom",
-            items: ["Custom"]
-        },
-        {
-            label: "📌 Fixed Recurring",
-            items: ["Rent", "Internet & Connectivity", "Airtime & Communication", "Fuel Allocation", "Hired Bike Payments"]
-        },
-        {
-            label: "⚙️ Operational",
-            items: ["Stationery", "Office Supplies", "Meetings & Conferences", "Accommodation", "Emergency Field Expenses"]
-        },
-        {
-            label: "💰 Petty Cash",
-            items: ["Electricity", "Fuel", "Repairs", "Maintenance", "Water"]
-        },
-        {
-            label: "📦 Procurement",
-            items: ["ICT Equipment", "Furniture", "Hardware"]
-        },
-        {
-            label: "🗂 General",
+            group: "General / Other",
             items: allCategories.filter(c =>
                 !["Rent", "Internet & Connectivity", "Airtime & Communication", "Fuel Allocation", "Hired Bike Payments",
                     "Stationery", "Office Supplies", "Meetings & Conferences", "Accommodation", "Emergency Field Expenses",
                     "Electricity", "Fuel", "Repairs", "Maintenance", "Water", "ICT Equipment", "Furniture", "Hardware"].includes(c)
             )
         }
+    ].map(g => ({
+        label: g.group,
+        options: g.items
+            .filter(i => allCategories.includes(i) || g.group === "General / Other")
+            .map(i => ({ value: i, label: i }))
+    })).filter(g => g.options.length > 0);
+
+    const paymentOptions = [
+        { value: 'MPESA_TILL',    label: 'M-Pesa Till',    img: '/pay/Mpesa-Logo.png' },
+        { value: 'MPESA_PAYBILL', label: 'M-Pesa Paybill', img: '/pay/Mpesa-Logo.png' },
+        { value: 'BANK_TRANSFER', label: 'Bank Transfer',   img: '/pay/accepted.png' },
+        { value: 'AIRTEL_MONEY',  label: 'Airtel Money',   img: '/pay/Airtel-Logo.png' },
+        { value: 'CASH',          label: 'Cash',            img: '/pay/money-stack.png' },
+        { value: 'CHEQUE',        label: 'Cheque',          img: '/pay/cheque.png' },
     ];
 
-    const filteredCategoryGroups = CATEGORY_GROUPS.map(group => ({
-        ...group,
-        items: group.items.filter(c => c.toLowerCase().includes(categorySearch.toLowerCase()))
-    })).filter(group => group.items.length > 0);
-
-    // flat list for backwards compat
-    const filteredCategories = allCategories.filter(c =>
-        c.toLowerCase().includes(categorySearch.toLowerCase())
-    );
-
     useEffect(() => {
-        loadCategories();
-        loadVendors();
-        loadUserDetails();
-        loadAccounts();
+        (async () => {
+            const [cats, vens, accs, userDetails] = await Promise.all([
+                getCategoriesAction(),
+                getVendorsAction(),
+                getExpenseAccountsAction(),
+                getUserBranchAndDepartmentAction(),
+            ]);
+            setAllCategories(cats);
+            setVendors(vens);
+            setExpenseAccounts(accs);
+            if (userDetails.branch) setBranch(userDetails.branch);
+            if (userDetails.department) setDepartment(userDetails.department);
+
+            const prefilledCategory = searchParams.get("category");
+            if (prefilledCategory) {
+                const matchedAccount = accs.find((a: any) => a.name === prefilledCategory);
+                if (matchedAccount) setCustomAccountId(matchedAccount.id);
+            }
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const loadAccounts = async () => {
-        const accs = await getExpenseAccountsAction();
-        setExpenseAccounts(accs);
-    };
-
-    const loadUserDetails = async () => {
-        const details = await getUserBranchAndDepartmentAction();
-        if (details.branch) setBranch(details.branch);
-        if (details.department) setDepartment(details.department);
-    };
-
-    const loadVendors = async () => {
-        const vens = await getVendorsAction();
-        setVendors(vens);
-    };
-
-    const loadCategories = async () => {
-        const categories = await getCategoriesAction();
-        setAllCategories(categories);
-    };
-
-    // Auto-fill payment details when vendor changes
     useEffect(() => {
         if (!vendor || vendors.length === 0) return;
-        
-        // Find if this vendor exists in our loaded list
-        const matchedVendor = vendors.find(v => v.name === vendor);
-        
-        if (matchedVendor && matchedVendor.preferredPaymentMethod) {
-            setPaymentMethod(matchedVendor.preferredPaymentMethod);
-            setPaymentReference(matchedVendor.bankAccount || "");
-        } else {
-            // Optional: clear if they type a custom vendor that isn't saved
-            // setPaymentMethod("");
-            // setPaymentReference("");
+        const matched = vendors.find(v => v.name === vendor);
+        if (matched?.preferredPaymentMethod) {
+            setPaymentMethod(matched.preferredPaymentMethod);
+            if (matched.preferredPaymentMethod === "MPESA_PAYBILL") {
+                const [pb, acc] = (matched.bankAccount || "").split('|');
+                setPaybillNumber(pb || "");
+                setPaybillAccountNumber(acc || "");
+            } else {
+                setPaymentReference(matched.bankAccount || "");
+            }
         }
     }, [vendor, vendors]);
-
-
-
-    const addItem = () => {
-        if (!itemTitle.trim() || !itemCategory || !itemUnitPrice || parseFloat(itemUnitPrice) <= 0) {
-            setFormMessage("Please fill in all item fields");
-            return;
-        }
-
-        const newItem: RequisitionItem = {
-            id: Date.now().toString(),
-            title: itemTitle,
-            description: itemDescription,
-            quantity: parseInt(itemQuantity) || 1,
-            unitPrice: parseFloat(itemUnitPrice),
-            category: itemCategory === "Custom" ? itemCustomCategory : itemCategory,
-            ...(itemIsRecurring && {
-                isRecurring: true,
-                frequency: itemFrequency,
-                startDate: itemStartDate?.toISOString() || new Date().toISOString(),
-            })
-        };
-
-        setItems([...items, newItem]);
-
-        // Reset item form
-        setItemTitle("");
-        setItemDescription("");
-        setItemQuantity("1");
-        setItemUnitPrice("");
-        setItemCategory("");
-        setItemCustomCategory("");
-        setItemIsRecurring(false);
-        setItemFrequency("MONTHLY");
-        setItemStartDate(undefined);
-        setShowItemForm(false);
-        setFormMessage("");
-    };
-
-    const removeItem = (id: string) => {
-        setItems(items.filter(item => item.id !== id));
-    };
-
-    const calculateTotal = () => {
-        return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-    };
 
     const handleCreateAccount = async () => {
         setAccountCreateError("");
         if (!newAccountName.trim() || !newAccountCode.trim()) {
-            setAccountCreateError("Name and Code are required.");
+            setAccountCreateError("Name and code are required.");
             return;
         }
-
         setIsSavingAccount(true);
         const res = await createExpenseAccountAction({ name: newAccountName, code: newAccountCode });
         setIsSavingAccount(false);
-
         if (res?.error) {
             setAccountCreateError(res.error);
         } else if (res?.success && res.account) {
@@ -308,44 +196,42 @@ export default function NewRequisitionPage() {
         }
     };
 
+    const handleReceiptChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setReceiptFile(file);
+        setIsUploadingReceipt(true);
+        try {
+            const fd = new FormData();
+            fd.append("file", file);
+            const res = await fetch("/api/upload", { method: "POST", body: fd });
+            const data = await res.json();
+            if (data.url) {
+                setReceiptUrl(data.url);
+                showToast("Receipt uploaded", "success");
+            } else {
+                showToast("Upload failed", "error");
+                setReceiptFile(null);
+            }
+        } catch {
+            showToast("Upload failed", "error");
+            setReceiptFile(null);
+        } finally {
+            setIsUploadingReceipt(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setErrors({});
-        setFormMessage("");
+        if (!title.trim()) { showToast("Requisition title is required.", "error", "Missing Title"); return; }
+        if (!description.trim() || description.length < 15) { showToast("Please provide a justification of at least 15 characters.", "error", "Justification Too Short"); return; }
+        if (!category) { showToast("Please select a category.", "error", "Category Required"); return; }
+        const amt = parseFloat(amount);
+        if (!amount || isNaN(amt) || amt <= 0) { showToast("Please enter a valid amount.", "error", "Invalid Amount"); return; }
 
-        if (!title.trim()) {
-            setFormMessage("Requisition title is required");
-            return;
-        }
-
-        // justification is now optional — no check needed
-
-        // In quick mode, synthesize a single item from amount + category
-        let resolvedItems = items;
-        if (formMode === "quick") {
-            const amt = parseFloat(quickAmount);
-            if (!quickCategory) {
-                setFormMessage("Please select a category");
-                return;
-            }
-            if (!quickAmount || isNaN(amt) || amt <= 0) {
-                setFormMessage("Please enter a valid amount");
-                return;
-            }
-            resolvedItems = [{
-                id: Date.now().toString(),
-                title: title,
-                description: description,
-                quantity: 1,
-                unitPrice: amt,
-                category: quickCategory === "Custom" ? quickCustomCategory : quickCategory,
-            }];
-        } else if (items.length === 0) {
-            setFormMessage("Please add at least one item");
-            return;
-        }
-
+        const resolvedItems = [{ id: Date.now().toString(), title, description, quantity: 1, unitPrice: amt, category }];
         setIsSubmitting(true);
+        setSubmitError(null);
 
         const formData = new FormData();
         formData.append("title", title);
@@ -357,1104 +243,430 @@ export default function NewRequisitionPage() {
         formData.append("vendor", vendor);
         formData.append("paymentMethod", paymentMethod);
         formData.append("paymentReference", paymentReference);
+        formData.append("paybillNumber", paybillNumber);
+        formData.append("paybillAccountNumber", paybillAccountNumber);
         if (customAccountId) formData.append("accountId", customAccountId);
         if (expectedDate) formData.append("expectedDate", expectedDate.toISOString());
-        if (isSSCAEnabled) {
-            formData.append("isSSCA", "true");
-            if (isStrictApproval) formData.append("isStrictApproval", "true");
-        }
+        if (receiptUrl) formData.append("receiptUrl", receiptUrl);
 
         try {
             const result = await createRequisitionWithItems(formData);
             if (result?.errors) {
-                setErrors(result.errors);
-                setFormMessage("Please correct the errors below");
+                const first = Object.values(result.errors).flat()[0] as string;
+                setSubmitError(first || "Validation failed.");
                 setIsSubmitting(false);
+                return;
             }
             if (result?.message) {
-                setFormMessage(result.message);
+                setSubmitError(result.message);
                 setIsSubmitting(false);
+                return;
             }
-        } catch (e) {
-            console.error(e);
-            setFormMessage("Something went wrong. Please try again.");
+        } catch (err) {
+            console.error(err);
+            showToast("Something went wrong.", "error", "Submission Failed");
             setIsSubmitting(false);
         }
     };
 
+    const calculateTotal = () => parseFloat(amount) || 0;
+    const getPaymentName = () => paymentOptions.find(o => o.value === paymentMethod)?.label || 'Not set';
+
     return (
-        <div className="max-w-4xl mx-auto pb-24 font-sans">
-            <form onSubmit={handleSubmit} className="bg-white border border-gray-300 rounded-xl shadow-sm flex flex-col">
-                {/* Header */}
-                <div className="h-[88px] px-6 flex items-center justify-between bg-gradient-to-r from-green-100 to-white border-b border-gray-200 rounded-t-xl">
-                    <div className="flex items-center gap-4">
-                        <Link href="/dashboard/requisitions" className="p-2 rounded-lg hover:bg-white/50 text-gray-500 hover:text-gray-900 transition-all">
-                            <PiCaretLeft className="text-xl" />
-                        </Link>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center justify-center shrink-0">
-                                <img src="/pos-terminal.png" alt="Requisition Icon" className="w-14 h-14 object-contain" />
+        <div className="-mt-[22px] -mx-[26px] -mb-[52px] min-h-[calc(100vh-64px)] flex bg-gray-50/50">
+
+            {/* ── LEFT: FORM ── */}
+            <div className="flex-1 overflow-y-auto px-10 py-8 min-w-0">
+                {/* Back link inline — no redundant sub-header bar */}
+                <Link href="/dashboard/requisitions"
+                    className="inline-flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-700 transition-colors mb-6">
+                    <PiCaretLeft className="text-[13px]" /> Back to Requisitions
+                </Link>
+
+                <form onSubmit={handleSubmit}>
+                    {/* ── ONE connected card ── */}
+                    <div className="bg-white rounded-[8px] mb-3 overflow-hidden"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+
+                        {/* Section 1: Request Details */}
+                        <SectionDivider title="Request Details" />
+                        <div className="px-6 py-5 grid grid-cols-2 gap-4">
+                            {/* Title — full width */}
+                            <div className="col-span-2">
+                                <label className={LABEL_CLASS}>Title <span className="text-[#6366F1]">*</span></label>
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={e => setTitle(e.target.value)}
+                                    placeholder="e.g. Office supplies for Nairobi HQ"
+                                    className={INPUT_CLASS}
+                                    style={INPUT_STYLE}
+                                />
                             </div>
+
+                            {/* Ledger account */}
                             <div>
-                                <h1 className="text-base font-semibold text-gray-900">New Requisition</h1>
-                                <p className="text-xs text-gray-500 mt-1">Submit a purchase or reimbursement request</p>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className={LABEL_CLASS.replace('mb-1.5', '')}>Ledger account <span className="text-[#6366F1]">*</span></label>
+                                    <button type="button" onClick={() => setIsCreatingAccount(true)}
+                                        className="flex items-center gap-1 text-[11px] text-[#6366F1] hover:text-indigo-700 transition-colors">
+                                        <PiPlus className="text-[10px]" /> create new
+                                    </button>
+                                </div>
+                                <Select
+                                    value={customAccountId}
+                                    onChange={setCustomAccountId}
+                                    placeholder="Auto-mapped by category…"
+                                    searchable
+                                    className="!bg-white !rounded-[6px] !py-[10px] !px-3 !text-[13px]"
+                                    options={expenseAccounts.map(acc => ({ value: acc.id, label: `${acc.code} · ${acc.name}` }))}
+                                />
+                            </div>
+
+                            {/* Category */}
+                            <div>
+                                <label className={LABEL_CLASS}>Category <span className="text-[#6366F1]">*</span></label>
+                                <Select
+                                    value={category}
+                                    onChange={setCategory}
+                                    placeholder="Select category…"
+                                    searchable
+                                    className="!bg-white !rounded-[6px] !py-[10px] !px-3 !text-[13px]"
+                                    groups={CATEGORY_GROUPS}
+                                />
+                            </div>
+
+                            {/* Justification — full width */}
+                            <div className="col-span-2">
+                                <label className={LABEL_CLASS}>Justification <span className="text-[#6366F1]">*</span></label>
+                                <textarea
+                                    value={description}
+                                    onChange={e => setDescription(e.target.value)}
+                                    placeholder="Explain the business need for this request (min. 15 characters)…"
+                                    rows={3}
+                                    className={INPUT_CLASS + " resize-none"}
+                                    style={INPUT_STYLE}
+                                />
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Form Error Message */}
-                {formMessage && (
-                    <div className="bg-rose-50 border-l-4 border-rose-500 p-4 mx-6 mt-6 rounded-r-lg">
-                        <div className="flex">
-                            <div className="flex-shrink-0">
-                                <PiCheckCircle className="h-5 w-5 text-rose-400 transform rotate-180" />
+                        {/* Section 2: Amount & Logistics */}
+                        <SectionDivider title="Amount & Logistics" />
+                        <div className="px-6 py-5 grid grid-cols-4 gap-4">
+                            <div>
+                                <label className={LABEL_CLASS}>Amount <span className="text-[#6366F1]">*</span></label>
+                                <input
+                                    type="number" min="0"
+                                    value={amount}
+                                    onChange={e => setAmount(e.target.value)}
+                                    placeholder="0.00"
+                                    className={INPUT_CLASS + " font-mono tabular-nums"}
+                                    style={INPUT_STYLE}
+                                />
                             </div>
-                            <div className="ml-3">
-                                <p className="text-sm text-rose-700">{formMessage}</p>
+                            <div>
+                                <label className={LABEL_CLASS}>Currency</label>
+                                <Select
+                                    value={currency}
+                                    onChange={setCurrency}
+                                    searchable
+                                    className="!bg-white !rounded-[6px] !py-[10px] !px-3 !text-[13px]"
+                                    options={CURRENCIES.map(c => ({ value: c.code, label: `${c.flag} ${c.code}` }))}
+                                />
+                            </div>
+                            <div>
+                                <label className={LABEL_CLASS}>Expected delivery</label>
+                                <DatePicker value={expectedDate} onChange={setExpectedDate} placeholder="Pick a date…" />
+                            </div>
+                            <div>
+                                <label className={LABEL_CLASS}>Preferred vendor <span className="text-gray-300">(optional)</span></label>
+                                <Select
+                                    value={vendor}
+                                    onChange={setVendor}
+                                    placeholder="Select or search…"
+                                    searchable
+                                    className="!bg-white !rounded-[6px] !py-[10px] !px-3 !text-[13px]"
+                                    options={vendors.map(v => ({ value: v.name, label: v.name }))}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Section 3: Payment Method */}
+                        <SectionDivider title="Payment Method" />
+                        <div className="px-6 py-5">
+                            <div className="grid grid-cols-6 gap-2 mb-4">
+                                {paymentOptions.map(opt => {
+                                    const isSelected = paymentMethod === opt.value;
+                                    return (
+                                        <button key={opt.value} type="button"
+                                            onClick={() => { setPaymentMethod(opt.value); setPaymentReference(""); }}
+                                            className="flex flex-col items-center gap-2 p-3 rounded-[7px] cursor-pointer transition-all"
+                                            style={{
+                                                border: isSelected ? '1px solid #6366F1' : '1px solid rgba(0,0,0,0.09)',
+                                                background: isSelected ? 'rgba(99,102,241,0.05)' : 'white',
+                                            }}>
+                                            <div className="w-8 h-8 flex items-center justify-center">
+                                                <Image src={opt.img} alt={opt.label} width={32} height={32} className="object-contain w-full h-full" />
+                                            </div>
+                                            <span className={`text-[10.5px] font-[500] text-center leading-tight ${isSelected ? 'text-[#6366F1]' : 'text-gray-400'}`}>
+                                                {opt.label}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {paymentMethod && paymentMethod !== 'CASH' && (
+                                <div className="grid grid-cols-2 gap-3">
+                                    {paymentMethod === 'MPESA_PAYBILL' ? (
+                                        <>
+                                            <div>
+                                                <label className={LABEL_CLASS}>Paybill number</label>
+                                                <input type="text" value={paybillNumber} onChange={e => setPaybillNumber(e.target.value)} placeholder="e.g. 247247" className={INPUT_CLASS} style={INPUT_STYLE} />
+                                            </div>
+                                            <div>
+                                                <label className={LABEL_CLASS}>Account number</label>
+                                                <input type="text" value={paybillAccountNumber} onChange={e => setPaybillAccountNumber(e.target.value)} placeholder="e.g. 12345678" className={INPUT_CLASS} style={INPUT_STYLE} />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="col-span-2">
+                                            <label className={LABEL_CLASS}>
+                                                {paymentMethod === 'MPESA_TILL' ? 'M-Pesa till number' :
+                                                 paymentMethod === 'BANK_TRANSFER' ? 'Bank account' :
+                                                 paymentMethod === 'AIRTEL_MONEY' ? 'Airtel Money number' : 'Reference'}
+                                            </label>
+                                            <input type="text" value={paymentReference} onChange={e => setPaymentReference(e.target.value)} placeholder="Enter detail…" className={INPUT_CLASS} style={INPUT_STYLE} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 4: Supporting Document */}
+                        <SectionDivider title="Supporting Document" optional />
+                        <div className="px-6 py-5">
+                            <input type="file" id="req-receipt-upload" accept="image/*,.pdf" className="hidden" onChange={handleReceiptChange} />
+
+                            {!receiptFile ? (
+                                <label htmlFor="req-receipt-upload"
+                                    className="flex items-center gap-4 p-4 rounded-[7px] border border-dashed cursor-pointer hover:bg-indigo-50/40 transition-colors group"
+                                    style={{ borderColor: 'rgba(99,102,241,0.25)' }}>
+                                    <div className="w-9 h-9 rounded-[6px] bg-indigo-50 flex items-center justify-center shrink-0 group-hover:bg-indigo-100 transition-colors">
+                                        <PiUploadSimple className="text-[#6366F1] text-lg" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[13px] font-[500] text-gray-700">Attach a receipt or quote</p>
+                                        <p className="text-[11.5px] text-gray-400 mt-0.5">PDF or image — helps approvers verify the request</p>
+                                    </div>
+                                </label>
+                            ) : (
+                                <div className="flex items-center gap-3 p-4 rounded-[7px] bg-indigo-50/30"
+                                    style={{ border: '1px solid rgba(99,102,241,0.2)' }}>
+                                    <div className="w-9 h-9 rounded-[6px] bg-indigo-100 flex items-center justify-center shrink-0">
+                                        {isUploadingReceipt
+                                            ? <div className="w-4 h-4 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
+                                            : <PiFile className="text-[#6366F1] text-lg" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[13px] font-[500] text-gray-900 truncate">{receiptFile.name}</p>
+                                        <p className="text-[11.5px] text-gray-400 mt-0.5">
+                                            {isUploadingReceipt ? "Uploading…" : receiptUrl ? "Uploaded successfully" : "Ready to attach"}
+                                        </p>
+                                    </div>
+                                    <button type="button" onClick={() => { setReceiptFile(null); setReceiptUrl(null); }}
+                                        className="p-1.5 rounded-[5px] text-gray-400 hover:text-gray-700 hover:bg-white/60 transition-colors shrink-0">
+                                        <PiX className="text-sm" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="pb-10">
+                        {submitError && (
+                            <div className="mb-4 px-4 py-3 rounded-[7px] bg-rose-50 text-rose-600 text-[12.5px] flex items-center gap-2"
+                                style={{ border: '1px solid rgba(239,68,68,0.15)' }}>
+                                <PiInfo className="text-[15px] shrink-0" /> {submitError}
+                            </div>
+                        )}
+                        <div className="flex items-center justify-between">
+                            <Link href="/dashboard/requisitions"
+                                className="text-[13px] text-gray-400 hover:text-gray-700 transition-colors">
+                                Cancel
+                            </Link>
+                            <button type="submit" disabled={isSubmitting}
+                                className="flex items-center gap-2 bg-[#6366F1] text-white px-5 py-2.5 rounded-[6px] text-[13px] font-[500] hover:bg-indigo-600 transition-colors disabled:opacity-50">
+                                {isSubmitting ? 'Submitting…' : <><PiPaperPlaneRight className="text-[14px]" /> Submit requisition</>}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                {/* Create account overlay */}
+                {isCreatingAccount && (
+                    <div className="fixed inset-0 z-[50] flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/20" onClick={() => setIsCreatingAccount(false)} />
+                        <div className="relative bg-white rounded-[10px] w-[460px] overflow-hidden"
+                            style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 20px 60px rgba(0,0,0,0.12)' }}>
+                            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                                <h3 className="text-[14px] font-[600] text-gray-900">Create Ledger Account</h3>
+                                <button onClick={() => setIsCreatingAccount(false)}
+                                    className="p-1.5 rounded-[5px] hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                                    <PiX className="text-[15px]" />
+                                </button>
+                            </div>
+                            <div className="px-5 py-5">
+                                {accountCreateError && (
+                                    <div className="mb-4 px-3 py-2.5 rounded-[6px] bg-rose-50 text-rose-600 text-[12px] flex items-center gap-2"
+                                        style={{ border: '1px solid rgba(239,68,68,0.15)' }}>
+                                        <PiInfo className="shrink-0" /> {accountCreateError}
+                                    </div>
+                                )}
+                                <div className="flex gap-3">
+                                    <div className="flex-1">
+                                        <label className={LABEL_CLASS}>Account name</label>
+                                        <input type="text" placeholder="e.g. Server Hosting" value={newAccountName} onChange={e => setNewAccountName(e.target.value)} className={INPUT_CLASS} style={INPUT_STYLE} />
+                                    </div>
+                                    <div className="w-[120px]">
+                                        <label className={LABEL_CLASS}>GL Code</label>
+                                        <input type="text" placeholder="e.g. 6005" value={newAccountCode} onChange={e => setNewAccountCode(e.target.value)} className={INPUT_CLASS + " font-mono"} style={INPUT_STYLE} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-2 px-5 py-4" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                                <button type="button" onClick={() => setIsCreatingAccount(false)} disabled={isSavingAccount}
+                                    className="px-4 py-2 text-[13px] font-[500] text-gray-500 rounded-[6px] hover:bg-gray-50 transition-colors"
+                                    style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                    Cancel
+                                </button>
+                                <button type="button" onClick={handleCreateAccount} disabled={isSavingAccount}
+                                    className="px-4 py-2 text-[13px] font-[600] text-white bg-[#6366F1] hover:bg-indigo-600 rounded-[6px] transition-colors disabled:opacity-50">
+                                    {isSavingAccount ? 'Saving…' : 'Save Account'}
+                                </button>
                             </div>
                         </div>
                     </div>
                 )}
+            </div>
 
-                {/* Mode Toggle */}
-                <div className="px-6 pt-5 pb-0">
-                    <div className="inline-flex items-center bg-gray-100 rounded-xl p-1 gap-1">
-                        <button
-                            type="button"
-                            onClick={() => setFormMode("quick")}
-                            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                                formMode === "quick"
-                                    ? "bg-white text-[#29258D] shadow-sm"
-                                    : "text-gray-500 hover:text-gray-700"
-                            }`}
-                        >
-                            ⚡ Quick Request
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setFormMode("itemized")}
-                            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                                formMode === "itemized"
-                                    ? "bg-white text-[#29258D] shadow-sm"
-                                    : "text-gray-500 hover:text-gray-700"
-                            }`}
-                        >
-                            📋 Itemized Request
-                        </button>
-                    </div>
-                    <p className="text-[11px] text-gray-400 mt-2 mb-0">
-                        {formMode === "quick"
-                            ? "For simple requests — just describe what you need and enter the total amount."
-                            : "For procurement — add line items with quantities and unit prices."}
+            {/* ── RIGHT: SUMMARY SIDEBAR ── */}
+            <div className="w-[280px] flex-shrink-0 bg-white sticky top-0 h-[calc(100vh-64px)] overflow-y-auto flex flex-col"
+                style={{ borderLeft: '1px solid rgba(0,0,0,0.07)' }}>
+
+                {/* ── Header + progress ── */}
+                <div className="px-5 pt-5 pb-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                    <p className="text-[10.5px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-3">Request Preview</p>
+                    {(() => {
+                        const filled = [!!title.trim(), !!category, !!customAccountId, parseFloat(amount) > 0].filter(Boolean).length;
+                        const pct = (filled / 4) * 100;
+                        const ready = filled === 4;
+                        return (
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[11.5px] text-gray-400">{filled} of 4 required</span>
+                                    <span className={`text-[11px] font-[600] ${ready ? 'text-emerald-600' : 'text-gray-300'}`}>
+                                        {ready ? 'Ready to submit' : 'Incomplete'}
+                                    </span>
+                                </div>
+                                <div className="h-[3px] rounded-full overflow-hidden bg-gray-100">
+                                    <div className="h-full rounded-full transition-all duration-500"
+                                        style={{ width: `${pct}%`, background: ready ? '#10b981' : '#6366F1' }} />
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
+
+                {/* ── Title preview ── */}
+                <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                    <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-1.5">Title</p>
+                    <p className={`text-[13px] font-[500] leading-snug ${title ? 'text-gray-900' : 'text-gray-300 italic'}`}>
+                        {title || 'Not entered yet…'}
                     </p>
                 </div>
 
-                {/* Body */}
-                <div className="bg-white p-6 lg:p-8 space-y-8">
-                    {/* Section 1: Request Details */}
-                    <div>
-                        <h3 className="text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Request details</h3>
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div className="md:col-span-1">
-                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                        Type
-                                    </label>
-                                    <div className="relative">
-                                        {/* Custom Type Dropdown */}
-                                        <div
-                                            onClick={() => setIsTypeOpen(!isTypeOpen)}
-                                            className={`w-full bg-white border rounded-xl min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] ${
-                                                isTypeOpen ? 'border-[#29258D] ring-2 ring-[#29258D]/10' : 'border-gray-200'
-                                            }`}
-                                        >
-                                            <span className="flex items-center gap-2">
-                                                {isSSCAEnabled ? (
-                                                    <>
-                                                        <PiCheckCircle className="text-[#29258D] text-sm" />
-                                                        <span className="text-sm font-semibold text-gray-900">SSCAA</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <PiStorefront className="text-gray-400 text-sm" />
-                                                        <span className="text-sm font-semibold text-gray-900">Standard</span>
-                                                    </>
-                                                )}
-                                            </span>
-                                            <PiCaretDown className={`text-gray-400 transition-transform text-sm ${isTypeOpen ? 'rotate-180' : ''}`} />
-                                        </div>
-
-                                        {/* Dropdown Panel */}
-                                        {isTypeOpen && (
-                                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-2 animate-in fade-in zoom-in-95 duration-100">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => { setIsSSCAEnabled(false); setIsTypeOpen(false); }}
-                                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
-                                                        !isSSCAEnabled ? 'bg-[#29258D]/8 text-[#29258D]' : 'hover:bg-gray-50 text-gray-700'
-                                                    }`}
-                                                >
-                                                    <PiStorefront className="text-sm opacity-70" />
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-bold leading-tight">Standard</p>
-                                                        <p className="text-[10px] opacity-60">Regular business request</p>
-                                                    </div>
-                                                </button>
-
-                                                {process.env.NEXT_PUBLIC_APP_NAME !== "Pesanest" && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            if ((session?.user as any)?.role !== 'SYSTEM_ADMIN') {
-                                                                setIsTypeOpen(false);
-                                                                setShowAccessDenied(true);
-                                                                return;
-                                                            }
-                                                            setIsSSCAEnabled(true);
-                                                            setIsTypeOpen(false);
-                                                        }}
-                                                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left mt-1 ${
-                                                            isSSCAEnabled ? 'bg-[#29258D]/8 text-[#29258D]' : 'hover:bg-gray-50 text-gray-700'
-                                                        }`}
-                                                    >
-                                                        <PiCheckCircle className="text-sm opacity-70" />
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-bold leading-tight">SSCAA Request</p>
-                                                            <p className="text-[10px] opacity-60">Civil Aviation workflow</p>
-                                                        </div>
-                                                    </button>
-                                                )}
-                                            </div>
-                                        )}
-                                        {isTypeOpen && <div className="fixed inset-0 z-40" onClick={() => setIsTypeOpen(false)} />}
-                                    </div>
-                                </div>
-                                <div className="md:col-span-3">
-                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                        Requisition title <span className="text-rose-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all shadow-none placeholder:text-gray-300"
-                                        placeholder="What is this request for?"
-                                    />
-                                    {errors.title && (
-                                        <p className="text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1 leading-none">
-                                            <PiCheckCircle className="rotate-45" /> {errors.title}
-                                        </p>
-                                    )}
-                                </div>
+                {/* ── Icon rows ── */}
+                <div className="px-5 py-2">
+                    {[
+                        { Icon: PiTag,           label: 'Category',          value: category,          accent: false, green: false },
+                        { Icon: PiCreditCard,    label: 'Payment method',    value: getPaymentName(),  accent: true,  green: false },
+                        { Icon: PiCalendarBlank, label: 'Expected delivery', value: expectedDate ? expectedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '', accent: false, green: false },
+                        { Icon: PiStorefront,    label: 'Vendor',            value: vendor,            accent: false, green: false },
+                        { Icon: PiPaperclip,     label: 'Receipt',           value: receiptUrl ? 'Attached' : '', accent: false, green: !!receiptUrl },
+                    ].map((row, idx, arr) => (
+                        <div key={row.label} className="flex items-center gap-3 py-3"
+                            style={idx < arr.length - 1 ? { borderBottom: '1px solid rgba(0,0,0,0.05)' } : {}}>
+                            <div className="w-[30px] h-[30px] rounded-[6px] flex items-center justify-center shrink-0 bg-gray-50"
+                                style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
+                                <row.Icon className="text-gray-400 text-[14px]" />
                             </div>
-
-                            {isSSCAEnabled && (
-                                <div className="bg-[#29258D]/5 border border-[#29258D]/20 rounded-xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <div className="flex items-center gap-3">
-                                        <input
-                                            type="checkbox"
-                                            id="isStrictApproval"
-                                            checked={isStrictApproval}
-                                            onChange={(e) => setIsStrictApproval(e.target.checked)}
-                                            className="h-4 w-4 text-[#29258D] focus:ring-[#29258D] border-gray-300 rounded cursor-pointer"
-                                        />
-                                        <label htmlFor="isStrictApproval" className="cursor-pointer select-none">
-                                            <span className="text-xs font-semibold text-gray-900 block">Require strict approval (SSCAA Workflow)</span>
-                                            <span className="text-[10px] text-gray-500 block">Force Manager + Finance approval regardless of amount for this Aviation request.</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* GL Account — Custom Dropdown */}
-                            <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label className="block text-xs font-medium text-gray-700">Ledger Account <span className="text-gray-400 font-normal">(Optional)</span></label>
-                                    <button
-                                        type="button"
-                                        onClick={() => { setIsCreatingAccount(!isCreatingAccount); setIsAccountOpen(false); }}
-                                        className="text-[#29258D] text-[10px] font-semibold hover:underline flex items-center gap-1"
-                                    >
-                                        <PiPlus /> {isCreatingAccount ? 'Cancel' : 'Create New'}
-                                    </button>
-                                </div>
-                                <div className="relative">
-                                    {/* Trigger */}
-                                    <div
-                                        onClick={() => { setIsAccountOpen(!isAccountOpen); setAccountSearch(""); }}
-                                        className={`w-full bg-white border rounded-xl min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-all hover:border-[#29258D] ${
-                                            isAccountOpen ? 'border-[#29258D] ring-2 ring-[#29258D]/10' : 'border-gray-200'
-                                        }`}
-                                    >
-                                        {customAccountId ? (() => {
-                                            const acc = expenseAccounts.find(a => a.id === customAccountId);
-                                            return acc ? (
-                                                <span className="flex items-center gap-2">
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#29258D]/10 text-[#29258D] text-[10px] font-bold tracking-wide">{acc.code}</span>
-                                                    <span className="text-sm font-medium text-gray-900">{acc.name}</span>
-                                                </span>
-                                            ) : null;
-                                        })() : (
-                                            <span className="text-sm text-gray-400">Auto-mapped by category...</span>
-                                        )}
-                                        <PiCaretDown className={`text-gray-400 transition-transform text-sm ${isAccountOpen ? 'rotate-180' : ''}`} />
-                                    </div>
-
-                                    {/* Dropdown Panel */}
-                                    {isAccountOpen && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100">
-                                            {/* Search */}
-                                            <div className="relative mb-3">
-                                                <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-                                                <input
-                                                    type="text"
-                                                    autoFocus
-                                                    placeholder="Search accounts..."
-                                                    value={accountSearch}
-                                                    onChange={e => setAccountSearch(e.target.value)}
-                                                    onClick={e => e.stopPropagation()}
-                                                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
-                                                />
-                                            </div>
-
-                                            <div className="max-h-52 overflow-y-auto space-y-0.5">
-                                                {/* Default option */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => { setCustomAccountId(""); setIsAccountOpen(false); }}
-                                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
-                                                        !customAccountId ? 'bg-[#29258D]/8 border border-[#29258D]/20' : 'hover:bg-gray-50 border border-transparent'
-                                                    }`}
-                                                >
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-gray-500 text-[10px] font-bold">AUTO</span>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className={`text-sm font-semibold ${!customAccountId ? 'text-[#29258D]' : 'text-gray-700'}`}>Auto-mapped by Category</p>
-                                                        <p className="text-[10px] text-gray-400">System selects the GL account automatically</p>
-                                                    </div>
-                                                    {!customAccountId && <div className="w-2 h-2 rounded-full bg-[#29258D] shrink-0" />}
-                                                </button>
-
-                                                {/* Account list */}
-                                                {expenseAccounts
-                                                    .filter(acc =>
-                                                        acc.name.toLowerCase().includes(accountSearch.toLowerCase()) ||
-                                                        acc.code.toLowerCase().includes(accountSearch.toLowerCase())
-                                                    )
-                                                    .map(acc => (
-                                                        <button
-                                                            key={acc.id}
-                                                            type="button"
-                                                            onClick={() => { setCustomAccountId(acc.id); setIsAccountOpen(false); }}
-                                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
-                                                                customAccountId === acc.id ? 'bg-[#29258D]/8 border border-[#29258D]/20' : 'hover:bg-gray-50 border border-transparent'
-                                                            }`}
-                                                        >
-                                                            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#29258D]/10 text-[#29258D] text-[10px] font-bold tracking-wide shrink-0">{acc.code}</span>
-                                                            <div className="flex-1 min-w-0">
-                                                                <p className={`text-sm font-semibold truncate ${customAccountId === acc.id ? 'text-[#29258D]' : 'text-gray-900'}`}>{acc.name}</p>
-                                                            </div>
-                                                            {customAccountId === acc.id && <div className="w-2 h-2 rounded-full bg-[#29258D] shrink-0" />}
-                                                        </button>
-                                                    ))
-                                                }
-
-                                                {/* Create new option */}
-                                                <button
-                                                    type="button"
-                                                    onClick={e => { e.stopPropagation(); setIsAccountOpen(false); setIsCreatingAccount(true); }}
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left border border-dashed border-[#29258D]/30 hover:border-[#29258D]/60 hover:bg-[#29258D]/5 mt-1"
-                                                >
-                                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#29258D]/10 text-[#29258D]"><PiPlus className="text-xs" /></span>
-                                                    <p className="text-sm font-semibold text-[#29258D]">Create New GL Account</p>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {isAccountOpen && <div className="fixed inset-0 z-40" onClick={() => setIsAccountOpen(false)} />}
-                                </div>
-
-                                {/* Inline create form */}
-                                {isCreatingAccount && (
-                                    <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <h4 className="text-xs font-bold text-gray-900">Create GL Account</h4>
-                                            <button type="button" onClick={() => setIsCreatingAccount(false)}><PiX className="text-gray-400 hover:text-gray-700" /></button>
-                                        </div>
-                                        {accountCreateError && <p className="text-red-500 text-[10px] mb-2">{accountCreateError}</p>}
-                                        <div className="grid grid-cols-2 gap-3 mb-3">
-                                            <div>
-                                                <label className="block text-[10px] font-medium text-gray-700 mb-1">GL Code</label>
-                                                <input type="text" value={newAccountCode} onChange={e => setNewAccountCode(e.target.value)} placeholder="e.g. 6050" className="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-medium text-gray-700 mb-1">Account Name</label>
-                                                <input type="text" value={newAccountName} onChange={e => setNewAccountName(e.target.value)} placeholder="e.g. Special Event" className="w-full text-xs px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#29258D]" />
-                                            </div>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={handleCreateAccount}
-                                            disabled={isSavingAccount}
-                                            className="w-full bg-[#29258D] text-white text-xs font-medium py-2 rounded flex justify-center items-center hover:bg-[#29258D]/90 disabled:opacity-50 transition-colors"
-                                        >
-                                            {isSavingAccount ? <PiArrowsClockwise className="animate-spin text-sm" /> : "Save Account"}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-
-
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                    Justification <span className="text-gray-400 font-normal text-[10px]">(optional)</span>
-                                </label>
-                                <textarea
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all min-h-[80px] shadow-none resize-none placeholder:text-gray-300"
-                                    placeholder="Explain the business need (optional)..."
-                                />
+                            <div className="min-w-0 flex-1">
+                                <p className="text-[10.5px] text-gray-400">{row.label}</p>
+                                <p className={`text-[12.5px] font-[500] truncate mt-0.5 ${
+                                    row.green   ? 'text-emerald-600' :
+                                    row.accent  ? 'text-[#6366F1]' :
+                                    row.value   ? 'text-gray-900' : 'text-gray-300'
+                                }`}>
+                                    {row.value || '—'}
+                                </p>
                             </div>
                         </div>
-                    </div>
+                    ))}
+                </div>
 
-                    {/* Section 2: Items / Quick Amount */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 flex-1">
-                                {formMode === "quick" ? "Amount & Category" : "Items"} <span className="text-rose-500">*</span>
-                            </h3>
-                        </div>
+                {/* ── Total amount ── */}
+                <div className="mx-5 mt-2 mb-5 rounded-[8px] px-4 py-5 text-center"
+                    style={{ background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.13)' }}>
+                    <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-indigo-300 mb-2">Total Requested</p>
+                    <p className="text-[34px] font-[250] text-[#6366F1] tracking-tight tabular-nums leading-none">
+                        {getCurrencySymbol(currency)}{calculateTotal().toLocaleString()}
+                    </p>
+                    <p className="text-[11px] text-indigo-300 mt-2 font-[500]">{currency}</p>
+                </div>
 
-                    {formMode === "quick" ? (
-                        /* ── Quick mode: single amount + category ── */
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Amount */}
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                    Total Amount <span className="text-rose-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">
-                                        {getCurrencySymbol(currency)}
-                                    </span>
-                                    <input
-                                        type="number"
-                                        step="1"
-                                        min="0"
-                                        value={quickAmount}
-                                        onChange={(e) => setQuickAmount(e.target.value)}
-                                        className="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-[#29258D] focus:ring-[#29258D]/10 transition-all font-mono"
-                                        placeholder="0"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Currency (in quick mode) */}
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">Currency</label>
-                                <div className="relative">
-                                    <div
-                                        onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-                                        className="w-full bg-white border border-gray-200 rounded-xl min-h-[42px] px-3 py-2.5 cursor-pointer flex items-center justify-between hover:border-[#29258D] transition-colors"
-                                    >
-                                        <span className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                                            <span className="text-lg leading-none">{selectedCurrency.flag}</span>
-                                            <span>{selectedCurrency.code}</span>
-                                            <span className="text-gray-400 font-normal text-xs">{selectedCurrency.symbol}</span>
-                                        </span>
-                                        <PiCaretDown className={`text-gray-400 transition-transform text-sm ${isCurrencyOpen ? 'rotate-180' : ''}`} />
-                                    </div>
-                                    {isCurrencyOpen && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100" style={{ minWidth: '240px' }}>
-                                            <div className="relative mb-3">
-                                                <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-                                                <input type="text" autoFocus placeholder="Search currency..." value={currencySearch} onChange={(e) => setCurrencySearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all" />
-                                            </div>
-                                            <div className="max-h-52 overflow-y-auto space-y-0.5">
-                                                {filteredCurrencies.map(cur => (
-                                                    <button key={cur.code} type="button" onClick={() => { setCurrency(cur.code); setIsCurrencyOpen(false); setCurrencySearch(""); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${currency === cur.code ? 'bg-[#29258D]/8 border border-[#29258D]/20' : 'hover:bg-gray-50 border border-transparent'}`}>
-                                                        <span className="text-xl leading-none w-7 text-center">{cur.flag}</span>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className={`text-sm font-bold ${currency === cur.code ? 'text-[#29258D]' : 'text-gray-900'}`}>{cur.code}</p>
-                                                            <p className="text-[10px] text-gray-400 truncate">{cur.name}</p>
-                                                        </div>
-                                                        <span className="text-xs font-mono text-gray-400 shrink-0">{cur.symbol}</span>
-                                                        {currency === cur.code && <div className="w-2 h-2 rounded-full bg-[#29258D] shrink-0" />}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {isCurrencyOpen && <div className="fixed inset-0 z-40" onClick={() => setIsCurrencyOpen(false)} />}
-                                </div>
-                            </div>
-
-                            {/* Category */}
-                            <div className="md:col-span-2">
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                    Category <span className="text-rose-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <div
-                                        onClick={() => setIsQuickCategoryOpen(!isQuickCategoryOpen)}
-                                        className="w-full bg-white border border-gray-200 rounded-xl min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-colors hover:border-[#29258D]"
-                                    >
-                                        {quickCategory ? (
-                                            <span className="text-sm text-gray-900">{quickCategory}</span>
-                                        ) : (
-                                            <span className="text-sm text-gray-400">Select a category...</span>
-                                        )}
-                                        <PiCaretDown className={`text-gray-400 transition-transform ${isQuickCategoryOpen ? 'rotate-180' : ''}`} />
-                                    </div>
-                                    {isQuickCategoryOpen && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100">
-                                            <div className="relative mb-3">
-                                                <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-                                                <input type="text" autoFocus placeholder="Search categories..." value={quickCategorySearch} onChange={(e) => setQuickCategorySearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all" />
-                                            </div>
-                                            <div className="max-h-56 overflow-y-auto space-y-3 pr-1">
-                                                {CATEGORY_GROUPS.map(group => {
-                                                    const filtered = group.items.filter(c => c.toLowerCase().includes(quickCategorySearch.toLowerCase()));
-                                                    if (!filtered.length) return null;
-                                                    return (
-                                                        <div key={group.label}>
-                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-1">{group.label}</p>
-                                                            <div className="flex flex-wrap gap-1.5">
-                                                                {filtered.map(cat => (
-                                                                    <button key={cat} type="button" onClick={() => { setQuickCategory(cat); setIsQuickCategoryOpen(false); setQuickCategorySearch(""); }} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${quickCategory === cat ? 'bg-[#29258D] border-[#29258D] text-white' : 'bg-white border-gray-200 text-gray-600 hover:border-[#29258D]/40 hover:bg-[#29258D]/5 hover:text-[#29258D]'}`}>
-                                                                        {cat}
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {isQuickCategoryOpen && <div className="fixed inset-0 z-40" onClick={() => setIsQuickCategoryOpen(false)} />}
-                                </div>
-                                
-                                {quickCategory === "Custom" && (
-                                    <div className="mt-3 animate-fade-in">
-                                        <input
-                                            type="text"
-                                            value={quickCustomCategory}
-                                            onChange={(e) => setQuickCustomCategory(e.target.value)}
-                                            className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                            placeholder="Enter your custom category..."
-                                            autoFocus
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ) : (
-                        /* ── Itemized mode: existing multi-item list ── */
-                        <div>
-
-                        {/* Items List */}
-                        {items.length > 0 && (
-                            <div className="space-y-3 mb-4">
-                                {items.map((item) => (
-                                    <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-4 flex items-start justify-between hover:border-gray-300 transition-colors">
-                                        <div className="flex-1">
-                                            <div className="flex items-start justify-between mb-2">
-                                                <div>
-                                                    <h4 className="font-semibold text-sm text-gray-900">{item.title}</h4>
-                                                    {item.description && (
-                                                        <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
-                                                    )}
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setItemTitle(item.title);
-                                                        setItemDescription(item.description || "");
-                                                        setItemCategory(item.category);
-                                                        setItemQuantity(item.quantity.toString());
-                                                        setItemUnitPrice(item.unitPrice.toString());
-                                                        setItemIsRecurring(item.isRecurring || false);
-                                                        setItemFrequency(item.frequency || "MONTHLY");
-                                                        const remaining = items.filter(i => i.id !== item.id);
-                                                        setItems(remaining);
-                                                        setShowItemForm(true);
-                                                    }}
-                                                    className="p-1.5 hover:bg-amber-50 rounded-lg transition-colors group ml-2"
-                                                >
-                                                    <PiPencil className="text-gray-400 group-hover:text-amber-500" />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeItem(item.id)}
-                                                    className="p-1.5 hover:bg-rose-50 rounded-lg transition-colors group ml-1"
-                                                >
-                                                    <PiTrash className="text-gray-400 group-hover:text-rose-500" />
-                                                </button>
-                                            </div>
-                                            <div className="flex items-center gap-4 text-xs">
-                                                <span className="px-2 py-1 bg-[#29258D]/10 text-[#29258D] rounded-md font-medium">
-                                                    {item.category}
-                                                </span>
-                                                <span className="text-gray-600">
-                                                    Qty: {item.quantity}
-                                                </span>
-                                                <span className="text-gray-600">
-                                                    @ {getCurrencySymbol(currency)}{item.unitPrice.toLocaleString()}
-                                                </span>
-                                                {item.isRecurring && (
-                                                    <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold tracking-wide uppercase border border-blue-100">
-                                                        <PiArrowsClockwise /> {item.frequency}
-                                                    </span>
-                                                )}
-                                                <span className="font-semibold text-gray-900 ml-auto">
-                                                    {getCurrencySymbol(currency)}{(item.quantity * item.unitPrice).toLocaleString()}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {/* Total */}
-                                <div className="bg-[#29258D]/5 border border-[#29258D]/20 rounded-lg p-4 flex items-center justify-between">
-                                    <span className="font-bold text-sm text-gray-900">Total Amount</span>
-                                    <span className="font-bold text-lg text-[#29258D]">
-                                        {getCurrencySymbol(currency)}{calculateTotal().toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Add Item Form */}
-                        {showItemForm ? (
-                            <div className="bg-white border border-[#29258D]/30 rounded-lg p-4 space-y-4">
-                                <div className="flex items-center justify-between mb-3">
-                                    <h4 className="font-semibold text-sm text-gray-900">Add New Item</h4>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowItemForm(false)}
-                                        className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                    >
-                                        <PiX className="text-gray-500" />
-                                    </button>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="md:col-span-2">
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                            Item Title <span className="text-rose-500">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={itemTitle}
-                                            onChange={(e) => setItemTitle(e.target.value)}
-                                            className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                            placeholder="e.g., Laptop Computer"
-                                        />
-                                    </div>
-
-                                    <div className="md:col-span-2">
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">Description</label>
-                                        <input
-                                            type="text"
-                                            value={itemDescription}
-                                            onChange={(e) => setItemDescription(e.target.value)}
-                                            className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                            placeholder="Optional details..."
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                            Category <span className="text-rose-500">*</span>
-                                        </label>
-                                        <div className="relative">
-                                            <div
-                                                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                                                className="w-full bg-white border border-gray-200 rounded-lg min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between transition-colors hover:border-[#29258D]"
-                                            >
-                                                {itemCategory ? (
-                                                    <span className="text-sm text-gray-900">{itemCategory}</span>
-                                                ) : (
-                                                    <span className="text-sm text-gray-400">Select category...</span>
-                                                )}
-                                                <PiCaretDown className={`text-gray-400 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`} />
-                                            </div>
-
-                                            {isCategoryOpen && (
-                                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100">
-                                                    <div className="relative mb-3">
-                                                        <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-                                                        <input
-                                                            type="text"
-                                                            autoFocus
-                                                            placeholder="Search categories..."
-                                                            value={categorySearch}
-                                                            onChange={(e) => setCategorySearch(e.target.value)}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
-                                                        />
-                                                    </div>
-                                                    <div className="max-h-56 overflow-y-auto space-y-3 pr-1">
-                                                        {filteredCategoryGroups.length > 0 ? (
-                                                            filteredCategoryGroups.map(group => (
-                                                                <div key={group.label}>
-                                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-1">{group.label}</p>
-                                                                    <div className="flex flex-wrap gap-1.5">
-                                                                        {group.items.map(cat => (
-                                                                            <button
-                                                                                key={cat}
-                                                                                type="button"
-                                                                                onClick={() => {
-                                                                                    setItemCategory(cat);
-                                                                                    setIsCategoryOpen(false);
-                                                                                    setCategorySearch("");
-                                                                                }}
-                                                                                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${itemCategory === cat
-                                                                                    ? 'bg-[#29258D] border-[#29258D] text-white'
-                                                                                    : 'bg-white border-gray-200 text-gray-600 hover:border-[#29258D]/40 hover:bg-[#29258D]/5 hover:text-[#29258D]'
-                                                                                    }`}
-                                                                            >
-                                                                                {cat}
-                                                                            </button>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                            ))
-                                                        ) : (
-                                                            <div className="py-4 text-center text-gray-400 text-xs">
-                                                                No categories found
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {isCategoryOpen && (
-                                                <div className="fixed inset-0 z-40" onClick={() => setIsCategoryOpen(false)} />
-                                            )}
-                                        </div>
-
-                                        {itemCategory === "Custom" && (
-                                            <div className="mt-3 animate-fade-in">
-                                                <input
-                                                    type="text"
-                                                    value={itemCustomCategory}
-                                                    onChange={(e) => setItemCustomCategory(e.target.value)}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                                    placeholder="Enter your custom category..."
-                                                    autoFocus
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">Currency</label>
-                                        <div className="relative">
-                                            <div
-                                                onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-                                                className="w-full bg-white border border-gray-200 rounded-lg min-h-[42px] px-3 py-2.5 cursor-pointer flex items-center justify-between hover:border-[#29258D] transition-colors"
-                                            >
-                                                <span className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                                                    <span className="text-lg leading-none">{selectedCurrency.flag}</span>
-                                                    <span>{selectedCurrency.code}</span>
-                                                    <span className="text-gray-400 font-normal text-xs">{selectedCurrency.symbol}</span>
-                                                </span>
-                                                <PiCaretDown className={`text-gray-400 transition-transform text-sm ${isCurrencyOpen ? 'rotate-180' : ''}`} />
-                                            </div>
-                                            {isCurrencyOpen && (
-                                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100" style={{ minWidth: '240px' }}>
-                                                    <div className="relative mb-3">
-                                                        <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-                                                        <input
-                                                            type="text"
-                                                            autoFocus
-                                                            placeholder="Search currency..."
-                                                            value={currencySearch}
-                                                            onChange={(e) => setCurrencySearch(e.target.value)}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
-                                                        />
-                                                    </div>
-                                                    <div className="max-h-52 overflow-y-auto space-y-0.5">
-                                                        {filteredCurrencies.map(cur => (
-                                                            <button
-                                                                key={cur.code}
-                                                                type="button"
-                                                                onClick={() => { setCurrency(cur.code); setIsCurrencyOpen(false); setCurrencySearch(""); }}
-                                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${currency === cur.code
-                                                                    ? 'bg-[#29258D]/8 border border-[#29258D]/20'
-                                                                    : 'hover:bg-gray-50 border border-transparent'
-                                                                    }`}
-                                                            >
-                                                                <span className="text-xl leading-none w-7 text-center">{cur.flag}</span>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <p className={`text-sm font-bold ${currency === cur.code ? 'text-[#29258D]' : 'text-gray-900'}`}>{cur.code}</p>
-                                                                    <p className="text-[10px] text-gray-400 truncate">{cur.name}</p>
-                                                                </div>
-                                                                <span className="text-xs font-mono text-gray-400 shrink-0">{cur.symbol}</span>
-                                                                {currency === cur.code && (
-                                                                    <div className="w-2 h-2 rounded-full bg-[#29258D] shrink-0" />
-                                                                )}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {isCurrencyOpen && <div className="fixed inset-0 z-40" onClick={() => setIsCurrencyOpen(false)} />}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                            Quantity <span className="text-gray-400 font-normal text-[10px]">(Optional)</span>
-                                        </label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={itemQuantity}
-                                            onChange={(e) => setItemQuantity(e.target.value)}
-                                            className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                            Unit Price <span className="text-rose-500">*</span>
-                                        </label>
-                                        <div className="relative">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">
-                                                {getCurrencySymbol(currency)}
-                                            </span>
-                                            <input
-                                                type="number"
-                                                step="1"
-                                                min="0"
-                                                value={itemUnitPrice}
-                                                onChange={(e) => setItemUnitPrice(e.target.value)}
-                                                className="w-full bg-white border border-gray-200 rounded-lg pl-12 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all font-mono"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Recurring Settings Toggle */}
-                                    <div className="md:col-span-2 mt-2 pt-4 border-t border-gray-100">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h5 className="text-sm font-semibold text-gray-900">Make Recurring</h5>
-                                                <p className="text-xs text-gray-500">Automatically generate a new requisition for this item on a schedule</p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => setItemIsRecurring(!itemIsRecurring)}
-                                                className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-300 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#29258D] focus-visible:ring-offset-2 shadow-inner ${itemIsRecurring ? 'bg-[#29258D]' : 'bg-gray-200 hover:bg-gray-300'}`}
-                                            >
-                                                <span className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ease-in-out ${itemIsRecurring ? 'translate-x-5' : 'translate-x-0'}`} />
-                                            </button>
-                                        </div>
-
-                                        {itemIsRecurring && (
-                                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-200">
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Frequency</label>
-                                                    <select
-                                                        value={itemFrequency}
-                                                        onChange={(e) => setItemFrequency(e.target.value)}
-                                                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:border-[#29258D] focus:ring-[#29258D] transition-all"
-                                                    >
-                                                        <option value="DAILY">Daily</option>
-                                                        <option value="WEEKLY">Weekly</option>
-                                                        <option value="MONTHLY">Monthly</option>
-                                                        <option value="QUARTERLY">Quarterly</option>
-                                                        <option value="YEARLY">Yearly</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1.5">First Run Date</label>
-                                                    <DatePicker
-                                                        value={itemStartDate}
-                                                        onChange={setItemStartDate}
-                                                        placeholder="When should this start?"
-                                                        className="w-full"
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2 pt-2">
-                                    <button
-                                        type="button"
-                                        onClick={addItem}
-                                        className="flex-1 px-4 py-2.5 bg-[#29258D] text-white rounded-lg font-medium text-xs hover:bg-[#29258D]/90 transition-all flex items-center justify-center gap-2"
-                                    >
-                                        <PiPlus className="text-sm" />
-                                        Add Item
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowItemForm(false)}
-                                        className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium text-xs hover:bg-gray-50 transition-all"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={() => setShowItemForm(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-[#29258D] hover:text-[#29258D] hover:bg-[#29258D]/5 transition-all flex items-center justify-center gap-2 font-medium text-sm"
-                            >
-                                <PiPlus className="text-lg" />
-                                Add Item
-                            </button>
-                        )}
-                    </div>
-                    )}
-                    </div>
-
-                    {/* Section 3: Logistics & Accounting */}
-                    <div>
-                        <h3 className="text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Logistics & accounting</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            {process.env.NEXT_PUBLIC_APP_NAME === "PesaStack" && (
-                                <>
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">Target Branch</label>
-                                        <input
-                                            type="text"
-                                            value={branch}
-                                            onChange={(e) => setBranch(e.target.value)}
-                                            className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                            placeholder="e.g. Headquarters"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1.5">Department</label>
-                                <input
-                                    type="text"
-                                    value={department}
-                                    onChange={(e) => setDepartment(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all"
-                                    placeholder="e.g. IT, Operations"
-                                />
-                            </div>
-                            </>
-                            )}
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">Expected Delivery Date</label>
-                                <DatePicker
-                                    value={expectedDate}
-                                    onChange={setExpectedDate}
-                                    placeholder="When do you need this?"
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">Preferred Vendor (Optional)</label>
-                                <div className="relative">
-                                    <div
-                                        onClick={() => setIsVendorOpen(!isVendorOpen)}
-                                        className="w-full bg-white border border-gray-200 rounded-lg min-h-[42px] px-4 py-2.5 cursor-pointer flex items-center justify-between hover:border-[#29258D] transition-colors"
-                                    >
-                                        {vendor ? (
-                                            <span className="text-sm text-gray-900 font-medium flex items-center gap-2">
-                                                <PiStorefront className="text-[#29258D]" /> {vendor}
-                                            </span>
-                                        ) : (
-                                            <span className="text-sm text-gray-400 flex items-center gap-2">
-                                                <PiStorefront /> Select or search vendor...
-                                            </span>
-                                        )}
-                                        <PiCaretDown className={`text-gray-400 transition-transform ${isVendorOpen ? 'rotate-180' : ''}`} />
-                                    </div>
-                                    {isVendorOpen && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100">
-                                            <div className="relative mb-3">
-                                                <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-                                                <input
-                                                    type="text"
-                                                    autoFocus
-                                                    placeholder="Search vendors..."
-                                                    value={vendorSearch}
-                                                    onChange={(e) => setVendorSearch(e.target.value)}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:bg-white transition-all"
-                                                />
-                                            </div>
-                                            <div className="max-h-52 overflow-y-auto space-y-1">
-                                                {vendorSearch && (
-                                                    <button type="button"
-                                                        onClick={() => { setVendor(vendorSearch); setIsVendorOpen(false); setVendorSearch(""); }}
-                                                        className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-[#29258D] hover:bg-[#29258D]/5 transition-colors">
-                                                        + Use &quot;{vendorSearch}&quot; as vendor
-                                                    </button>
-                                                )}
-                                                {vendors
-                                                    .filter((v: any) => v.name.toLowerCase().includes(vendorSearch.toLowerCase()))
-                                                    .map((v: any) => (
-                                                        <button
-                                                            key={v.id}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setVendor(v.name);
-                                                                setSelectedVendorId(v.id);
-                                                                setIsVendorOpen(false);
-                                                                setVendorSearch("");
-                                                                // Auto-populate payment details from vendor
-                                                                if (v.preferredPaymentMethod) {
-                                                                    setPaymentMethod(v.preferredPaymentMethod);
-                                                                    setPaymentReference(v.bankAccount || "");
-                                                                }
-                                                            }}
-                                                            className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors group border border-transparent hover:border-gray-100"
-                                                        >
-                                                            <p className="text-sm font-semibold text-gray-900 group-hover:text-[#29258D] transition-colors">{v.name}</p>
-                                                            {v.bankName && (
-                                                                <p className="text-[10px] text-gray-400 mt-0.5">{v.bankName}{v.bankAccount ? ` · Acc: ${v.bankAccount}` : ''}</p>
-                                                            )}
-                                                        </button>
-                                                    ))}
-                                                {vendors.filter((v: any) => v.name.toLowerCase().includes(vendorSearch.toLowerCase())).length === 0 && !vendorSearch && (
-                                                    <p className="text-center text-xs text-gray-400 py-4">No vendors yet. Type a name to use manually.</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {isVendorOpen && <div className="fixed inset-0 z-40" onClick={() => setIsVendorOpen(false)} />}
-                                </div>
-                                {vendor && (
-                                    <button type="button" onClick={() => { setVendor(""); setSelectedVendorId(""); }} className="text-[10px] text-rose-500 mt-1.5 hover:underline">
-                                        Clear vendor
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 4: Payment Method */}
-                    <div>
-                        <h3 className="text-xs font-bold text-gray-900 border-b border-gray-200 pb-2 mb-1">Payment method</h3>
-                        <p className="text-xs text-gray-400 mb-4">How should this be paid when approved? Finance will use this to prepare the right channel.</p>
-                        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-4">
+                {/* ── Approval flow ── */}
+                <div className="px-5 pb-6 mt-auto" style={{ borderTop: '1px solid rgba(0,0,0,0.07)', paddingTop: '16px' }}>
+                    <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400 mb-4">Approval Flow</p>
+                    <div className="relative">
+                        {/* Vertical connector line */}
+                        <div className="absolute left-[8px] top-5 bottom-5 w-px bg-gray-100" />
+                        <div className="space-y-5">
                             {[
-                                { value: 'MPESA_TILL', label: 'M-Pesa Till', img: '/pay/Mpesa-Logo.png' },
-                                { value: 'MPESA_PAYBILL', label: 'M-Pesa Paybill', img: '/pay/Mpesa-Logo.png' },
-                                { value: 'BANK_TRANSFER', label: 'Bank Transfer', img: '/pay/accepted.png' },
-                                { value: 'AIRTEL_MONEY', label: 'Airtel Money', img: '/pay/Airtel-Logo.png' },
-                                { value: 'CASH', label: 'Cash', img: '/pay/money-stack.png' },
-                                { value: 'CHEQUE', label: 'Cheque', img: '/pay/cheque.png' },
-                            ].map(opt => (
-                                <button
-                                    key={opt.value}
-                                    type="button"
-                                    onClick={() => { setPaymentMethod(opt.value); setPaymentReference(""); }}
-                                    className={`relative flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentMethod === opt.value
-                                        ? 'border-[#29258D] bg-[#29258D]/5 shadow-sm'
-                                        : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    {paymentMethod === opt.value && (
-                                        <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-[#29258D] flex items-center justify-center">
-                                            <PiCheckCircle className="text-white text-[8px]" />
-                                        </div>
-                                    )}
-                                    <div className="w-8 h-8 relative flex items-center justify-center">
-                                        <Image
-                                            src={opt.img}
-                                            alt={opt.label}
-                                            width={32}
-                                            height={32}
-                                            className="object-contain w-full h-full"
-                                        />
+                                { label: 'Draft created',     sub: 'Submission ready',    done: true },
+                                { label: 'Manager review',    sub: 'Awaiting submission', done: false },
+                                { label: 'Finance approval',  sub: 'Budget verification', done: false },
+                                { label: 'Payment processed', sub: 'Via selected channel',done: false },
+                            ].map((step, idx) => (
+                                <div key={idx} className="flex items-start gap-3 relative">
+                                    <div className={`w-[17px] h-[17px] rounded-full flex items-center justify-center shrink-0 mt-0.5 relative z-10 ${
+                                        step.done ? 'bg-emerald-500' : 'bg-white'
+                                    }`} style={{ border: step.done ? 'none' : '1.5px solid #e5e7eb' }}>
+                                        {step.done && <PiCheckCircle className="text-white text-[11px]" />}
                                     </div>
-                                    <span className={`text-[10px] font-bold text-center leading-tight ${paymentMethod === opt.value ? 'text-[#29258D]' : 'text-gray-500'}`}>
-                                        {opt.label}
-                                    </span>
-                                </button>
+                                    <div>
+                                        <p className={`text-[12px] font-[500] leading-tight ${step.done ? 'text-gray-800' : 'text-gray-400'}`}>
+                                            {step.label}
+                                        </p>
+                                        <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>
+                                    </div>
+                                </div>
                             ))}
                         </div>
-
-                        {paymentMethod && paymentMethod !== 'CASH' && (
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                    {paymentMethod === 'MPESA_TILL' && 'M-Pesa Till Number'}
-                                    {paymentMethod === 'MPESA_PAYBILL' && 'Paybill Number & Account Number'}
-                                    {paymentMethod === 'BANK_TRANSFER' && 'Bank Account Number'}
-                                    {paymentMethod === 'AIRTEL_MONEY' && 'Airtel Money Phone Number'}
-                                    {paymentMethod === 'CHEQUE' && 'Cheque / Reference Number'}
-                                </label>
-                                <input
-                                    type="text"
-                                    value={paymentReference}
-                                    onChange={(e) => setPaymentReference(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all font-mono tracking-wide"
-                                    placeholder={
-                                        paymentMethod === 'MPESA_TILL' ? 'e.g. 123456' :
-                                            paymentMethod === 'MPESA_PAYBILL' ? 'e.g. 247247 / account number' :
-                                                paymentMethod === 'BANK_TRANSFER' ? 'e.g. 01234567890000' :
-                                                    paymentMethod === 'AIRTEL_MONEY' ? 'e.g. +254 712 345 678' :
-                                                        'Reference number'
-                                    }
-                                />
-                            </div>
-                        )}
                     </div>
                 </div>
-
-                {/* Footer */}
-                <div className="h-[88px] px-6 bg-white border-t border-gray-200 flex items-center justify-end gap-3 rounded-b-xl">
-                    <Link
-                        href="/dashboard/requisitions"
-                        className="px-4 py-2.5 rounded-md text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
-                    >
-                        Cancel
-                    </Link>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-6 py-2.5 bg-[#29258D] text-white rounded-md font-medium text-xs hover:bg-[#29258D]/90 transition-all disabled:opacity-50 flex items-center gap-2"
-                    >
-                        {isSubmitting ? "Submitting..." : (
-                            <>
-                                <PiCheckCircle className="text-sm" />
-                                Submit Requisition
-                            </>
-                        )}
-                    </button>
-                </div>
-            </form>
-
-            {/* Access Denied Modal */}
-            {showAccessDenied && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden scale-100 animate-in zoom-in-95 duration-200">
-                        <div className="p-6 text-center">
-                            <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <span className="text-2xl">😔</span>
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">Access Restricted</h3>
-                            <p className="text-sm text-gray-500 mb-6">
-                                Sorry, you cannot access this service at the moment. Please request an admin for access.
-                            </p>
-                            <button
-                                onClick={() => setShowAccessDenied(false)}
-                                className="w-full py-2.5 bg-gray-900 text-white rounded-lg text-sm font-bold hover:bg-gray-800 transition-colors"
-                            >
-                                Dismiss
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            </div>
         </div>
+    );
+}
+
+export default function NewRequisitionPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center text-gray-400 text-sm">Loading…</div>
+        }>
+            <NewRequisitionForm />
+        </Suspense>
     );
 }

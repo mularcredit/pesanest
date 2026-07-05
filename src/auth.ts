@@ -3,6 +3,21 @@ import Credentials from "next-auth/providers/credentials"
 import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import { totp as totpUtil } from "@/lib/totp"
+
+const LOCKOUT_THRESHOLD = 5;  // failed attempts before lockout
+const LOCKOUT_MINUTES = 15;
+
+async function recordLoginEvent(params: {
+    userId?: string; email: string; success: boolean;
+    ipAddress?: string; userAgent?: string; reason?: string;
+}) {
+    try {
+        await (prisma as any).loginEvent.create({ data: params });
+    } catch {
+        console.error('[LoginEvent] Failed to record login event');
+    }
+}
 
 // Centralised legacy role → permissions map (used in both authorize and session callbacks)
 const LEGACY_PERMISSIONS: Record<string, string[]> = {
@@ -60,14 +75,16 @@ const LEGACY_PERMISSIONS: Record<string, string[]> = {
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Credentials({
-            async authorize(credentials) {
-                console.log("Authorize attempt for:", credentials?.email);
+            async authorize(credentials, request) {
+                const ipAddress = (request as any)?.headers?.get?.('x-forwarded-for') || undefined;
+                const userAgent = (request as any)?.headers?.get?.('user-agent') || undefined;
+
                 const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
+                    .object({ email: z.string().email(), password: z.string().min(6), totp: z.string().optional() })
                     .safeParse(credentials)
 
                 if (parsedCredentials.success) {
-                    const { email, password } = parsedCredentials.data
+                    const { email, password, totp } = parsedCredentials.data
 
                     // Fetch user with Custom Role and Permissions
                     const user = await prisma.user.findUnique({
@@ -83,42 +100,71 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                                 }
                             }
                         }
-                    })
+                    }) as any
 
                     if (!user) {
-                        console.log("User not found:", email);
+                        await recordLoginEvent({ email, success: false, ipAddress, userAgent, reason: 'USER_NOT_FOUND' });
                         return null
                     }
 
-                    if (user && (user.accountStatus === 'PENDING' || !user.isActive)) {
-                        console.log("User account pending or inactive:", email);
+                    // Account lockout check
+                    if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+                        await recordLoginEvent({ userId: user.id, email, success: false, ipAddress, userAgent, reason: 'ACCOUNT_LOCKED' });
+                        return null;
+                    }
+
+                    if (user.accountStatus === 'PENDING' || !user.isActive) {
+                        await recordLoginEvent({ userId: user.id, email, success: false, ipAddress, userAgent, reason: 'ACCOUNT_INACTIVE' });
                         return null;
                     }
 
                     const passwordsMatch = await bcrypt.compare(password, user.password)
-                    if (passwordsMatch) {
-                        console.log("Password match for:", email);
-
-                        let permissions: string[] = [];
-
-                        if (user.customRole) {
-                            // Custom role permissions take priority
-                            permissions = user.customRole.permissions.map(rp =>
-                                `${rp.permission.resource}.${rp.permission.action}`
-                            );
-                        } else {
-                            // Fallback to legacy role-based permissions
-                            permissions = LEGACY_PERMISSIONS[user.role] || [];
-                        }
-
-                        return {
-                            ...user,
-                            permissions
-                        };
+                    if (!passwordsMatch) {
+                        // Increment failed attempts
+                        const attempts = (user.failedLoginAttempts || 0) + 1;
+                        const lockout = attempts >= LOCKOUT_THRESHOLD
+                            ? { lockedUntil: new Date(Date.now() + LOCKOUT_MINUTES * 60_000) }
+                            : {};
+                        await prisma.user.update({
+                            where: { id: user.id },
+                            data: { failedLoginAttempts: attempts, ...lockout } as any
+                        });
+                        await recordLoginEvent({ userId: user.id, email, success: false, ipAddress, userAgent, reason: 'WRONG_PASSWORD' });
+                        return null;
                     }
-                    console.log("Password mismatch for:", email);
+
+                    // TOTP check if enabled
+                    if (user.totpEnabled) {
+                        if (!totp) {
+                            await recordLoginEvent({ userId: user.id, email, success: false, ipAddress, userAgent, reason: 'TOTP_REQUIRED' });
+                            return null;
+                        }
+                        const validTotp = totpUtil.verify({ token: totp, secret: user.totpSecret });
+                        if (!validTotp) {
+                            await recordLoginEvent({ userId: user.id, email, success: false, ipAddress, userAgent, reason: 'WRONG_TOTP' });
+                            return null;
+                        }
+                    }
+
+                    // Reset failed attempts on successful login
+                    await prisma.user.update({
+                        where: { id: user.id },
+                        data: { failedLoginAttempts: 0, lockedUntil: null } as any
+                    });
+                    await recordLoginEvent({ userId: user.id, email, success: true, ipAddress, userAgent });
+
+                    let permissions: string[] = [];
+                    if (user.customRole) {
+                        permissions = user.customRole.permissions.map((rp: any) =>
+                            `${rp.permission.resource}.${rp.permission.action}`
+                        );
+                    } else {
+                        permissions = LEGACY_PERMISSIONS[user.role] || [];
+                    }
+
+                    return { ...user, permissions };
                 } else {
-                    console.log("Invalid credentials format:", parsedCredentials.error.format());
+                    await recordLoginEvent({ email: (credentials?.email as string) || '', success: false, reason: 'INVALID_FORMAT' });
                 }
 
                 return null

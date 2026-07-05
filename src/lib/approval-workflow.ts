@@ -52,27 +52,7 @@ export class ApprovalWorkflowEngine {
             },
             approvers: []
         },
-        {
-            id: 'rule-ssca-strict',
-            name: 'South Sudan CA - Strict',
-            priority: 0,
-            conditions: {
-                requisitionType: 'SOUTH_SUDAN_STRICT'
-            },
-            approvers: [
-                { level: 1, role: 'FINANCE_APPROVER', required: true },
-                { level: 2, role: 'SYSTEM_ADMIN', required: true }
-            ]
-        },
-        {
-            id: 'rule-ssca',
-            name: 'South Sudan CA - Expedited',
-            priority: 0, // High priority
-            conditions: {
-                requisitionType: 'SOUTH_SUDAN'
-            },
-            approvers: [] // Auto-approve / Fast Track
-        },
+
         {
             id: 'rule-standard-approval',
             name: 'Standard Approval Chain',
@@ -99,15 +79,7 @@ export class ApprovalWorkflowEngine {
         requisitionType?: string,
         regionId?: string
     ): Promise<ApprovalRoute> {
-        // 0. Immediate bypass for SSCA Expedited (Hard rule)
-        if (requisitionType === 'SOUTH_SUDAN') {
-            return {
-                levels: [],
-                estimatedDays: 0,
-                autoApprove: true,
-                reason: 'South Sudan CA - Expedited Path (Bypassed Rules)'
-            };
-        }
+
 
         // 1. Check for Dynamic Auto-Approval Policies in DB
         const autoApprovalPolicies = await prisma.policy.findMany({
@@ -115,6 +87,12 @@ export class ApprovalWorkflowEngine {
                 type: 'AUTO_APPROVAL',
                 isActive: true
             }
+        });
+
+        // Parallelize initial checks context
+        const userPromise = prisma.user.findUnique({
+            where: { id: userId },
+            include: { manager: true }
         });
 
         for (const policy of autoApprovalPolicies) {
@@ -125,7 +103,7 @@ export class ApprovalWorkflowEngine {
                         levels: [],
                         estimatedDays: 0,
                         autoApprove: true,
-                        reason: `Auto-approved by policy: ${policy.name} (Threshold: $${rules.amountMax})`
+                        reason: `Auto-approved by policy: ${policy.name} (Threshold: KES ${rules.amountMax})`
                     };
                 }
             } catch (e) {
@@ -169,13 +147,8 @@ export class ApprovalWorkflowEngine {
             };
         }
 
-        // Get user's manager and build approval chain
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: {
-                manager: true
-            }
-        });
+        // Get user context (we might have already started this promise above)
+        const user = await userPromise;
 
         const levels = await Promise.all(
             matchingRule.approvers.map(async (approverRule) => {
@@ -295,21 +268,21 @@ export class ApprovalWorkflowEngine {
             return [];
         }
 
-        const approvals = [];
-
-        for (const level of route.levels) {
-            for (const approver of level.approvers) {
-                const approval = await prisma.approval.create({
+        // Parallelize all approval creations
+        const approvalPromises = route.levels.flatMap(level =>
+            level.approvers.map(approver =>
+                prisma.approval.create({
                     data: {
                         expenseId,
                         approverId: approver.id,
                         level: level.level,
                         status: 'PENDING'
                     }
-                });
-                approvals.push(approval);
-            }
-        }
+                })
+            )
+        );
+
+        const approvals = await Promise.all(approvalPromises);
 
         // Update expense status
         await prisma.expense.update({
@@ -332,21 +305,21 @@ export class ApprovalWorkflowEngine {
             return [];
         }
 
-        const approvals = [];
-
-        for (const level of route.levels) {
-            for (const approver of level.approvers) {
-                const approval = await prisma.approval.create({
+        // Parallelize all requisition approval creations
+        const approvalPromises = route.levels.flatMap(level =>
+            level.approvers.map(approver =>
+                prisma.approval.create({
                     data: {
                         requisitionId,
                         approverId: approver.id,
                         level: level.level,
                         status: 'PENDING'
                     }
-                });
-                approvals.push(approval);
-            }
-        }
+                })
+            )
+        );
+
+        const approvals = await Promise.all(approvalPromises);
 
         return approvals;
     }
@@ -363,28 +336,28 @@ export class ApprovalWorkflowEngine {
             return [];
         }
 
-        const approvals = [];
-
-        for (const level of route.levels) {
-            for (const approver of level.approvers) {
-                const approval = await prisma.approval.create({
+        // Parallelize all budget approval creations
+        const approvalPromises = route.levels.flatMap(level =>
+            level.approvers.map(approver =>
+                prisma.approval.create({
                     data: {
                         monthlyBudgetId: budgetId,
                         approverId: approver.id,
                         level: level.level,
                         status: 'PENDING'
                     }
-                });
-                approvals.push(approval);
-            }
-        }
+                })
+            )
+        );
+
+        const approvals = await Promise.all(approvalPromises);
 
         return approvals;
     }
 
     async processApproval(
         approvalId: string,
-        decision: 'APPROVED' | 'REJECTED',
+        decision: 'APPROVED' | 'REJECTED' | 'ADJUSTMENT',
         comments?: string,
         isOverride: boolean = false,
         actualApproverId?: string
@@ -425,10 +398,11 @@ export class ApprovalWorkflowEngine {
 
         // Handle Expense Approval
         if (approval.expense) {
-            if (decision === 'REJECTED' || isOverride) {
+            if (decision === 'REJECTED' || decision === 'ADJUSTMENT' || isOverride) {
+                const finalStatus = decision === 'APPROVED' ? 'APPROVED' : (decision === 'ADJUSTMENT' ? 'ADJUSTMENT_REQUIRED' : 'REJECTED');
                 await prisma.expense.update({
                     where: { id: approval.expenseId! },
-                    data: { status: decision === 'APPROVED' ? 'APPROVED' : 'REJECTED' }
+                    data: { status: finalStatus }
                 });
 
                 if (isOverride) {
@@ -455,10 +429,11 @@ export class ApprovalWorkflowEngine {
 
         // Handle Requisition Approval
         if (approval.requisition) {
-            if (decision === 'REJECTED' || isOverride) {
+            if (decision === 'REJECTED' || decision === 'ADJUSTMENT' || isOverride) {
+                const finalStatus = decision === 'APPROVED' ? 'APPROVED' : (decision === 'ADJUSTMENT' ? 'ADJUSTMENT_REQUIRED' : 'REJECTED');
                 await prisma.requisition.update({
                     where: { id: approval.requisitionId! },
-                    data: { status: decision === 'APPROVED' ? 'APPROVED' : 'REJECTED' }
+                    data: { status: finalStatus }
                 });
 
                 if (isOverride) {
@@ -484,10 +459,11 @@ export class ApprovalWorkflowEngine {
 
         // Handle Budget Approval
         if (approval.monthlyBudget) {
-            if (decision === 'REJECTED' || isOverride) {
+            if (decision === 'REJECTED' || decision === 'ADJUSTMENT' || isOverride) {
+                const finalStatus = decision === 'APPROVED' ? 'APPROVED' : (decision === 'ADJUSTMENT' ? 'ADJUSTMENT_REQUIRED' : 'REJECTED');
                 await (prisma as any).monthlyBudget.update({
                     where: { id: approval.monthlyBudgetId! },
-                    data: { status: decision === 'APPROVED' ? 'APPROVED' : 'REJECTED' }
+                    data: { status: finalStatus }
                 });
 
                 if (isOverride) {

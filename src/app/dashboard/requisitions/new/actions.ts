@@ -8,7 +8,7 @@ import { z } from "zod";
 const RequisitionSchema = z.object({
     title: z.string().min(5, "Title must be at least 5 characters"),
     amount: z.coerce.number().positive("Amount must be positive"),
-    currency: z.string().default("USD"),
+    currency: z.string().default('KES'),
     category: z.string().min(1, "Please select a category"),
     description: z.string().min(10, "Justification must be at least 10 characters"),
 });
@@ -36,21 +36,27 @@ export async function createRequisition(formData: FormData) {
         };
     }
 
-    const closureCheck = await checkEnforceClosure(session.user.id);
+    const { title, amount, currency, category, description } = validatedFields.data;
+
+    // Parallelize all validation checks and user metadata fetching
+    const [closureCheck, policyResult, user] = await Promise.all([
+        checkEnforceClosure(session.user.id),
+        checkExpensePolicies({
+            title,
+            amount,
+            category,
+            expenseDate: new Date(),
+            userId: session.user.id
+        }),
+        prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { branchId: true, regionId: true, leadBranch: { select: { regionId: true } } }
+        })
+    ]);
+
     if (closureCheck.blocked) {
         return { message: closureCheck.message };
     }
-
-    const { title, amount, currency, category, description } = validatedFields.data;
-
-    // Run Policy Checks (only blocking rules matter for Requisitions as they are always PENDING)
-    const policyResult = await checkExpensePolicies({
-        title,
-        amount,
-        category,
-        expenseDate: new Date(),
-        userId: session.user.id
-    });
 
     if (!policyResult.isValid) {
         const blockers = policyResult.violations.filter(v => v.isBlocking).map(v => v.message);
@@ -86,12 +92,6 @@ export async function createRequisition(formData: FormData) {
     }
 
     const expectedDate = expectedDateStr ? new Date(expectedDateStr) : undefined;
-
-    // Fetch user to check if they have a branchId (e.g., Team Leader)
-    const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { branchId: true, regionId: true, leadBranch: { select: { regionId: true } } }
-    });
 
     const userRegionId = user?.regionId || user?.leadBranch?.regionId;
 

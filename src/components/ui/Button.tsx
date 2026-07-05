@@ -6,20 +6,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-[5px] text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center whitespace-nowrap rounded-[5px] text-sm font-normal ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
     {
         variants: {
             variant: {
-                default: "bg-[#29258D] text-white hover:bg-[#29258D]/90 shadow-sm",
+                default: "bg-[var(--p)] text-white hover:bg-[var(--p)]/90 ",
                 secondary:
-                    "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 shadow-sm",
+                    "bg-[var(--sidebar)] text-[var(--t2)] border border-[var(--p-line)] hover:bg-[var(--glass)] ",
                 outline:
-                    "border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900",
-                ghost: "hover:bg-gray-100 hover:text-gray-900",
-                link: "text-[#29258D] underline-offset-4 hover:underline",
-                premium: "bg-gradient-to-r from-emerald-400 to-cyan-400 text-white hover:brightness-110 shadow-lg shadow-emerald-500/25 border border-white/10",
-                destructive: "bg-red-500/10 text-red-600 border border-red-500/20 hover:bg-red-500/20",
-                success: "bg-green-600 text-white hover:bg-green-700 shadow-sm border border-green-700/10",
+                    "border border-[var(--p-line)] bg-[var(--sidebar)] hover:bg-[var(--glass-h)] hover:text-[var(--t1)]",
+                ghost: "hover:bg-[var(--glass-h)] hover:text-[var(--t1)]",
+                link: "text-[var(--p)] underline-offset-4 hover:underline",
+                premium: "bg-gradient-to-r from-[var(--p)] to-[var(--p-soft)] text-white hover:brightness-110 shadow-lg shadow-[var(--p)]/25 border border-white/10",
+                destructive: "bg-[var(--red)]/10 text-[var(--red)] border border-[var(--red)]/20 hover:bg-[var(--red)]/20",
+                success: "bg-[var(--green)]/20 text-[var(--green)] hover:bg-[var(--green)]/30 border border-[var(--green)]/20",
             },
             size: {
                 default: "h-10 px-4 py-2",

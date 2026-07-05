@@ -26,7 +26,7 @@ export const CreditNoteTemplate: React.FC<CreditNoteProps> = ({
 }) => {
     const formattedAmount = new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'KES',
     }).format(amount);
 
     const formattedDate = date.toLocaleDateString('en-GB', {
@@ -126,7 +126,7 @@ export const CreditNoteTemplate: React.FC<CreditNoteProps> = ({
                 <div className="flex justify-between items-center mb-[20px] pb-[4px] border-b border-[#eee] text-[9px] text-[#555]">
                     <div className="flex-1 text-left font-bold text-[#333]">
                         <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Site</strong>
-                        https://sscaa.eservices.gov.ss
+                        www.pesanest.com
                     </div>
                     <div className="flex-1 text-center font-bold text-[#333]">
                         <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Contact Number</strong>
@@ -134,7 +134,7 @@ export const CreditNoteTemplate: React.FC<CreditNoteProps> = ({
                     </div>
                     <div className="flex-1 text-right font-bold text-[#333]">
                         <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Email</strong>
-                        ans-sscaa@eservices.gov.ss
+                        support@pesanest.com
                     </div>
                 </div>
 
@@ -192,7 +192,7 @@ export const CreditNoteTemplate: React.FC<CreditNoteProps> = ({
                             <tr>
                                 <th className="bg-[#236A9E] text-white text-left p-[10px_12px] text-[11px] uppercase font-semibold w-1/2">Description</th>
                                 <th className="bg-[#236A9E] text-white text-left p-[10px_12px] text-[11px] uppercase font-semibold">Period</th>
-                                <th className="bg-[#236A9E] text-white text-right p-[10px_12px] text-[11px] uppercase font-semibold">Amount (USD)</th>
+                                <th className="bg-[#236A9E] text-white text-right p-[10px_12px] text-[11px] uppercase font-semibold">Amount (KES)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -219,7 +219,7 @@ export const CreditNoteTemplate: React.FC<CreditNoteProps> = ({
                                 <span>0.00</span>
                             </div>
                             <div className="flex justify-between mt-[4px] pt-[8px] border-t-2 border-[#e2e8f0] font-bold text-[16px] text-[#236A9E]">
-                                <span>Total Credit USD</span>
+                                <span>Total Credit KES</span>
                                 <span>{formattedAmount}</span>
                             </div>
                         </div>

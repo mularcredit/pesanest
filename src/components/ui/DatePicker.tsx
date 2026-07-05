@@ -78,17 +78,17 @@ export function DatePicker({ value, onChange, label, placeholder = "Select date"
 
     return (
         <div className={`relative ${className}`} ref={containerRef}>
-            {label && <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 pl-1">{label}</label>}
+            {label && <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5 pl-1">{label}</label>}
 
             {/* Input Trigger */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-3 w-full h-[48px] px-4 bg-white border border-gray-200 rounded-[5px] cursor-pointer transition-all group select-none
-                    ${isOpen ? 'ring-1 ring-[#29258D] border-[#29258D]' : 'hover:border-gray-400'}
+                className={`flex items-center gap-3 w-full min-h-[44px] px-4 py-2.5 bg-white border border-gray-200 rounded-[10px] cursor-pointer transition-all group select-none
+                    ${isOpen ? 'ring-2 ring-[#6366F1]/10 border-[#6366F1]' : 'hover:border-gray-300'}
                 `}
             >
-                <PiCalendar className={`text-lg transition-colors ${isOpen ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-500'}`} />
-                <span className={`font-medium ${value ? 'text-gray-900' : 'text-gray-400'} ${className?.includes('text-xs') ? 'text-xs' : 'text-sm'}`}>
+                <PiCalendar className={`text-lg transition-colors shrink-0 ${isOpen ? 'text-[#6366F1]' : 'text-gray-400 group-hover:text-indigo-500'}`} />
+                <span className={`font-medium truncate ${value ? 'text-gray-900' : 'text-gray-400'} ${className?.includes('text-xs') ? 'text-xs' : 'text-sm'}`}>
                     {value ? format(value, "MMM dd, yyyy") : placeholder}
                 </span>
             </div>
@@ -120,7 +120,7 @@ export function DatePicker({ value, onChange, label, placeholder = "Select date"
                                 <button
                                     type="button"
                                     onClick={() => setViewMode(viewMode === 'month' ? 'day' : 'month')}
-                                    className={`text-sm font-bold px-2 py-1 rounded-lg transition-colors flex items-center gap-1
+                                    className={`text-sm font-semibold px-2 py-1 rounded-lg transition-colors flex items-center gap-1
                                         ${viewMode === 'month' ? 'bg-gray-100 text-indigo-600' : 'text-gray-900 hover:bg-gray-50'}
                                     `}
                                 >
@@ -131,7 +131,7 @@ export function DatePicker({ value, onChange, label, placeholder = "Select date"
                                 <button
                                     type="button"
                                     onClick={() => setViewMode(viewMode === 'year' ? 'day' : 'year')}
-                                    className={`text-sm font-bold px-2 py-1 rounded-lg transition-colors flex items-center gap-1
+                                    className={`text-sm font-semibold px-2 py-1 rounded-lg transition-colors flex items-center gap-1
                                         ${viewMode === 'year' ? 'bg-gray-100 text-indigo-600' : 'text-gray-900 hover:bg-gray-50'}
                                     `}
                                 >
@@ -162,7 +162,7 @@ export function DatePicker({ value, onChange, label, placeholder = "Select date"
                                 >
                                     <div className="grid grid-cols-7 mb-2">
                                         {weekDays.map(day => (
-                                            <div key={day} className="text-center text-[10px] font-bold text-gray-400 uppercase">
+                                            <div key={day} className="text-center text-[10px] font-semibold text-gray-400 uppercase">
                                                 {day}
                                             </div>
                                         ))}
@@ -181,7 +181,7 @@ export function DatePicker({ value, onChange, label, placeholder = "Select date"
                                                         h-8 w-8 rounded-lg flex items-center justify-center text-xs font-medium transition-all relative
                                                         ${!isCurrentMonth ? 'text-gray-300' : 'text-gray-700 hover:bg-gray-100'}
                                                         ${isSelected ? '!bg-indigo-600 !text-white' : ''}
-                                                        ${isTodayDate && !isSelected ? 'text-indigo-600 font-bold bg-indigo-50' : ''}
+                                                        ${isTodayDate && !isSelected ? 'text-indigo-600 font-semibold bg-indigo-50' : ''}
                                                     `}
                                                 >
                                                     {format(day, "d")}
@@ -248,7 +248,7 @@ export function DatePicker({ value, onChange, label, placeholder = "Select date"
                                 <button
                                     type="button"
                                     onClick={() => { onChange(new Date()); setIsOpen(false); }}
-                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline"
+                                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
                                 >
                                     Jump to Today
                                 </button>

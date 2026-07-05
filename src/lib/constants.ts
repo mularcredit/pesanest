@@ -1,49 +1,33 @@
-export const EXPENSE_CATEGORIES = [
-    // Fixed Recurring Expenses
-    "Rent",
-    "Internet & Connectivity",
-    "Airtime & Communication",
-    "Fuel Allocation",
-    "Hired Bike Payments",
-
-    // Operational Expenses
-    "Stationery",
-    "Office Supplies",
-    "Meetings & Conferences",
-    "Accommodation",
-    "Emergency Field Expenses",
-
-    // Petty Cash Expenses
-    "Electricity",
-    "Fuel",
-    "Repairs",
-    "Maintenance",
-
-    // Procurement Expenses
-    "ICT Equipment",
-    "Furniture",
-    "Hardware",
-    "Water",
-
-    // General / Other
-    "Operations",
-    "Salaries & Wages",
-    "Travel & Transport",
-    "Meals & Hospitality",
-    "Per Diem / Allowance",
-    "Casual Labor",
-    "Utilities (Water, Power)",
-    "Vehicle Maintenance",
-    "Security Services",
-    "Permits & Licenses",
-    "Marketing & Branding",
-    "Software & Subscriptions",
-    "Equipment & Repairs",
-    "Professional Services",
-    "Medical & Welfare",
-    "Bank Charges",
-    "Other"
+export const EXPENSE_CATEGORIES_WITH_GROUPS = [
+    {
+        group: "Fixed Recurring",
+        items: ["Rent", "Internet & Connectivity", "Airtime & Communication", "Fuel Allocation", "Hired Bike Payments"]
+    },
+    {
+        group: "Operational",
+        items: ["Stationery", "Office Supplies", "Meetings & Conferences", "Accommodation", "Emergency Field Expenses"]
+    },
+    {
+        group: "Petty Cash",
+        items: ["Electricity", "Fuel", "Repairs", "Maintenance", "Water"]
+    },
+    {
+        group: "Procurement",
+        items: ["ICT Equipment", "Furniture", "Hardware"]
+    },
+    {
+        group: "General / Other",
+        items: [
+            "Operations", "Salaries & Wages", "Travel & Transport", "Meals & Hospitality", 
+            "Per Diem / Allowance", "Casual Labor", "Utilities (Water, Power)", 
+            "Vehicle Maintenance", "Security Services", "Permits & Licenses", 
+            "Marketing & Branding", "Software & Subscriptions", "Equipment & Repairs", 
+            "Professional Services", "Medical & Welfare", "Bank Charges", "Other"
+        ]
+    }
 ];
+
+export const EXPENSE_CATEGORIES = EXPENSE_CATEGORIES_WITH_GROUPS.flatMap(g => g.items);
 
 export type ExpenseCategory = typeof EXPENSE_CATEGORIES[number];
 

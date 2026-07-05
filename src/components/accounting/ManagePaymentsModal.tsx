@@ -173,7 +173,7 @@ export function ManagePaymentsModal({
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">
+                        <h2 className="text-xl font-semibold text-gray-900">
                             {editingPayment ? "Edit Payment" : "Payment History"}
                         </h2>
                         <p className="text-sm text-gray-500 font-medium flex items-center gap-2 mt-1">
@@ -195,23 +195,23 @@ export function ManagePaymentsModal({
                         <div className="space-y-6 animate-fade-in">
                             <button
                                 onClick={() => setEditingPayment(null)}
-                                className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 mb-4 transition-colors"
+                                className="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-800 mb-4 transition-colors"
                             >
                                 <PiArrowLeft /> Back to List
                             </button>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Amount ({editingPayment.currency})</label>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase">Amount ({editingPayment.currency})</label>
                                     <Input
                                         type="number"
                                         value={editForm.amount}
                                         onChange={e => setEditForm({ ...editForm, amount: e.target.value })}
-                                        className="h-11 border-gray-200 font-mono text-lg font-bold text-gray-900 bg-gray-50/50 focus:bg-white"
+                                        className="h-11 border-gray-200 font-mono text-lg font-semibold text-gray-900 bg-gray-50/50 focus:bg-white"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Payment Date</label>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase">Payment Date</label>
                                     <Input
                                         type="date"
                                         value={editForm.paymentDate}
@@ -220,7 +220,7 @@ export function ManagePaymentsModal({
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Method</label>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase">Method</label>
                                     <select
                                         value={editForm.method}
                                         onChange={e => setEditForm({ ...editForm, method: e.target.value })}
@@ -234,7 +234,7 @@ export function ManagePaymentsModal({
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Reference</label>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase">Reference</label>
                                     <Input
                                         value={editForm.reference}
                                         onChange={e => setEditForm({ ...editForm, reference: e.target.value })}
@@ -243,7 +243,7 @@ export function ManagePaymentsModal({
                                     />
                                 </div>
                                 <div className="col-span-1 sm:col-span-2 space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Notes</label>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase">Notes</label>
                                     <textarea
                                         value={editForm.notes}
                                         onChange={e => setEditForm({ ...editForm, notes: e.target.value })}
@@ -257,14 +257,14 @@ export function ManagePaymentsModal({
                                 <button
                                     onClick={() => setEditingPayment(null)}
                                     disabled={isSaving}
-                                    className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50 rounded-lg transition-colors"
+                                    className="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-50 rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={saveEdit}
                                     disabled={isSaving}
-                                    className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-bold shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all"
+                                    className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all"
                                 >
                                     {isSaving ? <PiSpinner className="animate-spin" /> : <PiFloppyDisk />}
                                     Save Changes
@@ -284,7 +284,7 @@ export function ManagePaymentsModal({
                                     <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
                                         <PiReceipt className="text-2xl text-gray-300" />
                                     </div>
-                                    <p className="text-sm font-bold text-gray-500">No payments recorded</p>
+                                    <p className="text-sm font-semibold text-gray-500">No payments recorded</p>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -296,10 +296,10 @@ export function ManagePaymentsModal({
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <span className="text-lg font-bold text-gray-900">
+                                                        <span className="text-lg font-semibold text-gray-900">
                                                             {payment.currency} {payment.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                         </span>
-                                                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                                                        <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
                                                             {payment.method.replace('_', ' ')}
                                                         </span>
                                                     </div>

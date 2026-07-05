@@ -13,15 +13,11 @@ export default async function PoliciesPage() {
     });
 
     return (
-        <div className="space-y-8 animate-fade-in-up pb-12">
-            <div className="flex items-end justify-between">
-                <div>
-                    <p className="text-gds-text-muted text-sm font-medium tracking-wide">
-                        Automated compliance rules & spend controls
-                    </p>
-                </div>
+        <div className="space-y-6 pb-24">
+            <div>
+                <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Policies</h1>
+                <p className="text-[12.5px] text-gray-400 mt-0.5">Automated compliance rules &amp; spend controls</p>
             </div>
-
             <PolicyManager policies={policies} />
         </div>
     );

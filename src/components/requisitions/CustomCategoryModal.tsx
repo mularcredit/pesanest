@@ -94,7 +94,7 @@ export function CustomCategoryModal({
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all"
+                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all"
                                     placeholder="e.g., IT Equipment"
                                 />
                             </div>
@@ -106,7 +106,7 @@ export function CustomCategoryModal({
                                 <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#29258D]/10 focus:border-[#29258D] transition-all resize-none"
+                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all resize-none"
                                     rows={2}
                                     placeholder="Brief description of this category..."
                                 />
@@ -115,7 +115,7 @@ export function CustomCategoryModal({
                             <button
                                 type="submit"
                                 disabled={isSubmitting || !name.trim()}
-                                className="w-full px-4 py-2.5 bg-[#29258D] text-white rounded-lg font-medium text-xs hover:bg-[#29258D]/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full px-4 py-2.5 bg-[#6366F1] text-white rounded-lg font-medium text-xs hover:bg-[#6366F1]/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 <PiPlus className="text-sm" />
                                 {isSubmitting ? "Creating..." : "Create Category"}

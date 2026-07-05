@@ -74,15 +74,20 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'No items selected' }, { status: 400 });
         }
 
-        // Calculate total
+        // Calculate total and determine currency
         let totalAmount = 0;
-        let currency = "USD"; // Assuming single currency for now
+        let currency = 'KES';
+        let currencyDetected = false;
 
         // Verify expenses
         if (expenseIds.length > 0) {
             const expenses = await prisma.expense.findMany({
                 where: { id: { in: expenseIds }, status: 'APPROVED' }
             });
+            if (expenses.length > 0 && !currencyDetected) {
+                currency = expenses[0].currency;
+                currencyDetected = true;
+            }
             totalAmount += expenses.reduce((sum, e) => sum + e.amount, 0);
         }
 
@@ -91,7 +96,11 @@ export async function POST(req: NextRequest) {
             const invoices = await prisma.invoice.findMany({
                 where: { id: { in: invoiceIds }, status: 'APPROVED' }
             });
-            totalAmount += invoices.reduce((sum, i) => sum + i.amount, 0);
+            if (invoices.length > 0 && !currencyDetected) {
+                currency = invoices[0].currency;
+                currencyDetected = true;
+            }
+            totalAmount += invoices.reduce((sum, i) => sum + Number(i.amount), 0);
         }
 
         // Verify Requisitions
@@ -99,6 +108,10 @@ export async function POST(req: NextRequest) {
             const requisitions = await prisma.requisition.findMany({
                 where: { id: { in: requisitionIds }, status: 'APPROVED' }
             });
+            if (requisitions.length > 0 && !currencyDetected) {
+                currency = requisitions[0].currency;
+                currencyDetected = true;
+            }
             totalAmount += requisitions.reduce((sum, r) => sum + r.amount, 0);
         }
 
@@ -107,6 +120,12 @@ export async function POST(req: NextRequest) {
             const budgets = await (prisma as any).monthlyBudget.findMany({
                 where: { id: { in: budgetIds }, status: 'APPROVED' }
             });
+            // Budgets are currently KES only in schema usually, but let's be safe
+            if (budgets.length > 0 && !currencyDetected) {
+                // If monthlyBudget doesn't have a currency field, it defaults to KES in calculations
+                currency = 'KES';
+                currencyDetected = true;
+            }
             totalAmount += budgets.reduce((sum: number, b: any) => sum + b.totalAmount, 0);
         }
 

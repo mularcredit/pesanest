@@ -1,15 +1,13 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
     PiX,
-    PiUser,
     PiEnvelope,
     PiPhone,
-    PiMapPin,
     PiIdentificationCard,
     PiGlobe,
     PiCaretDown,
@@ -19,19 +17,24 @@ import {
     PiUserCircle,
     PiPencilSimple
 } from "react-icons/pi";
-import { Input } from "@/components/ui/Input";
-import { PhoneInput } from "@/components/ui/PhoneInput";
 import { useToast } from "@/components/ui/ToastProvider";
 
+const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
+
 interface EditCustomerModalProps {
-    customer: any; // Using any for simplicity here, but should be typed ideally
+    customer: any;
 }
 
 export function EditCustomerModal({ customer }: EditCustomerModalProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const { showToast } = useToast();
+
+    useEffect(() => { setMounted(true); }, []);
 
     const [formData, setFormData] = useState({
         id: customer.id,
@@ -43,7 +46,7 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
         city: customer.city || "",
         country: customer.country || "",
         taxId: customer.taxId || "",
-        currency: customer.currency || "USD",
+        currency: customer.currency || 'KES',
         isActive: customer.isActive
     });
 
@@ -70,177 +73,219 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
         }
     };
 
+    const modal = mounted && isOpen ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/30" onClick={() => setIsOpen(false)} />
+            <div
+                className="relative bg-white w-full max-w-2xl max-h-[90vh] rounded-[12px] overflow-hidden flex flex-col"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}
+                onClick={e => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4"
+                    style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: '#FAFAFA' }}>
+                    <div>
+                        <h2 className="text-[15px] font-[600] text-gray-900">Edit Customer Details</h2>
+                        <p className="text-[11.5px] text-gray-400 mt-0.5">Update profile information for {customer.name}</p>
+                    </div>
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-[6px] transition-colors"
+                    >
+                        <PiX className="text-[18px]" />
+                    </button>
+                </div>
+
+                {/* Scrollable Body */}
+                <div className="overflow-y-auto p-6 space-y-5">
+                    <form id="edit-customer-form" onSubmit={handleSubmit} className="space-y-5">
+                        {/* Basic Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="md:col-span-2">
+                                <label className={LABEL_CLS}>Company Name</label>
+                                <div className="relative">
+                                    <PiBuildings className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                    <input
+                                        required
+                                        type="text"
+                                        className={INPUT_CLS + " pl-8"}
+                                        style={INPUT_STYLE}
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className={LABEL_CLS}>Email</label>
+                                <div className="relative">
+                                    <PiEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                    <input
+                                        type="email"
+                                        className={INPUT_CLS + " pl-8"}
+                                        style={INPUT_STYLE}
+                                        value={formData.email}
+                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className={LABEL_CLS}>Phone</label>
+                                <div className="relative">
+                                    <PiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                    <input
+                                        type="tel"
+                                        className={INPUT_CLS + " pl-8"}
+                                        style={INPUT_STYLE}
+                                        placeholder="+211 ..."
+                                        value={formData.phone}
+                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Address */}
+                        <div className="space-y-4 pt-4" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                            <div>
+                                <label className={LABEL_CLS}>Address</label>
+                                <textarea
+                                    className="w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white resize-none h-20"
+                                    style={INPUT_STYLE}
+                                    value={formData.address}
+                                    onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                    placeholder="Street Address..."
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className={LABEL_CLS}>City</label>
+                                    <input
+                                        type="text"
+                                        className={INPUT_CLS}
+                                        style={INPUT_STYLE}
+                                        value={formData.city}
+                                        onChange={e => setFormData({ ...formData, city: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={LABEL_CLS}>Country</label>
+                                    <div className="relative">
+                                        <PiGlobe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                        <input
+                                            type="text"
+                                            className={INPUT_CLS + " pl-8"}
+                                            style={INPUT_STYLE}
+                                            value={formData.country}
+                                            onChange={e => setFormData({ ...formData, country: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Additional Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4"
+                            style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                            <div>
+                                <label className={LABEL_CLS}>Contact Person</label>
+                                <div className="relative">
+                                    <PiUserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                    <input
+                                        type="text"
+                                        className={INPUT_CLS + " pl-8"}
+                                        style={INPUT_STYLE}
+                                        value={formData.contactPerson}
+                                        onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className={LABEL_CLS}>Tax ID / TIN</label>
+                                <div className="relative">
+                                    <PiIdentificationCard className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                    <input
+                                        type="text"
+                                        className={INPUT_CLS + " pl-8"}
+                                        style={INPUT_STYLE}
+                                        value={formData.taxId}
+                                        onChange={e => setFormData({ ...formData, taxId: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className={LABEL_CLS}>Currency</label>
+                                <div className="relative">
+                                    <select
+                                        className={INPUT_CLS + " appearance-none pr-8 cursor-pointer"}
+                                        style={INPUT_STYLE}
+                                        value={formData.currency}
+                                        onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                                    >
+                                        <option value="KES">KES - Kenyan Shilling</option>
+                                        <option value="USD">USD - US Dollar</option>
+                                        <option value="SSP">SSP - South Sudanese Pound</option>
+                                    </select>
+                                    <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[13px]" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className={LABEL_CLS}>Status</label>
+                                <div className="flex items-center gap-3 px-3 py-[10px] rounded-[6px]"
+                                    style={{ border: '1px solid rgba(0,0,0,0.09)', background: '#FAFAFA' }}>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.isActive}
+                                            onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
+                                            className="w-4 h-4 text-[#6366F1] rounded border-gray-300 focus:ring-[#6366F1]"
+                                        />
+                                        <span className="text-[13px] font-[500] text-gray-900">Active Customer</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 flex justify-end gap-3"
+                    style={{ borderTop: '1px solid rgba(0,0,0,0.07)', background: '#FAFAFA' }}>
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className="px-4 py-2 text-[12.5px] font-[500] text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-[6px] transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        form="edit-customer-form"
+                        disabled={isSubmitting}
+                        className="px-5 py-2 bg-[#6366F1] hover:bg-indigo-600 text-white text-[12.5px] font-[600] rounded-[6px] transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                        {isSubmitting ? <PiSpinner className="animate-spin" /> : <PiCheckCircle />}
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    ) : null;
+
     return (
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="text-gray-400 hover:text-indigo-600 transition-colors p-1 rounded-md hover:bg-indigo-50"
+                className="text-gray-400 hover:text-[#6366F1] transition-colors p-1.5 rounded-[6px] hover:bg-indigo-50"
                 title="Edit Details"
             >
-                <PiPencilSimple className="text-lg" />
+                <PiPencilSimple className="text-[15px]" />
             </button>
-
-            {isOpen && createPortal(
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/50 backdrop-blur-sm animate-fade-in">
-                    <div
-                        className="bg-white w-full max-w-2xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scale-in"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
-                            <div>
-                                <h2 className="text-lg font-bold text-gray-900">Edit Customer Details</h2>
-                                <p className="text-xs text-gray-500 mt-1">Update profile information for {customer.name}</p>
-                            </div>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-                            >
-                                <PiX className="text-xl" />
-                            </button>
-                        </div>
-
-                        {/* Scrollable Body */}
-                        <div className="overflow-y-auto p-6 space-y-6">
-                            <form id="edit-customer-form" onSubmit={handleSubmit} className="space-y-6">
-                                {/* Basic Info */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="md:col-span-2">
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Company Name</label>
-                                        <div className="relative">
-                                            <PiBuildings className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                            <Input
-                                                required
-                                                className="pl-9"
-                                                value={formData.name}
-                                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Email</label>
-                                        <div className="relative">
-                                            <PiEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                            <Input
-                                                type="email"
-                                                className="pl-9"
-                                                value={formData.email}
-                                                onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Phone</label>
-                                        <PhoneInput
-                                            value={formData.phone}
-                                            onChange={val => setFormData({ ...formData, phone: val })}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Address */}
-                                <div className="space-y-4 pt-4 border-t border-gray-100">
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Address</label>
-                                        <div className="relative">
-                                            <textarea
-                                                className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500 rounded-xl p-3 text-sm h-20 resize-none outline-none transition-all placeholder:text-gray-400"
-                                                value={formData.address}
-                                                onChange={e => setFormData({ ...formData, address: e.target.value })}
-                                                placeholder="Street Address..."
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">City</label>
-                                            <Input
-                                                value={formData.city}
-                                                onChange={e => setFormData({ ...formData, city: e.target.value })}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Country</label>
-                                            <div className="relative">
-                                                <PiGlobe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                                <Input
-                                                    className="pl-9"
-                                                    value={formData.country}
-                                                    onChange={e => setFormData({ ...formData, country: e.target.value })}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Additional Info */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Contact Person</label>
-                                        <div className="relative">
-                                            <PiUserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                            <Input
-                                                className="pl-9"
-                                                value={formData.contactPerson}
-                                                onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Tax ID / TIN</label>
-                                        <div className="relative">
-                                            <PiIdentificationCard className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                            <Input
-                                                className="pl-9"
-                                                value={formData.taxId}
-                                                onChange={e => setFormData({ ...formData, taxId: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Status</label>
-                                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                                            <label className="flex items-center gap-2 cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={formData.isActive}
-                                                    onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
-                                                    className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-                                                />
-                                                <span className="text-sm font-medium text-gray-900">Active Customer</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                form="edit-customer-form"
-                                disabled={isSubmitting}
-                                className="px-6 py-2 bg-[#29258D] hover:bg-[#1e1b66] text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
-                            >
-                                {isSubmitting ? <PiSpinner className="animate-spin" /> : <PiCheckCircle className="text-lg" />}
-                                Save Changes
-                            </button>
-                        </div>
-                    </div>
-                </div>,
-                document.body
-            )}
+            {modal}
         </>
     );
 }

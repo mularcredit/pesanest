@@ -2,42 +2,24 @@ import prisma from "@/lib/prisma";
 
 export async function checkEnforceClosure(userId: string): Promise<{ blocked: boolean; message?: string }> {
     try {
-        // 1. First check if user is an Admin - Admins are EXEMPT from closure restrictions
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { role: true }
-        });
+        // Parallelize all checks
+        const [user, setting, activeExpenses, activeReqs] = await Promise.all([
+            prisma.user.findUnique({ where: { id: userId }, select: { role: true } }),
+            (prisma as any).systemSetting.findUnique({ where: { key: 'enforce_request_closure' } }),
+            prisma.expense.count({ where: { userId, status: { notIn: ['CLOSED', 'REJECTED', 'PAID', 'COMPLETED', 'FULFILLED', 'APPROVED'] } } }),
+            (prisma as any).requisition.count({ where: { userId, status: { notIn: ['CLOSED', 'REJECTED', 'PAID', 'COMPLETED', 'FULFILLED', 'APPROVED'] } } })
+        ]);
 
+        // 1. If user is an Admin - Admins are EXEMPT
         const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'SYSTEM_ADMIN';
         if (isAdmin) return { blocked: false };
 
         // 2. Check the global setting
-        const setting = await (prisma as any).systemSetting.findUnique({
-            where: { key: 'enforce_request_closure' }
-        });
-
-        // Deactivated by default (unless strictly set to 'true')
         if (!setting || setting.value !== 'true') {
             return { blocked: false };
         }
 
-        // 3. Count active (non-finalized) requests
-        const DONE_STATUSES = ['CLOSED', 'REJECTED', 'PAID', 'COMPLETED', 'FULFILLED', 'APPROVED'];
-
-        const activeExpenses = await prisma.expense.count({
-            where: {
-                userId,
-                status: { notIn: DONE_STATUSES }
-            }
-        });
-
-        const activeReqs = await (prisma as any).requisition.count({
-            where: {
-                userId,
-                status: { notIn: DONE_STATUSES }
-            }
-        });
-
+        // 3. Check counts
         if (activeExpenses > 0 || activeReqs > 0) {
             return {
                 blocked: true,

@@ -1,18 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { createPortal } from "react-dom";
 import {
-    PiX,
-    PiCheckCircle,
-    PiCurrencyDollar,
-    PiCalendarBlank,
-    PiTag,
-    PiTrendUp,
-    PiWarningCircle
+    PiX, PiCheckCircle, PiMagnifyingGlass, PiCaretUpDown,
+    PiChartPieSlice, PiSpinner,
 } from "react-icons/pi";
-import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { EXPENSE_CATEGORIES } from "@/lib/constants";
 import { getExpenseAccountsAction } from "@/app/dashboard/requisitions/new/multi-item-actions";
 
@@ -22,225 +16,259 @@ interface CreateBudgetModalProps {
     onSuccess?: () => void;
 }
 
+const INPUT_CLASS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLASS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
+
 export function CreateBudgetModal({ isOpen, onClose, onSuccess }: CreateBudgetModalProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [frequency, setFrequency] = useState<"MONTHLY" | "WEEKLY">("MONTHLY");
-    const [amount, setAmount] = useState("");
-    const [category, setCategory] = useState("");
-    const [alertThreshold, setAlertThreshold] = useState("80");
+    const [frequency, setFrequency] = useState<'MONTHLY' | 'WEEKLY'>('MONTHLY');
+    const [amount, setAmount] = useState('');
+    const [category, setCategory] = useState('');
+    const [alertThreshold, setAlertThreshold] = useState('80');
     const [rollover, setRollover] = useState(false);
-    const [customAccountId, setCustomAccountId] = useState("");
+    const [customAccountId, setCustomAccountId] = useState('');
     const [expenseAccounts, setExpenseAccounts] = useState<any[]>([]);
 
+    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const [categorySearch, setCategorySearch] = useState('');
+    const [isAccountOpen, setIsAccountOpen] = useState(false);
+    const [accountSearch, setAccountSearch] = useState('');
+
     useEffect(() => {
-        if (isOpen) {
-            getExpenseAccountsAction().then(accs => setExpenseAccounts(accs));
-        }
+        if (isOpen) getExpenseAccountsAction().then(a => setExpenseAccounts(a));
     }, [isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false);
-            onSuccess?.();
-            onClose();
-        }, 1000);
+        await new Promise(r => setTimeout(r, 900));
+        setIsSubmitting(false);
+        onSuccess?.();
     };
+
+    const reset = () => {
+        setFrequency('MONTHLY'); setAmount(''); setCategory(''); setAlertThreshold('80');
+        setRollover(false); setCustomAccountId('');
+    };
+
+    const handleClose = () => { reset(); onClose(); };
 
     if (!isOpen) return null;
 
+    const filteredCategories = EXPENSE_CATEGORIES.filter(c =>
+        c.toLowerCase().includes(categorySearch.toLowerCase())
+    );
+    const filteredAccounts = expenseAccounts.filter(a =>
+        a.name.toLowerCase().includes(accountSearch.toLowerCase()) ||
+        a.code.toLowerCase().includes(accountSearch.toLowerCase())
+    );
+
     return createPortal(
-        <AnimatePresence>
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-gray-900/50 backdrop-blur-sm">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
-                >
-                    {/* Header */}
-                    <div className="h-[88px] px-6 bg-gradient-to-r from-green-100 to-white border-b border-gray-100 rounded-t-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center justify-center shrink-0">
-                                <Image src="/accounting.png" alt="Budget Icon" width={64} height={64} className="object-contain" />
-                            </div>
-                            <div>
-                                <h2 className="text-base font-bold text-gray-900">New Budget Rule</h2>
-                                <p className="text-xs text-gray-500">Set spending limits and alerts</p>
-                            </div>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/30" onClick={handleClose} />
+            <div className="relative bg-white rounded-[12px] w-full max-w-[460px] overflow-hidden flex flex-col max-h-[90vh] z-10"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 shrink-0"
+                    style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-[7px] bg-indigo-50 flex items-center justify-center">
+                            <PiChartPieSlice className="text-[#6366F1] text-[15px]" />
                         </div>
-                        <button
-                            onClick={onClose}
-                            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white/50 rounded-lg transition-colors"
-                        >
-                            <PiX className="text-lg" />
-                        </button>
+                        <div>
+                            <h2 className="text-[14px] font-[600] text-gray-900">New Budget Rule</h2>
+                            <p className="text-[11.5px] text-gray-400">Set a category spending limit</p>
+                        </div>
                     </div>
+                    <button onClick={handleClose}
+                        className="p-1.5 rounded-[5px] hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                        <PiX className="text-[15px]" />
+                    </button>
+                </div>
 
-                    {/* Body */}
-                    <form onSubmit={handleSubmit} className="p-6 space-y-6 bg-gray-50/50">
+                {/* Body */}
+                <form id="budget-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+                    <div className="px-6 py-5 space-y-5">
 
-                        {/* Frequency Toggle */}
-                        <div className="bg-white p-1 rounded-xl border border-gray-200 flex shadow-sm">
-                            <button
-                                type="button"
-                                onClick={() => setFrequency("MONTHLY")}
-                                className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${frequency === "MONTHLY"
-                                    ? "bg-indigo-600 text-white shadow-md"
-                                    : "text-gray-500 hover:bg-gray-50"
-                                    }`}
-                            >
-                                Monthly Budget
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setFrequency("WEEKLY")}
-                                className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${frequency === "WEEKLY"
-                                    ? "bg-indigo-600 text-white shadow-md"
-                                    : "text-gray-500 hover:bg-gray-50"
-                                    }`}
-                            >
-                                Weekly Budget
-                            </button>
+                        {/* Frequency toggle */}
+                        <div>
+                            <p className={LABEL_CLASS}>Cycle</p>
+                            <div className="flex rounded-[6px] overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                {(['MONTHLY', 'WEEKLY'] as const).map(f => (
+                                    <button key={f} type="button" onClick={() => setFrequency(f)}
+                                        className={cn("flex-1 py-2 text-[12.5px] font-[500] transition-colors",
+                                            frequency === f ? "bg-indigo-50 text-[#6366F1]" : "bg-white text-gray-500 hover:bg-gray-50")}
+                                        style={f === 'WEEKLY' ? { borderLeft: '1px solid rgba(0,0,0,0.09)' } : {}}>
+                                        {f === 'MONTHLY' ? 'Monthly' : 'Weekly'}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
-                        <div className="space-y-4">
-                            {/* Category */}
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                                    Expense Category
-                                </label>
-                                <div className="relative">
-                                    <PiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                    <select
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value)}
-                                        required
-                                        className="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 appearance-none transition-all cursor-pointer"
-                                    >
-                                        <option value="">Select Category...</option>
-                                        {EXPENSE_CATEGORIES.map((cat) => (
-                                            <option key={cat} value={cat}>{cat}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
+                        {/* Category */}
+                        <div className="relative">
+                            <label className={LABEL_CLASS}>Category <span className="text-rose-400">*</span></label>
+                            <button type="button" onClick={() => { setIsCategoryOpen(o => !o); setIsAccountOpen(false); }}
+                                className={cn(INPUT_CLASS, "flex items-center justify-between text-left")}
+                                style={INPUT_STYLE}>
+                                <span className={category ? 'text-gray-900' : 'text-gray-300'}>
+                                    {category || 'Select expense category…'}
+                                </span>
+                                <PiCaretUpDown className="text-gray-400 text-[14px] shrink-0" />
+                            </button>
+                            {isCategoryOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsCategoryOpen(false)} />
+                                    <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-[8px] z-50 overflow-hidden"
+                                        style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                                        <div className="p-2" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                                            <div className="relative">
+                                                <PiMagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                                <input autoFocus type="text" value={categorySearch}
+                                                    onChange={e => setCategorySearch(e.target.value)}
+                                                    placeholder="Search categories…"
+                                                    className="w-full rounded-[5px] pl-8 pr-3 py-1.5 text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                                                    style={{ border: '1px solid rgba(0,0,0,0.09)' }} />
+                                            </div>
+                                        </div>
+                                        <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
+                                            {filteredCategories.length === 0 ? (
+                                                <p className="text-[12px] text-gray-400 px-3 py-2">No categories found</p>
+                                            ) : filteredCategories.map(cat => (
+                                                <button key={cat} type="button"
+                                                    onClick={() => { setCategory(cat); setIsCategoryOpen(false); setCategorySearch(''); }}
+                                                    className={cn("w-full text-left px-3 py-2 rounded-[5px] text-[12.5px] font-[500] transition-colors",
+                                                        category === cat ? "bg-indigo-50 text-[#6366F1]" : "text-gray-700 hover:bg-gray-50")}>
+                                                    {cat}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
 
-                            {/* Amount */}
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                                    Budget Limit
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                                    <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        placeholder="0.00"
-                                        required
-                                        min="0"
-                                        step="0.01"
-                                        className="w-full bg-white border border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-300"
-                                    />
-                                </div>
+                        {/* Amount */}
+                        <div>
+                            <label className={LABEL_CLASS}>Maximum Limit <span className="text-rose-400">*</span></label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-[500]">KES</span>
+                                <input type="number" required min="0" step="1" value={amount}
+                                    onChange={e => setAmount(e.target.value)}
+                                    placeholder="0"
+                                    className="w-full rounded-[6px] pl-12 pr-3 py-[10px] text-[13px] font-mono text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                                    style={INPUT_STYLE} />
                             </div>
+                        </div>
 
-                            {/* Custom Ledger Account */}
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 flex items-center gap-1 cursor-help" title="Overrides default category-based ledger routing">
-                                    Custom Ledger Account <span className="text-gray-400 normal-case tracking-normal font-normal">(Optional)</span>
-                                </label>
-                                <div className="relative">
-                                    <select
-                                        value={customAccountId}
-                                        onChange={(e) => setCustomAccountId(e.target.value)}
-                                        className="w-full bg-white border border-gray-200 rounded-xl pl-4 pr-10 py-2.5 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 appearance-none transition-all cursor-pointer shadow-sm"
-                                    >
-                                        <option value="">Default Routing</option>
-                                        {expenseAccounts.map((acc: any) => (
-                                            <option key={acc.id} value={acc.id}>
-                                                {acc.code} - {acc.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Alert Threshold */}
-                            <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest">
-                                        Alert Threshold
-                                    </label>
-                                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
-                                        {alertThreshold}%
+                        {/* Ledger account */}
+                        <div className="relative">
+                            <label className={LABEL_CLASS}>General Ledger Account <span className="text-gray-300">(optional)</span></label>
+                            <button type="button" onClick={() => { setIsAccountOpen(o => !o); setIsCategoryOpen(false); }}
+                                className={cn(INPUT_CLASS, "flex items-center justify-between text-left")}
+                                style={INPUT_STYLE}>
+                                {customAccountId ? (
+                                    <span className="text-gray-900">
+                                        {expenseAccounts.find(a => a.id === customAccountId)?.name}{' '}
+                                        <span className="text-gray-400 font-mono text-[11px]">
+                                            GL-{expenseAccounts.find(a => a.id === customAccountId)?.code}
+                                        </span>
                                     </span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="50"
-                                    max="100"
-                                    step="5"
-                                    value={alertThreshold}
-                                    onChange={(e) => setAlertThreshold(e.target.value)}
-                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                                />
-                                <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
-                                    <PiWarningCircle />
-                                    Receive notification when spending reaches {alertThreshold}% of budget
-                                </p>
-                            </div>
-
-                            {/* Rollover Toggle */}
-                            <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl">
-                                <div className={`p-2 rounded-lg ${rollover ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
-                                    <PiTrendUp className="text-lg" />
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="text-xs font-bold text-gray-900">Rollover Unused Funds</h4>
-                                    <p className="text-[10px] text-gray-500">Remaining budget carries over to next period</p>
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    checked={rollover}
-                                    onChange={(e) => setRollover(e.target.checked)}
-                                    className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300 cursor-pointer"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Footer Actions */}
-                        <div className="pt-2 flex gap-3">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors uppercase tracking-wider"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting || !category || !amount}
-                                className="flex-[2] px-4 py-2.5 bg-[#29258D] text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-[#29258D]/90 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                            >
-                                {isSubmitting ? (
-                                    <>Saving...</>
                                 ) : (
-                                    <>
-                                        <PiCheckCircle className="text-lg" />
-                                        Create Budget
-                                    </>
+                                    <span className="text-gray-300">Standard auto-routing…</span>
                                 )}
+                                <PiCaretUpDown className="text-gray-400 text-[14px] shrink-0" />
                             </button>
+                            {isAccountOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsAccountOpen(false)} />
+                                    <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-[8px] z-50 overflow-hidden"
+                                        style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                                        <div className="p-2" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                                            <div className="relative">
+                                                <PiMagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                                <input autoFocus type="text" value={accountSearch}
+                                                    onChange={e => setAccountSearch(e.target.value)}
+                                                    placeholder="Search GL codes…"
+                                                    className="w-full rounded-[5px] pl-8 pr-3 py-1.5 text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                                                    style={{ border: '1px solid rgba(0,0,0,0.09)' }} />
+                                            </div>
+                                        </div>
+                                        <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
+                                            <button type="button"
+                                                onClick={() => { setCustomAccountId(''); setIsAccountOpen(false); }}
+                                                className={cn("w-full text-left px-3 py-2 rounded-[5px] text-[12.5px] font-[500] transition-colors",
+                                                    !customAccountId ? "bg-indigo-50 text-[#6366F1]" : "text-gray-700 hover:bg-gray-50")}>
+                                                Standard auto-routing
+                                            </button>
+                                            {filteredAccounts.map(acc => (
+                                                <button key={acc.id} type="button"
+                                                    onClick={() => { setCustomAccountId(acc.id); setIsAccountOpen(false); setAccountSearch(''); }}
+                                                    className={cn("w-full text-left px-3 py-2 rounded-[5px] transition-colors flex items-center justify-between",
+                                                        customAccountId === acc.id ? "bg-indigo-50 text-[#6366F1]" : "text-gray-700 hover:bg-gray-50")}>
+                                                    <div>
+                                                        <p className="text-[12.5px] font-[500]">{acc.name}</p>
+                                                        <p className="text-[11px] text-gray-400 font-mono mt-0.5">GL-{acc.code}</p>
+                                                    </div>
+                                                    {customAccountId === acc.id && <PiCheckCircle className="text-[#6366F1] text-[14px]" />}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
-                    </form>
-                </motion.div>
+
+                        {/* Divider */}
+                        <div style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }} />
+
+                        {/* Alert threshold */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className={LABEL_CLASS + ' mb-0'}>Warning Threshold</label>
+                                <span className="text-[12.5px] font-[600] text-[#6366F1]">{alertThreshold}%</span>
+                            </div>
+                            <input type="range" min="50" max="100" step="5" value={alertThreshold}
+                                onChange={e => setAlertThreshold(e.target.value)}
+                                className="w-full h-[3px] rounded-full appearance-none cursor-pointer accent-[#6366F1] bg-gray-100" />
+                            <p className="text-[11px] text-gray-400 mt-1.5">Alert fires when utilization crosses this threshold.</p>
+                        </div>
+
+                        {/* Rollover toggle */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-[13px] font-[500] text-gray-900">Rollover unused funds</p>
+                                <p className="text-[11.5px] text-gray-400 mt-0.5">Carry unused allocation into the next period.</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input type="checkbox" checked={rollover} onChange={e => setRollover(e.target.checked)} className="sr-only peer" />
+                                <div className="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:bg-[#6366F1] peer-focus:ring-2 peer-focus:ring-[#6366F1]/30 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
+                            </label>
+                        </div>
+                    </div>
+                </form>
+
+                {/* Footer */}
+                <div className="flex items-center justify-end gap-3 px-6 py-4 shrink-0"
+                    style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                    <button type="button" onClick={handleClose}
+                        className="px-4 py-2 text-[12.5px] font-[500] text-gray-600 rounded-[6px] hover:bg-gray-50 transition-colors"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                        Cancel
+                    </button>
+                    <button type="submit" form="budget-form" disabled={isSubmitting || !category || !amount}
+                        className="flex items-center gap-2 px-5 py-2 text-[12.5px] font-[600] text-white bg-[#6366F1] rounded-[6px] hover:bg-indigo-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                        {isSubmitting
+                            ? <><PiSpinner className="animate-spin text-[14px]" /> Saving…</>
+                            : <><PiCheckCircle className="text-[14px]" /> Create Rule</>
+                        }
+                    </button>
+                </div>
             </div>
-        </AnimatePresence>,
+        </div>,
         document.body
     );
 }

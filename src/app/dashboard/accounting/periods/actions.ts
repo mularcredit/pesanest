@@ -91,19 +91,43 @@ export async function createFiscalYear(data: z.infer<typeof FiscalYearSchema>) {
     }
 }
 
+async function requireAccountingAdmin(session: any) {
+    if (!session?.user) return false;
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true, customRole: { select: { isSystem: true } } }
+    });
+    return user?.role === 'SYSTEM_ADMIN' || user?.customRole?.isSystem;
+}
+
 export async function closePeriod(periodId: string) {
     const session = await auth();
     if (!session?.user) return { success: false, error: "Unauthorized" };
 
+    if (!(await requireAccountingAdmin(session))) {
+        return { success: false, error: "Only System Admins can close accounting periods" };
+    }
+
     try {
+        const period = await prisma.accountingPeriod.findUnique({ where: { id: periodId } });
+        if (!period) return { success: false, error: "Period not found" };
+        if (period.isClosed) return { success: false, error: "Period is already closed" };
+
         await prisma.accountingPeriod.update({
             where: { id: periodId },
+            data: { isClosed: true, closedAt: new Date(), closedBy: session.user.id }
+        });
+
+        await (prisma as any).auditLog.create({
             data: {
-                isClosed: true,
-                closedAt: new Date(),
-                closedBy: session.user.id
+                actorId: session.user.id,
+                action: 'PERIOD_CLOSE',
+                entity: 'AccountingPeriod',
+                entityId: periodId,
+                after: { name: period.name, closedAt: new Date() },
             }
         });
+
         revalidatePath("/dashboard/accounting/periods");
         return { success: true };
     } catch (error) {
@@ -112,20 +136,77 @@ export async function closePeriod(periodId: string) {
     }
 }
 
+export async function reopenPeriod(periodId: string, reason: string) {
+    const session = await auth();
+    if (!session?.user) return { success: false, error: "Unauthorized" };
+
+    if (!(await requireAccountingAdmin(session))) {
+        return { success: false, error: "Only System Admins can reopen accounting periods" };
+    }
+
+    if (!reason?.trim()) return { success: false, error: "A reason is required to reopen a period" };
+
+    try {
+        const period = await prisma.accountingPeriod.findUnique({ where: { id: periodId } });
+        if (!period) return { success: false, error: "Period not found" };
+        if (!period.isClosed) return { success: false, error: "Period is not closed" };
+
+        await prisma.accountingPeriod.update({
+            where: { id: periodId },
+            data: { isClosed: false, closedAt: null, closedBy: null }
+        });
+
+        await (prisma as any).auditLog.create({
+            data: {
+                actorId: session.user.id,
+                action: 'PERIOD_REOPEN',
+                entity: 'AccountingPeriod',
+                entityId: periodId,
+                after: { name: period.name, reason, reopenedAt: new Date() },
+            }
+        });
+
+        revalidatePath("/dashboard/accounting/periods");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { success: false, error: "Failed to reopen period" };
+    }
+}
+
 export async function closeFiscalYear(fyId: string) {
     const session = await auth();
     if (!session?.user) return { success: false, error: "Unauthorized" };
 
+    if (!(await requireAccountingAdmin(session))) {
+        return { success: false, error: "Only System Admins can close a fiscal year" };
+    }
+
     try {
-        // Ensure all periods are closed? standard logic usually requires it.
-        // For simplicity, we just close the year.
+        const fy = await prisma.fiscalYear.findUnique({
+            where: { id: fyId },
+            include: { periods: { where: { isClosed: false } } }
+        });
+        if (!fy) return { success: false, error: "Fiscal year not found" };
+        if (fy.periods.length > 0) {
+            return { success: false, error: `${fy.periods.length} period(s) are still open. Close all periods before closing the fiscal year.` };
+        }
+
         await prisma.fiscalYear.update({
             where: { id: fyId },
+            data: { isClosed: true, isCurrent: false }
+        });
+
+        await (prisma as any).auditLog.create({
             data: {
-                isClosed: true,
-                isCurrent: false
+                actorId: session.user.id,
+                action: 'FISCAL_YEAR_CLOSE',
+                entity: 'FiscalYear',
+                entityId: fyId,
+                after: { name: fy.name, closedAt: new Date() },
             }
         });
+
         revalidatePath("/dashboard/accounting/periods");
         return { success: true };
     } catch (error) {

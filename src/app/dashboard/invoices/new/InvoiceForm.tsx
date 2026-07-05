@@ -1,23 +1,15 @@
-
 "use client";
 
 import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import {
-    PiUploadSimple,
-    PiTrash,
-    PiPlus,
-    PiFloppyDisk,
-    PiReceipt,
-    PiCheckCircle,
-    PiSpinner
-} from "react-icons/pi";
 import { useSearchParams } from "next/navigation";
-import { useToast } from "@/components/ui/ToastProvider";
+import {
+    PiUploadSimple, PiTrash, PiPlus, PiFloppyDisk,
+    PiReceipt, PiCheckCircle, PiSpinner, PiListBullets,
+} from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface InvoiceFormProps {
     vendors: Array<{ id: string; name: string }>;
@@ -42,332 +34,282 @@ interface InvoiceFormData {
     items: InvoiceItem[];
 }
 
-export function InvoiceForm({ vendors }: InvoiceFormProps) {
-    const router = useRouter();
-    const { showToast } = useToast();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
-    const [uploadError, setUploadError] = useState("");
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const INPUT_CLASS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLASS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
 
-    const searchParams = useSearchParams();
+const CURRENCIES: Record<string, string> = { KES: 'KES', USD: 'USD', SSP: 'SSP' };
+
+export function InvoiceForm({ vendors }: InvoiceFormProps) {
+    const router        = useRouter();
+    const { showToast } = useToast();
+    const searchParams  = useSearchParams();
     const initialFileUrl = searchParams.get("fileUrl") || "";
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploading, setIsUploading]   = useState(false);
+    const [uploadError, setUploadError]   = useState("");
 
     const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm<InvoiceFormData>({
         defaultValues: {
-            vendorId: "",
-            invoiceNumber: "",
+            vendorId: "", invoiceNumber: "",
             invoiceDate: new Date().toISOString().split('T')[0],
-            dueDate: "",
-            currency: "USD",
-            description: "",
+            dueDate: "", currency: 'KES', description: "",
             fileUrl: initialFileUrl,
             items: [{ description: "", quantity: 1, unitPrice: 0, total: 0, category: "" }]
         }
     });
 
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "items"
-    });
+    const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
-    // Watch items to calculate totals
-    const items = watch("items");
-    const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0);
+    const items    = watch("items");
+    const currency = watch("currency");
+    const fileUrl  = watch("fileUrl");
+    const subtotal = items.reduce((s, item) => s + (Number(item.quantity) * Number(item.unitPrice)), 0);
+
+    const currencyPrefix = CURRENCIES[currency] ?? currency;
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
         setIsUploading(true);
         setUploadError("");
-
         const formData = new FormData();
         formData.append("file", file);
-
         try {
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Upload failed");
-            }
-
+            const res = await fetch("/api/upload", { method: "POST", body: formData });
+            if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Upload failed"); }
             const data = await res.json();
             setValue("fileUrl", data.url);
             showToast("Receipt uploaded successfully", "success");
         } catch (error: any) {
-            console.error("Upload error:", error);
             setUploadError(error.message);
             showToast("Failed to upload receipt", "error");
-        } finally {
-            setIsUploading(false);
-        }
+        } finally { setIsUploading(false); }
     };
 
-    const onSubmit = async (data: any) => {
-        if (data.items.length === 0) {
-            showToast("Please add at least one line item", "error");
-            return;
-        }
-
+    const onSubmit = async (data: InvoiceFormData) => {
+        if (data.items.length === 0) { showToast("Please add at least one line item", "error"); return; }
         setIsSubmitting(true);
         try {
-            // Recalculate item totals just in case
-            const formattedItems = data.items.map((item: any) => ({
+            const formattedItems = data.items.map(item => ({
                 ...item,
                 quantity: Number(item.quantity),
                 unitPrice: Number(item.unitPrice),
                 total: Number(item.quantity) * Number(item.unitPrice)
             }));
-
-            const payload = {
-                ...data,
-                amount: subtotal,
-                items: formattedItems
-            };
-
             const res = await fetch("/api/invoices", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ ...data, amount: subtotal, items: formattedItems })
             });
-
-            if (!res.ok) {
-                const json = await res.json();
-                throw new Error(json.error || "Failed to create invoice");
-            }
-
+            if (!res.ok) { const json = await res.json(); throw new Error(json.error || "Failed to create invoice"); }
             showToast("Invoice recorded successfully!", "success");
             router.push("/dashboard/invoices");
             router.refresh();
         } catch (error: any) {
             showToast(error.message, "error");
-        } finally {
-            setIsSubmitting(false);
-        }
+        } finally { setIsSubmitting(false); }
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 animate-fade-in-up font-sans">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Vendor & Invoice Details */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                        <div className="bg-white px-6 h-[72px] flex items-center gap-3 border-b border-gray-100">
-                            <div className="w-8 h-8 rounded-full bg-[#29258D]/10 flex items-center justify-center">
-                                <PiReceipt className="text-lg text-[#29258D]" />
+        <form onSubmit={handleSubmit(onSubmit)} className="pb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                {/* ── LEFT COLUMN ── */}
+                <div className="lg:col-span-2 space-y-5">
+
+                    {/* Invoice Details card */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <div className="w-7 h-7 rounded-[6px] bg-indigo-50 flex items-center justify-center shrink-0">
+                                <PiReceipt className="text-[#6366F1] text-[13px]" />
                             </div>
-                            <h2 className="text-base font-semibold text-gray-900">
-                                Invoice Details
-                            </h2>
+                            <h2 className="text-[13.5px] font-[600] text-gray-900">Invoice Details</h2>
                         </div>
 
-                        <div className="p-6 bg-[#F6F6F6] space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="px-5 py-5 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-medium text-gray-700 block mb-1.5 uppercase tracking-wide">Vendor</label>
-                                    <select
-                                        className="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] disabled:cursor-not-allowed disabled:opacity-50 text-gray-900 transition-all shadow-sm"
-                                        {...register("vendorId", { required: "Vendor is required" })}
-                                    >
-                                        <option value="">Select Vendor</option>
-                                        {vendors.map(v => (
-                                            <option key={v.id} value={v.id}>{v.name}</option>
-                                        ))}
+                                    <label className={LABEL_CLASS}>Vendor <span className="text-rose-400">*</span></label>
+                                    <select className={cn(INPUT_CLASS, 'cursor-pointer')} style={INPUT_STYLE}
+                                        {...register("vendorId", { required: "Vendor is required" })}>
+                                        <option value="">Select vendor…</option>
+                                        {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                                     </select>
-                                    {errors.vendorId && <span className="text-xs text-rose-500 font-medium mt-1 block">{errors.vendorId.message as string}</span>}
+                                    {errors.vendorId && <p className="text-[11px] text-rose-500 mt-1">{errors.vendorId.message as string}</p>}
                                 </div>
-
                                 <div>
-                                    <label className="text-xs font-medium text-gray-700 block mb-1.5 uppercase tracking-wide">Invoice Number</label>
-                                    <Input
-                                        type="text"
-                                        placeholder="INV-2024-001"
-                                        {...register("invoiceNumber", { required: "Invoice Number is required" })}
-                                        className="bg-white"
-                                    />
-                                    {errors.invoiceNumber && <span className="text-xs text-rose-500 font-medium mt-1 block">{errors.invoiceNumber.message as string}</span>}
+                                    <label className={LABEL_CLASS}>Invoice number <span className="text-rose-400">*</span></label>
+                                    <input type="text" placeholder="INV-2024-001" className={INPUT_CLASS} style={INPUT_STYLE}
+                                        {...register("invoiceNumber", { required: "Invoice number is required" })} />
+                                    {errors.invoiceNumber && <p className="text-[11px] text-rose-500 mt-1">{errors.invoiceNumber.message as string}</p>}
                                 </div>
-
                                 <div>
-                                    <label className="text-xs font-medium text-gray-700 block mb-1.5 uppercase tracking-wide">Invoice Date</label>
-                                    <Input
-                                        type="date"
-                                        {...register("invoiceDate", { required: "Date is required" })}
-                                        className="bg-white"
-                                    />
+                                    <label className={LABEL_CLASS}>Invoice date <span className="text-rose-400">*</span></label>
+                                    <input type="date" className={INPUT_CLASS} style={INPUT_STYLE}
+                                        {...register("invoiceDate", { required: true })} />
                                 </div>
-
                                 <div>
-                                    <label className="text-xs font-medium text-gray-700 block mb-1.5 uppercase tracking-wide">Due Date</label>
-                                    <Input
-                                        type="date"
-                                        {...register("dueDate", { required: "Due Date is required" })}
-                                        className="bg-white"
-                                    />
+                                    <label className={LABEL_CLASS}>Due date <span className="text-rose-400">*</span></label>
+                                    <input type="date" className={INPUT_CLASS} style={INPUT_STYLE}
+                                        {...register("dueDate", { required: true })} />
                                 </div>
-
                                 <div>
-                                    <label className="text-xs font-medium text-gray-700 block mb-1.5 uppercase tracking-wide">Currency</label>
-                                    <select
-                                        className="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] disabled:cursor-not-allowed disabled:opacity-50 text-gray-900 transition-all shadow-sm"
-                                        {...register("currency")}
-                                    >
-                                        <option value="USD">USD ($)</option>
-                                        <option value="SSP">SSP (£)</option>
+                                    <label className={LABEL_CLASS}>Currency</label>
+                                    <select className={cn(INPUT_CLASS, 'cursor-pointer')} style={INPUT_STYLE}
+                                        {...register("currency")}>
+                                        <option value="KES">KES (Kenya Shilling)</option>
+                                        <option value="USD">USD (US Dollar)</option>
+                                        <option value="SSP">SSP (South Sudan Pound)</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-gray-700 block mb-1.5 uppercase tracking-wide">Description (Optional)</label>
-                                <textarea
-                                    className="flex w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#29258D] focus:border-[#29258D] disabled:cursor-not-allowed disabled:opacity-50 text-gray-900 transition-all shadow-sm h-20 resize-none"
-                                    placeholder="Brief description of services or goods..."
-                                    {...register("description")}
-                                />
+                                <label className={LABEL_CLASS}>Description <span className="text-gray-300">(optional)</span></label>
+                                <textarea rows={2} placeholder="Brief description of services or goods…"
+                                    className={cn(INPUT_CLASS, 'resize-none')} style={INPUT_STYLE}
+                                    {...register("description")} />
                             </div>
                         </div>
                     </div>
 
-                    {/* Line Items */}
-                    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                        <div className="bg-white px-6 h-[60px] flex justify-between items-center border-b border-gray-100">
-                            <h3 className="text-sm font-semibold text-gray-900">Line Items</h3>
-                            <button
-                                type="button"
+                    {/* Line Items card */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <div className="flex items-center gap-3">
+                                <div className="w-7 h-7 rounded-[6px] bg-gray-50 flex items-center justify-center shrink-0"
+                                    style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
+                                    <PiListBullets className="text-gray-400 text-[13px]" />
+                                </div>
+                                <h3 className="text-[13.5px] font-[600] text-gray-900">Line Items</h3>
+                            </div>
+                            <button type="button"
                                 onClick={() => append({ description: "", quantity: 1, unitPrice: 0, total: 0, category: "" })}
-                                className="text-xs font-medium text-[#29258D] hover:underline flex items-center gap-1"
-                            >
-                                <PiPlus /> Add Item
+                                className="flex items-center gap-1.5 text-[12px] font-[500] text-[#6366F1] hover:bg-indigo-50 px-2.5 py-1.5 rounded-[5px] transition-colors">
+                                <PiPlus className="text-[13px]" /> Add item
                             </button>
                         </div>
 
-                        <div className="p-6 bg-[#F6F6F6] space-y-4">
+                        {/* Column headers */}
+                        <div className="grid grid-cols-12 gap-3 px-5 py-2.5 bg-gray-50/60"
+                            style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                            <div className="col-span-5 text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400">Description</div>
+                            <div className="col-span-2 text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400 text-center">Qty</div>
+                            <div className="col-span-3 text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400">Unit Price</div>
+                            <div className="col-span-2 text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400 text-right">Total</div>
+                        </div>
+
+                        {/* Rows */}
+                        <div className="px-5 py-3 space-y-3">
                             {fields.map((field, index) => (
-                                <div key={field.id} className="grid grid-cols-12 gap-4 items-end group">
+                                <div key={field.id} className="grid grid-cols-12 gap-3 items-center">
                                     <div className="col-span-5">
-                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Description</label>
-                                        <Input
-                                            type="text"
-                                            placeholder="Item name"
-                                            {...register(`items.${index}.description` as const, { required: true })}
-                                            className="bg-white"
-                                        />
+                                        <input type="text" placeholder="Item description"
+                                            className={INPUT_CLASS} style={INPUT_STYLE}
+                                            {...register(`items.${index}.description` as const, { required: true })} />
                                     </div>
                                     <div className="col-span-2">
-                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Qty</label>
-                                        <Input
-                                            type="number"
-                                            min="1"
-                                            {...register(`items.${index}.quantity` as const, { required: true })}
-                                            className="bg-white text-center"
-                                        />
+                                        <input type="number" min="1"
+                                            className={cn(INPUT_CLASS, 'text-center')} style={INPUT_STYLE}
+                                            {...register(`items.${index}.quantity` as const, { required: true })} />
                                     </div>
-                                    <div className="col-span-3">
-                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Unit Price</label>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-                                                {watch("currency") === 'USD' ? '$' : '£'}
-                                            </span>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                {...register(`items.${index}.unitPrice` as const, { required: true })}
-                                                className="bg-white pl-7"
-                                            />
-                                        </div>
+                                    <div className="col-span-3 relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-[500]">
+                                            {currencyPrefix}
+                                        </span>
+                                        <input type="number" step="0.01"
+                                            className={cn(INPUT_CLASS, 'pl-10 tabular-nums')} style={INPUT_STYLE}
+                                            {...register(`items.${index}.unitPrice` as const, { required: true })} />
                                     </div>
-                                    <div className="col-span-2 flex items-center mb-2 gap-2 justify-end">
-                                        <p className="font-mono font-bold text-sm text-gray-900">
-                                            {watch("currency") === 'USD' ? '$' : '£'}{(Number(watch(`items.${index}.quantity`)) * Number(watch(`items.${index}.unitPrice`))).toFixed(2)}
-                                        </p>
-                                        <button
-                                            type="button"
-                                            onClick={() => remove(index)}
-                                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                        >
-                                            <PiTrash />
+                                    <div className="col-span-2 flex items-center justify-end gap-2">
+                                        <span className="font-mono text-[13px] font-[600] text-gray-900 tabular-nums">
+                                            {(Number(watch(`items.${index}.quantity`)) * Number(watch(`items.${index}.unitPrice`))).toFixed(2)}
+                                        </span>
+                                        <button type="button" onClick={() => remove(index)}
+                                            className="p-1 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-[4px] transition-colors shrink-0">
+                                            <PiTrash className="text-[13px]" />
                                         </button>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="bg-white px-6 py-4 border-t border-gray-100 flex justify-end">
-                            <div className="text-right">
-                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">Total Amount</p>
-                                <p className="text-2xl font-bold text-[#29258D]">
-                                    {watch("currency") === 'USD' ? '$' : '£'}{subtotal.toFixed(2)}
-                                </p>
+                        {/* Total footer */}
+                        <div className="flex justify-between items-center px-5 py-3.5"
+                            style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-gray-400">Total amount</p>
+                            <p className="text-[20px] font-[700] text-[#6366F1] tabular-nums">
+                                {currencyPrefix} {subtotal.toFixed(2)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── RIGHT COLUMN ── */}
+                <div className="space-y-4">
+
+                    {/* Actions card */}
+                    <div className="bg-white rounded-[8px] px-5 py-4 space-y-3" style={CARD_STYLE}>
+                        <p className="text-[11px] font-[600] uppercase tracking-[0.07em] text-gray-400">Actions</p>
+                        <button type="submit" disabled={isSubmitting}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[6px] bg-[#6366F1] hover:bg-indigo-600 text-white text-[13px] font-[500] transition-colors disabled:opacity-60">
+                            {isSubmitting
+                                ? <><PiSpinner className="animate-spin text-[15px]" /> Saving…</>
+                                : <><PiFloppyDisk className="text-[15px]" /> Save Invoice</>}
+                        </button>
+                        <button type="button" onClick={() => router.back()}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[6px] text-[13px] font-[500] text-gray-500 hover:bg-gray-50 transition-colors"
+                            style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                            Cancel
+                        </button>
+                    </div>
+
+                    {/* File upload card */}
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <p className="text-[11px] font-[600] uppercase tracking-[0.07em] text-gray-400">Invoice File</p>
+                        </div>
+                        <div className="px-5 py-4">
+                            <div className={cn(
+                                "relative rounded-[8px] flex flex-col items-center justify-center h-36 text-center transition-colors group",
+                                fileUrl ? "bg-emerald-50" : "bg-gray-50/60 hover:bg-indigo-50/40"
+                            )} style={{
+                                border: fileUrl
+                                    ? '1.5px dashed rgba(16,185,129,0.35)'
+                                    : '1.5px dashed rgba(0,0,0,0.12)'
+                            }}>
+                                <input type="file" accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={handleFileUpload}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    disabled={isUploading} />
+                                {isUploading ? (
+                                    <>
+                                        <PiSpinner className="animate-spin text-[#6366F1] text-xl mb-2" />
+                                        <p className="text-[12px] font-[500] text-[#6366F1]">Uploading…</p>
+                                    </>
+                                ) : fileUrl ? (
+                                    <>
+                                        <PiCheckCircle className="text-emerald-500 text-2xl mb-2" />
+                                        <p className="text-[12.5px] font-[500] text-emerald-600">File attached</p>
+                                        <p className="text-[10.5px] text-gray-400 mt-0.5 px-3 truncate max-w-full">{fileUrl.split('/').pop()}</p>
+                                        <p className="text-[10.5px] text-[#6366F1] font-[500] mt-1 relative z-20 pointer-events-none">Click to replace</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <PiUploadSimple className="text-gray-300 text-xl mb-2 group-hover:text-[#6366F1] transition-colors" />
+                                        <p className="text-[12.5px] font-[500] text-gray-600 group-hover:text-[#6366F1] transition-colors">Upload invoice PDF</p>
+                                        <p className="text-[11px] text-gray-400 mt-0.5">PDF, JPG or PNG</p>
+                                        {uploadError && <p className="text-[10.5px] text-rose-500 font-[500] mt-1">{uploadError}</p>}
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* Right Column: Actions & Meta */}
-                <div className="space-y-6">
-                    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6 space-y-4">
-                        <h3 className="font-bold text-gray-900 text-xs uppercase tracking-wide border-b border-gray-100 pb-2 mb-2">Actions</h3>
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full"
-                        >
-                            {isSubmitting ? (
-                                <PiSpinner className="animate-spin text-lg" />
-                            ) : (
-                                <PiFloppyDisk className="text-lg mr-2" />
-                            )}
-                            {isSubmitting ? "Saving..." : "Save Invoice"}
-                        </Button>
-                        <Button
-                            type="button"
-                            onClick={() => router.back()}
-                            variant="secondary"
-                            className="w-full"
-                        >
-                            Cancel
-                        </Button>
-                    </div>
-
-                    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-6 space-y-4">
-                        <h3 className="font-bold text-gray-900 text-xs uppercase tracking-wide border-b border-gray-100 pb-2 mb-2">File Upload</h3>
-                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors relative group">
-                            <input
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={handleFileUpload}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                disabled={isUploading}
-                            />
-                            {isUploading ? (
-                                <div className="flex flex-col items-center">
-                                    <PiSpinner className="animate-spin text-2xl text-[#29258D] mb-2" />
-                                    <p className="text-xs font-bold text-[#29258D]">Uploading...</p>
-                                </div>
-                            ) : watch("fileUrl") ? (
-                                <div className="flex flex-col items-center">
-                                    <PiCheckCircle className="text-3xl text-emerald-500 mb-2" />
-                                    <p className="text-sm font-bold text-emerald-600">File attached</p>
-                                    <p className="text-xs text-gray-500 mt-1 break-all px-4">{watch("fileUrl")?.split('/').pop()}</p>
-                                    <p className="text-[10px] text-[#29258D] font-bold mt-2 z-20 relative pointer-events-none">Click to replace</p>
-                                </div>
-                            ) : (
-                                <>
-                                    <PiUploadSimple className="text-3xl text-gray-400 mx-auto mb-2 group-hover:text-[#29258D] transition-colors" />
-                                    <p className="text-sm font-bold text-gray-900">Click to upload invoice PDF</p>
-                                    <p className="text-xs text-gray-500 mt-1">or drag and drop here</p>
-                                    {uploadError && <p className="text-xs text-rose-500 font-bold mt-2">{uploadError}</p>}
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
             </div>
-        </form >
+        </form>
     );
 }

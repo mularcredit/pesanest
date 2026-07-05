@@ -7,6 +7,7 @@ import { z } from "zod";
 import { checkEnforceClosure } from "@/lib/closure-check";
 import { checkExpensePolicies } from "@/lib/policy-engine";
 import { approvalWorkflow } from "@/lib/approval-workflow";
+import { EXPENSE_CATEGORIES } from "@/lib/constants";
 
 const RequisitionItemSchema = z.object({
     title: z.string().min(3, "Item title must be at least 3 characters"),
@@ -21,8 +22,8 @@ const RequisitionItemSchema = z.object({
 
 const RequisitionSchema = z.object({
     title: z.string().min(5, "Title must be at least 5 characters"),
-    description: z.string().min(10, "Justification must be at least 10 characters"),
-    currency: z.string().default("USD"),
+    description: z.string().min(15, "Justification must be at least 15 characters"),
+    currency: z.string().default('KES'),
     items: z.array(RequisitionItemSchema).min(1, "At least one item is required"),
 });
 
@@ -99,13 +100,23 @@ export async function createRequisitionWithItems(formData: FormData) {
         select: { id: true, branchId: true, regionId: true, leadBranch: true }
     });
 
-    const branchId = (formData.get("branchId") as string) || (formData.get("branch") as string) || user?.branchId || user?.leadBranch?.id;
+    // Note: the "branch" field on the form is a read-only display name (never a real
+    // Branch id), so it must never be used to resolve branchId — only "branchId" (an
+    // explicit id override, if one is ever wired up) or the user's own branch relations.
+    const branchId = (formData.get("branchId") as string) || user?.branchId || user?.leadBranch?.id;
     const department = formData.get("department") as string;
     const vendor = formData.get("vendor") as string;
     const expectedDateStr = formData.get("expectedDate") as string;
     const paymentMethod = formData.get("paymentMethod") as string;
-    const paymentReference = formData.get("paymentReference") as string;
+    let paymentReference = formData.get("paymentReference") as string;
+    const paybillNumber = (formData.get("paybillNumber") as string) || "";
+    const paybillAccountNumber = (formData.get("paybillAccountNumber") as string) || "";
+
+    if (paymentMethod === "MPESA_PAYBILL" && paybillNumber) {
+        paymentReference = `${paybillNumber}${paybillAccountNumber ? `|${paybillAccountNumber}` : ''}`;
+    }
     const accountId = formData.get("accountId") as string;
+    const receiptUrl = (formData.get("receiptUrl") as string) || null;
 
     let finalDescription = description;
     if (vendor && vendor.trim()) {
@@ -145,6 +156,7 @@ export async function createRequisitionWithItems(formData: FormData) {
             ...(accountId ? { accountId } : {}),
             ...(paymentMethod ? { paymentMethod } : {}),
             ...(paymentReference ? { paymentReference } : {}),
+            ...(receiptUrl ? { receiptUrl } : {}),
             items: {
                 create: validatedItems.map(item => {
                     const isRecurring = item.isRecurring === true;
@@ -424,8 +436,14 @@ export async function getUserBranchAndDepartmentAction() {
 
         if (!user) return { branch: "", department: "" };
 
-        // For Branch Managers (TEAM_LEADER), their branch is stored in `leadBranch` or `branchId`
-        const branchName = user.leadBranch?.name || user.branchId || "";
+        // For Branch Managers (TEAM_LEADER), their branch is stored in `leadBranch`;
+        // everyone else's branch lives in `branchId` and must be resolved to a name —
+        // it must never be returned as the raw id, since this value is display-only.
+        let branchName = user.leadBranch?.name || "";
+        if (!branchName && user.branchId) {
+            const branch = await prisma.branch.findUnique({ where: { id: user.branchId }, select: { name: true } });
+            branchName = branch?.name || "";
+        }
         const department = user.department || "";
 
         return { branch: branchName, department };
@@ -442,10 +460,66 @@ export async function getExpenseAccountsAction() {
             select: { id: true, name: true, code: true },
             orderBy: { name: 'asc' }
         });
+
+        // Self-healing: Check for missing standard categories and seed them silently
+        const existingNames = new Set(accounts.map(a => a.name));
+        const missingCategories = EXPENSE_CATEGORIES.filter(cat => !existingNames.has(cat));
+
+        if (missingCategories.length > 0) {
+            console.log(`Self-healing: Seeding ${missingCategories.length} missing expense accounts...`);
+            
+            const seedData = missingCategories.map((cat, index) => ({
+                name: cat,
+                code: (6001 + accounts.length + index).toString(),
+                type: 'EXPENSE',
+                subtype: 'OPERATING_EXPENSE',
+                isActive: true
+            }));
+
+            await prisma.account.createMany({
+                data: seedData,
+                skipDuplicates: true
+            });
+
+            // Return the full updated list
+            return await prisma.account.findMany({
+                where: { type: 'EXPENSE' },
+                select: { id: true, name: true, code: true },
+                orderBy: { name: 'asc' }
+            });
+        }
+
         return accounts;
     } catch (error) {
         console.error("Error fetching expense accounts:", error);
         return [];
+    }
+}
+
+export async function reseedExpenseAccountsAction() {
+    const session = await auth();
+    if (!session?.user?.id) return { error: "Unauthorized" };
+
+    try {
+        console.log("Forcing reseed of expense accounts...");
+        
+        const seedData = EXPENSE_CATEGORIES.map((cat, index) => ({
+            name: cat,
+            code: (6001 + index).toString(),
+            type: 'EXPENSE',
+            subtype: 'OPERATING_EXPENSE',
+            isActive: true
+        }));
+
+        await prisma.account.createMany({
+            data: seedData,
+            skipDuplicates: true
+        });
+
+        return { success: true };
+    } catch (e: any) {
+        console.error("Manual reseed failed:", e);
+        return { error: e.message || "Failed to seed accounts" };
     }
 }
 

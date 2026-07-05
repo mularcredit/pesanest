@@ -39,7 +39,7 @@ export async function POST(req: Request) {
             data: {
                 userId: user.id,
                 balance: 0,
-                currency: "USD",
+                currency: 'KES',
             },
         });
 

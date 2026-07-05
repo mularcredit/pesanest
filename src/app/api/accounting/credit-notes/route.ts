@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
             const totalSettled = totalPaid + totalCredited;
 
             let newStatus = sale.status;
-            if (totalSettled >= sale.totalAmount) {
+            if (totalSettled >= Number(sale.totalAmount)) {
                 newStatus = "PAID";
             } else if (totalSettled > 0) {
                 newStatus = "PARTIAL";
@@ -350,7 +350,7 @@ export async function PATCH(req: NextRequest) {
             const totalSettled = totalPaid + totalCredited;
 
             let newStatus = "SENT"; // Default back to SENT
-            if (totalSettled >= sale.totalAmount) {
+            if (totalSettled >= Number(sale.totalAmount)) {
                 newStatus = "PAID";
             } else if (totalSettled > 0) {
                 newStatus = "PARTIAL";

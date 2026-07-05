@@ -10,7 +10,6 @@ import {
     PiFileText
 } from "react-icons/pi";
 import { PaymentQueue } from "../../../components/dashboard/PaymentQueue";
-import { stripe } from "@/lib/stripe";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 
 export default async function PaymentsPage() {
@@ -46,12 +45,12 @@ export default async function PaymentsPage() {
         : { status: 'PENDING_AUTHORIZATION' };
 
     const authorizedPaymentWhere = isBranchManager
-        ? { status: 'AUTHORIZED', makerId: session.user.id }
-        : { status: 'AUTHORIZED' };
+        ? { status: { in: ['AUTHORIZED', 'FAILED'] }, makerId: session.user.id }
+        : { status: { in: ['AUTHORIZED', 'FAILED'] } };
 
     const paidPaymentWhere = isBranchManager
-        ? { status: 'PAID', makerId: session.user.id }
-        : { status: 'PAID' };
+        ? { status: { in: ['PAID', 'PARTIALLY_PAID'] }, makerId: session.user.id }
+        : { status: { in: ['PAID', 'PARTIALLY_PAID'] } };
 
     const payoutHistoryWhere = isBranchManager
         ? { status: { in: ['REJECTED', 'CLOSED'] }, makerId: session.user.id }
@@ -197,52 +196,21 @@ export default async function PaymentsPage() {
         return acc;
     }, {} as Record<string, any>);
 
-    let stripeStatus = userProfile?.stripeConnectStatus || 'NOT_CONNECTED';
-
-    // Verify Stripe status if pending
-    if (userProfile?.stripeAccountId && (stripeStatus === 'PENDING' || stripeStatus === 'NOT_CONNECTED')) {
-        try {
-            const account = await stripe.accounts.retrieve(userProfile.stripeAccountId);
-            if (account.details_submitted) {
-                stripeStatus = 'COMPLETED';
-                await prisma.user.update({
-                    where: { id: session.user.id },
-                    data: { stripeConnectStatus: 'COMPLETED' } as any
-                });
-            }
-        } catch (e) {
-            console.error('Failed to verify Stripe account', e);
-        }
-    }
+    let paystackStatus = userProfile?.paystackCustomerCode ? 'COMPLETED' : 'NOT_CONNECTED';
 
     return (
-        <div className="space-y-8 animate-fade-in-up pb-20">
-            {/* Header */}
-            <div className="flex items-end justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1">Payment Center</h1>
-                    <p className="text-gray-400 text-sm font-medium tracking-wide">
-                        Process reimbursements, vendor payments and requisitions
-                    </p>
-                </div>
-            </div>
-
-
-
-            {/* Payment Queue Component */}
-            <PaymentQueue
-                expenses={JSON.parse(JSON.stringify(approvedExpenses))}
-                invoices={JSON.parse(JSON.stringify(approvedInvoices))}
-                requisitions={JSON.parse(JSON.stringify(approvedRequisitions))}
-                budgets={JSON.parse(JSON.stringify(approvedBudgets))}
-                pendingPayments={JSON.parse(JSON.stringify(pendingPayments))}
-                authorizedPayments={JSON.parse(JSON.stringify(authorizedPayments))}
-                paidPayments={JSON.parse(JSON.stringify(paidPayments))}
-                history={JSON.parse(JSON.stringify(payoutHistory))}
-                userRole={userRole}
-                stripeStatus={stripeStatus}
-                isSystemAdmin={isSystemAdmin}
-            />
-        </div>
+        <PaymentQueue
+            expenses={JSON.parse(JSON.stringify(approvedExpenses))}
+            invoices={JSON.parse(JSON.stringify(approvedInvoices))}
+            requisitions={JSON.parse(JSON.stringify(approvedRequisitions))}
+            budgets={JSON.parse(JSON.stringify(approvedBudgets))}
+            pendingPayments={JSON.parse(JSON.stringify(pendingPayments))}
+            authorizedPayments={JSON.parse(JSON.stringify(authorizedPayments))}
+            paidPayments={JSON.parse(JSON.stringify(paidPayments))}
+            history={JSON.parse(JSON.stringify(payoutHistory))}
+            userRole={userRole}
+            paystackStatus={paystackStatus}
+            isSystemAdmin={isSystemAdmin}
+        />
     );
 }

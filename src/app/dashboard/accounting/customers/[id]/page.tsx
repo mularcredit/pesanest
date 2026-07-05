@@ -5,27 +5,35 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
     PiArrowLeft,
-    PiPencilSimple,
     PiFileText,
     PiReceipt,
-    PiTrendUp,
     PiBuildings,
     PiMapPin,
     PiPhone,
     PiEnvelope,
     PiGlobe,
-    PiCurrencyDollar
+    PiMoney,
+    PiPlus,
+    PiArrowRight,
 } from "react-icons/pi";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { EditCustomerModal } from "@/components/accounting/EditCustomerModal";
 
-// Helper for currency formatting
-const formatCurrency = (amount: number, currency = "USD") => {
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+
+const formatCurrency = (amount: number, currency = 'KES') => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency,
     }).format(amount);
+};
+
+const SALE_STATUS_META: Record<string, { cls: string; border: string }> = {
+    PAID:      { cls: 'text-emerald-600 bg-emerald-50', border: 'rgba(16,185,129,0.2)' },
+    PARTIAL:   { cls: 'text-amber-600 bg-amber-50',    border: 'rgba(245,158,11,0.2)' },
+    PENDING:   { cls: 'text-amber-600 bg-amber-50',    border: 'rgba(245,158,11,0.2)' },
+    DRAFT:     { cls: 'text-gray-500 bg-gray-50',      border: 'rgba(0,0,0,0.09)' },
+    OVERDUE:   { cls: 'text-rose-600 bg-rose-50',      border: 'rgba(239,68,68,0.2)' },
+    CANCELLED: { cls: 'text-gray-400 bg-gray-50',      border: 'rgba(0,0,0,0.07)' },
 };
 
 export default async function CustomerDetailsPage({
@@ -54,8 +62,6 @@ export default async function CustomerDetailsPage({
 
     if (!customer) return redirect("/dashboard/accounting/customers");
 
-    // Calculate Totals
-    // Note: Ideally we'd use strict aggregations for accuracy over all time
     const totalSalesAgg = await prisma.sale.aggregate({
         where: { customerId: id },
         _sum: { totalAmount: true }
@@ -65,77 +71,82 @@ export default async function CustomerDetailsPage({
         _sum: { amount: true }
     });
 
-    const totalInvoiced = totalSalesAgg._sum.totalAmount || 0;
-    const totalPaid = totalPaymentsAgg._sum.amount || 0;
+    const totalInvoiced = Number(totalSalesAgg._sum.totalAmount || 0);
+    const totalPaid = Number(totalPaymentsAgg._sum.amount || 0);
     const balance = totalInvoiced - totalPaid;
 
     return (
-        <div className="space-y-8 animate-fade-in-up font-sans pb-12">
+        <div className="space-y-6 pb-12">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <Link
                         href="/dashboard/accounting/customers"
-                        className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-colors"
+                        className="p-2 rounded-[6px] bg-white hover:bg-gray-50 text-gray-400 hover:text-gray-700 transition-colors"
+                        style={CARD_STYLE}
                     >
-                        <PiArrowLeft className="text-xl" />
+                        <PiArrowLeft className="text-[16px]" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                            {customer.name}
-                            <Badge variant={customer.isActive ? "success" : "secondary"}>
+                        <div className="flex items-center gap-2.5">
+                            <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">{customer.name}</h1>
+                            <span
+                                className={`text-[10px] font-[500] px-2 py-0.5 rounded-[4px] ${customer.isActive ? 'text-emerald-600 bg-emerald-50' : 'text-gray-400 bg-gray-50'}`}
+                                style={{ border: customer.isActive ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(0,0,0,0.09)' }}>
                                 {customer.isActive ? "Active" : "Inactive"}
-                            </Badge>
-                        </h1>
-                        <p className="text-gray-500 text-sm flex items-center gap-2 mt-1">
-                            <PiBuildings /> {customer.city || 'No City'}, {customer.country || 'South Sudan'}
+                            </span>
+                        </div>
+                        <p className="text-[12px] text-gray-400 flex items-center gap-1.5 mt-0.5">
+                            <PiBuildings className="text-[13px]" />
+                            {customer.city || 'No City'}, {customer.country || 'South Sudan'}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <Link href={`/dashboard/accounting/sales/new?customerId=${id}`}>
-                        <Button variant="outline">
-                            Create Invoice
-                        </Button>
+                <div className="flex gap-2">
+                    <Link
+                        href={`/dashboard/accounting/sales/new?customerId=${id}`}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                        style={CARD_STYLE}>
+                        <PiPlus className="text-[13px]" /> Create Invoice
                     </Link>
-                    <Link href={`/dashboard/accounting/customers/${id}/statement`}>
-                        <Button className="gds-btn-premium">
-                            View Statement
-                        </Button>
+                    <Link
+                        href={`/dashboard/accounting/customers/${id}/statement`}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[600] text-white bg-[#6366F1] hover:bg-indigo-600 transition-colors">
+                        <PiArrowRight className="text-[13px]" /> View Statement
                     </Link>
                 </div>
             </div>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Stats & Contact */}
-                <div className="space-y-6">
-                    {/* Financial Summary Card */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
-                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                            <PiCurrencyDollar className="text-lg text-indigo-600" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column */}
+                <div className="space-y-4">
+                    {/* Financial Summary */}
+                    <div className="bg-white rounded-[8px] p-5 space-y-4" style={CARD_STYLE}>
+                        <h3 className="text-[10.5px] font-[600] text-gray-400 uppercase tracking-[0.07em] flex items-center gap-1.5">
+                            <PiMoney className="text-[14px] text-[#6366F1]" />
                             Financial Overview
                         </h3>
 
-                        <div className="space-y-4">
-                            <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Outstanding Balance</span>
-                                <div className={`text-2xl font-bold font-mono mt-1 ${balance > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        <div className="space-y-3">
+                            <div className="p-4 rounded-[8px]" style={{ background: '#FAFAFA', border: '1px solid rgba(0,0,0,0.06)' }}>
+                                <span className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Outstanding Balance</span>
+                                <div className={`text-[22px] font-[600] font-mono mt-1 ${balance > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                                     {formatCurrency(balance, customer.currency)}
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 rounded-xl border border-gray-100">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Billed</span>
-                                    <div className="text-lg font-bold text-gray-900 font-mono mt-1">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="p-3 rounded-[8px]" style={{ background: '#FAFAFA', border: '1px solid rgba(0,0,0,0.06)' }}>
+                                    <span className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Total Billed</span>
+                                    <div className="text-[15px] font-[600] text-gray-900 font-mono mt-1">
                                         {formatCurrency(totalInvoiced, customer.currency)}
                                     </div>
                                 </div>
-                                <div className="p-4 rounded-xl border border-gray-100">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Paid</span>
-                                    <div className="text-lg font-bold text-emerald-600 font-mono mt-1">
+                                <div className="p-3 rounded-[8px]" style={{ background: '#FAFAFA', border: '1px solid rgba(0,0,0,0.06)' }}>
+                                    <span className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Total Paid</span>
+                                    <div className="text-[15px] font-[600] text-emerald-600 font-mono mt-1">
                                         {formatCurrency(totalPaid, customer.currency)}
                                     </div>
                                 </div>
@@ -143,50 +154,51 @@ export default async function CustomerDetailsPage({
                         </div>
                     </div>
 
-                    {/* Contact Info Card */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                                <PiBuildings className="text-lg text-indigo-600" />
+                    {/* Contact Info */}
+                    <div className="bg-white rounded-[8px] p-5" style={CARD_STYLE}>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-[10.5px] font-[600] text-gray-400 uppercase tracking-[0.07em] flex items-center gap-1.5">
+                                <PiBuildings className="text-[14px] text-[#6366F1]" />
                                 Contact Details
                             </h3>
                             <EditCustomerModal customer={customer} />
                         </div>
 
-                        <div className="space-y-4 text-sm">
-                            <div className="flex items-start gap-3">
-                                <PiMapPin className="text-lg text-gray-400 mt-0.5" />
+                        <div className="space-y-3">
+                            <div className="flex items-start gap-2.5">
+                                <PiMapPin className="text-[14px] text-gray-400 mt-0.5 shrink-0" />
                                 <div>
-                                    <span className="block text-gray-900 font-medium">Address</span>
-                                    <span className="text-gray-500">
+                                    <span className="block text-[12.5px] text-gray-900 font-[500]">Address</span>
+                                    <span className="text-[12px] text-gray-400">
                                         {customer.address || "No address provided"}
-                                        <br />
-                                        {customer.city} {customer.country}
+                                        {(customer.city || customer.country) && (
+                                            <><br />{customer.city} {customer.country}</>
+                                        )}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <PiPhone className="text-lg text-gray-400" />
+                            <div className="flex items-start gap-2.5">
+                                <PiPhone className="text-[14px] text-gray-400 mt-0.5 shrink-0" />
                                 <div>
-                                    <span className="block text-gray-900 font-medium">Phone</span>
-                                    <span className="text-gray-500">{customer.phone || "N/A"}</span>
+                                    <span className="block text-[12.5px] text-gray-900 font-[500]">Phone</span>
+                                    <span className="text-[12px] text-gray-400">{customer.phone || "N/A"}</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <PiEnvelope className="text-lg text-gray-400" />
+                            <div className="flex items-start gap-2.5">
+                                <PiEnvelope className="text-[14px] text-gray-400 mt-0.5 shrink-0" />
                                 <div>
-                                    <span className="block text-gray-900 font-medium">Email</span>
-                                    <span className="text-gray-500">{customer.email || "N/A"}</span>
+                                    <span className="block text-[12.5px] text-gray-900 font-[500]">Email</span>
+                                    <span className="text-[12px] text-gray-400">{customer.email || "N/A"}</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <PiGlobe className="text-lg text-gray-400" />
+                            <div className="flex items-start gap-2.5">
+                                <PiGlobe className="text-[14px] text-gray-400 mt-0.5 shrink-0" />
                                 <div>
-                                    <span className="block text-gray-900 font-medium">Person</span>
-                                    <span className="text-gray-500">{customer.contactPerson || "N/A"}</span>
+                                    <span className="block text-[12.5px] text-gray-900 font-[500]">Contact Person</span>
+                                    <span className="text-[12px] text-gray-400">{customer.contactPerson || "N/A"}</span>
                                 </div>
                             </div>
                         </div>
@@ -194,57 +206,61 @@ export default async function CustomerDetailsPage({
                 </div>
 
                 {/* Right Column: Activities */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-4">
                     {/* Recent Invoices */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                <PiFileText className="text-indigo-500" />
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-5 py-4 flex items-center justify-between"
+                            style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <h3 className="text-[13px] font-[600] text-gray-900 flex items-center gap-1.5">
+                                <PiFileText className="text-[#6366F1]" />
                                 Recent Invoices
                             </h3>
-                            <Link href={`/dashboard/accounting/customers/${id}/statement`} className="text-xs text-indigo-600 hover:underline font-medium">
+                            <Link href={`/dashboard/accounting/customers/${id}/statement`}
+                                className="text-[11.5px] text-[#6366F1] hover:underline font-[500]">
                                 View All
                             </Link>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-50/50 text-xs text-gray-500 uppercase font-semibold">
+                            <table className="w-full text-left">
+                                <thead style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: '#FAFAFA' }}>
                                     <tr>
-                                        <th className="px-6 py-3">Date</th>
-                                        <th className="px-6 py-3">Invoice #</th>
-                                        <th className="px-6 py-3 text-right">Amount</th>
-                                        <th className="px-6 py-3">Status</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Date</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Invoice #</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] text-right">Amount</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody>
                                     {customer.sales.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="px-6 py-8 text-center text-gray-500 italic">
+                                            <td colSpan={4} className="px-5 py-8 text-center text-[12.5px] text-gray-400 italic">
                                                 No invoices yet
                                             </td>
                                         </tr>
                                     ) : (
-                                        customer.sales.map((sale) => (
-                                            <tr key={sale.id} className="hover:bg-gray-50/50 transition-colors">
-                                                <td className="px-6 py-3 text-gray-600">
-                                                    {new Date(sale.issueDate).toLocaleDateString()}
-                                                </td>
-                                                <td className="px-6 py-3 font-mono font-medium text-gray-900">
-                                                    {sale.invoiceNumber}
-                                                </td>
-                                                <td className="px-6 py-3 text-right font-mono font-bold text-gray-900">
-                                                    {formatCurrency(sale.totalAmount, sale.currency)}
-                                                </td>
-                                                <td className="px-6 py-3">
-                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${sale.status === 'PAID' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                        sale.status === 'PARTIAL' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                                                            'bg-gray-50 text-gray-600 border-gray-100'
-                                                        }`}>
-                                                        {sale.status}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))
+                                        customer.sales.map((sale, idx) => {
+                                            const sMeta = SALE_STATUS_META[sale.status] || SALE_STATUS_META['PENDING'];
+                                            return (
+                                                <tr key={sale.id} className="hover:bg-gray-50/60 transition-colors"
+                                                    style={idx < customer.sales.length - 1 ? { borderBottom: '1px solid rgba(0,0,0,0.06)' } : {}}>
+                                                    <td className="px-5 py-3.5 text-[12.5px] text-gray-500">
+                                                        {new Date(sale.issueDate).toLocaleDateString()}
+                                                    </td>
+                                                    <td className="px-5 py-3.5 font-mono font-[500] text-[12px] text-gray-900">
+                                                        {sale.invoiceNumber}
+                                                    </td>
+                                                    <td className="px-5 py-3.5 text-right font-mono font-[600] text-[13px] text-gray-900">
+                                                        {formatCurrency(Number(sale.totalAmount), sale.currency)}
+                                                    </td>
+                                                    <td className="px-5 py-3.5">
+                                                        <span className={`text-[10px] font-[500] px-2 py-0.5 rounded-[4px] uppercase ${sMeta.cls}`}
+                                                            style={{ border: `1px solid ${sMeta.border}` }}>
+                                                            {sale.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
                                     )}
                                 </tbody>
                             </table>
@@ -252,46 +268,49 @@ export default async function CustomerDetailsPage({
                     </div>
 
                     {/* Recent Payments */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                <PiReceipt className="text-indigo-500" />
+                    <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
+                        <div className="px-5 py-4 flex items-center justify-between"
+                            style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                            <h3 className="text-[13px] font-[600] text-gray-900 flex items-center gap-1.5">
+                                <PiReceipt className="text-[#6366F1]" />
                                 Recent Payments
                             </h3>
-                            <Link href={`/dashboard/accounting/customers/${id}/statement`} className="text-xs text-indigo-600 hover:underline font-medium">
+                            <Link href={`/dashboard/accounting/customers/${id}/statement`}
+                                className="text-[11.5px] text-[#6366F1] hover:underline font-[500]">
                                 View History
                             </Link>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-50/50 text-xs text-gray-500 uppercase font-semibold">
+                            <table className="w-full text-left">
+                                <thead style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: '#FAFAFA' }}>
                                     <tr>
-                                        <th className="px-6 py-3">Date</th>
-                                        <th className="px-6 py-3">Reference</th>
-                                        <th className="px-6 py-3">Method</th>
-                                        <th className="px-6 py-3 text-right">Amount</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Date</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Reference</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">Method</th>
+                                        <th className="px-5 py-3 text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] text-right">Amount</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody>
                                     {customer.payments.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="px-6 py-8 text-center text-gray-500 italic">
+                                            <td colSpan={4} className="px-5 py-8 text-center text-[12.5px] text-gray-400 italic">
                                                 No payments found
                                             </td>
                                         </tr>
                                     ) : (
-                                        customer.payments.map((payment) => (
-                                            <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors">
-                                                <td className="px-6 py-3 text-gray-600">
+                                        customer.payments.map((payment, idx) => (
+                                            <tr key={payment.id} className="hover:bg-gray-50/60 transition-colors"
+                                                style={idx < customer.payments.length - 1 ? { borderBottom: '1px solid rgba(0,0,0,0.06)' } : {}}>
+                                                <td className="px-5 py-3.5 text-[12.5px] text-gray-500">
                                                     {new Date(payment.paymentDate).toLocaleDateString()}
                                                 </td>
-                                                <td className="px-6 py-3 text-gray-600 font-mono text-xs">
+                                                <td className="px-5 py-3.5 text-gray-500 font-mono text-[11.5px]">
                                                     {payment.reference || '-'}
                                                 </td>
-                                                <td className="px-6 py-3 text-gray-600 capitalize">
+                                                <td className="px-5 py-3.5 text-[12.5px] text-gray-500 capitalize">
                                                     {payment.method.replace('_', ' ').toLowerCase()}
                                                 </td>
-                                                <td className="px-6 py-3 text-right font-mono font-bold text-emerald-600">
+                                                <td className="px-5 py-3.5 text-right font-mono font-[600] text-[13px] text-emerald-600">
                                                     {formatCurrency(payment.amount, payment.currency)}
                                                 </td>
                                             </tr>

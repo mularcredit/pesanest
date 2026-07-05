@@ -38,7 +38,7 @@ export async function getRequisitionDetailsForReceipt(requisitionId: string) {
         // Map each requisition item to the receipt format
         items = req.items.map((item: any) => ({
             description: item.title,
-            subtext: `${item.category} - Qty: ${item.quantity} @ ${req.currency || 'USD'} ${item.unitPrice.toFixed(2)}`,
+            subtext: `${item.category} - Qty: ${item.quantity} @ ${req.currency || 'KES'} ${item.unitPrice.toFixed(2)}`,
             date: item.createdAt,
             amount: item.totalPrice
         }));
@@ -89,7 +89,7 @@ export async function getInvoiceDetailsForReceipt(invoiceId: string) {
     return {
         receiptNo: `VCH-${new Date().getFullYear()}-${inv.id.slice(0, 8).toUpperCase()}`,
         date: inv.invoiceDate,
-        amount: inv.amount,
+        amount: Number(inv.amount),
         beneficiary: {
             name: inv.vendor.name,
             address: inv.vendor.address || "N/A"
@@ -101,7 +101,7 @@ export async function getInvoiceDetailsForReceipt(invoiceId: string) {
                 description: `Invoice: ${inv.invoiceNumber}`,
                 subtext: inv.description || "Vendor Payment",
                 date: inv.invoiceDate,
-                amount: inv.amount
+                amount: Number(inv.amount)
             }
         ],
         approvals: {
@@ -197,7 +197,7 @@ export async function getPaymentDetailsForReceipt(paymentId: string) {
             for (const item of req.items) {
                 items.push({
                     description: item.title,
-                    subtext: `${item.category || req.category} - Qty: ${item.quantity} @ ${req.currency || 'USD'} ${Number(item.unitPrice).toFixed(2)}`,
+                    subtext: `${item.category || req.category} - Qty: ${item.quantity} @ ${req.currency || 'KES'} ${Number(item.unitPrice).toFixed(2)}`,
                     date: item.createdAt,
                     amount: item.totalPrice
                 });
@@ -332,7 +332,7 @@ export async function getRequisitionItemDetailsForReceipt(itemId: string) {
     let beneficiaryName = vendorMatch && vendorMatch[1] ? vendorMatch[1].trim() : req.title;
     const beneficiaryAddress = req.department ? `${req.department} Dept` : (req.branch || "N/A");
 
-    const currency = req.currency || "USD";
+    const currency = req.currency || 'KES';
     const itemTotal = item.quantity * item.unitPrice;
 
     return {

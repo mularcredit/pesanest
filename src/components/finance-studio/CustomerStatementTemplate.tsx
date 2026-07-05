@@ -43,7 +43,7 @@ export const CustomerStatementTemplate: React.FC<CustomerStatementProps> = ({
     notes,
 }) => {
     const formatCurrency = (val: number) =>
-        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'KES' }).format(val);
 
     const formatDate = (d: Date) =>
         d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -135,7 +135,7 @@ export const CustomerStatementTemplate: React.FC<CustomerStatementProps> = ({
                     <div className="flex justify-between items-center mb-[20px] pb-[8px] border-b border-[#eee] text-[8px] text-[#555]">
                         <div className="flex-1 text-left font-bold text-[#333]">
                             <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Site</strong>
-                            https://sscaa.eservices.gov.ss
+                            www.pesanest.com
                         </div>
                         <div className="flex-1 text-center font-bold text-[#333]">
                             <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Contact Number</strong>
@@ -143,7 +143,7 @@ export const CustomerStatementTemplate: React.FC<CustomerStatementProps> = ({
                         </div>
                         <div className="flex-1 text-right font-bold text-[#333]">
                             <strong className="block text-[#666] mb-[1px] uppercase text-[8px] font-normal">Email</strong>
-                            ans-sscaa@eservices.gov.ss
+                            support@pesanest.com
                         </div>
                     </div>
 
@@ -167,7 +167,7 @@ export const CustomerStatementTemplate: React.FC<CustomerStatementProps> = ({
                             </div>
                             <div>
                                 <h4 className="text-[8px] uppercase text-[#64748b] m-0 mb-[2px] font-normal">Currency</h4>
-                                <p className="m-0 text-[9px] font-bold text-[#1a1a1a]">USD</p>
+                                <p className="m-0 text-[9px] font-bold text-[#1a1a1a]">KES</p>
                             </div>
                             <div className="text-right">
                                 <h4 className="text-[8px] uppercase text-[#64748b] m-0 mb-[2px] font-normal">Statement Period</h4>
@@ -215,9 +215,9 @@ export const CustomerStatementTemplate: React.FC<CustomerStatementProps> = ({
                                     <th className="bg-[#236A9E] text-white text-left p-[5px_4px] text-[8px] uppercase font-semibold w-[18%]">Description</th>
                                     <th className="bg-[#236A9E] text-white text-left p-[5px_4px] text-[8px] uppercase font-semibold w-[14%]">Reference</th>
                                     <th className="bg-[#236A9E] text-white text-left p-[5px_4px] text-[8px] uppercase font-semibold w-[23%]">Date</th>
-                                    <th className="bg-[#236A9E] text-white text-right p-[5px_4px] text-[8px] uppercase font-semibold w-[13%]">Debit (USD)</th>
-                                    <th className="bg-[#236A9E] text-white text-right p-[5px_4px] text-[8px] uppercase font-semibold w-[13%]">Credit (USD)</th>
-                                    <th className="bg-[#236A9E] text-white text-right p-[5px_4px] text-[8px] uppercase font-semibold w-[14%]">Balance (USD)</th>
+                                    <th className="bg-[#236A9E] text-white text-right p-[5px_4px] text-[8px] uppercase font-semibold w-[13%]">Debit (KES)</th>
+                                    <th className="bg-[#236A9E] text-white text-right p-[5px_4px] text-[8px] uppercase font-semibold w-[13%]">Credit (KES)</th>
+                                    <th className="bg-[#236A9E] text-white text-right p-[5px_4px] text-[8px] uppercase font-semibold w-[14%]">Balance (KES)</th>
                                 </tr>
                             </thead>
                             <tbody>

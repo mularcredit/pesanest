@@ -3,33 +3,41 @@
 import { useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/Card";
 
-interface CategoryData {
-    name: string;
-    value: number;
-}
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
 
 interface DistributionChartsProps {
     expensesData: [string, number][];
     requisitionsData: [string, number][];
+    title1?: string;
+    title2?: string;
     className?: string;
 }
 
-const COLORS_EXPENSES = ['#10b981', '#34d399', '#6ee7b7', '#059669', '#a7f3d0', '#047857', '#ecfdf5'];
-const COLORS_REQUISITIONS = ['#6366f1', '#818cf8', '#a5b4fc', '#4f46e5', '#c7d2fe', '#4338ca', '#e0e7ff'];
+const COLORS_CATEGORY = [
+    '#6366f1', '#10b981', '#f59e0b', '#3b82f6',
+    '#8b5cf6', '#ec4899', '#14b8a6', '#f97316',
+];
 
-const CustomPieTooltip = ({ active, payload }: any) => {
+const COLORS_STATUS = [
+    '#10b981', '#6366f1', '#f59e0b', '#9ca3af', '#ef4444', '#3b82f6',
+];
+
+const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
         return (
-            <div className="bg-white border border-slate-200 shadow-xl p-3 rounded-xl backdrop-blur-sm bg-white/90">
+            <div className="bg-white p-3 rounded-[8px] min-w-[180px]"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
-                        <span className={`w-2.5 h-2.5 rounded-full`} style={{ backgroundColor: payload[0].payload.fill }}></span>
-                        <span className="text-[11px] font-bold text-slate-700">{payload[0].name.replace(/_/g, ' ')}</span>
+                        <span className="w-2 h-2 rounded-[2px] inline-block"
+                            style={{ backgroundColor: payload[0].payload.fill }} />
+                        <span className="text-[11px] font-[500] text-gray-600 capitalize">
+                            {String(payload[0].name).replace(/_/g, ' ').toLowerCase()}
+                        </span>
                     </div>
-                    <span className="text-xs font-bold text-slate-900 font-mono">
-                        ${payload[0].value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    <span className="text-[12px] font-[600] text-gray-900 font-mono">
+                        KES {Number(payload[0].value).toLocaleString(undefined, { minimumFractionDigits: 0 })}
                     </span>
                 </div>
             </div>
@@ -38,48 +46,63 @@ const CustomPieTooltip = ({ active, payload }: any) => {
     return null;
 };
 
-export function DistributionCharts({ expensesData, requisitionsData, className }: DistributionChartsProps) {
-    const formattedExpenses = useMemo(() => expensesData.map(([name, value]) => ({ name, value })), [expensesData]);
-    const formattedRequisitions = useMemo(() => requisitionsData.map(([name, value]) => ({ name, value })), [requisitionsData]);
+export function DistributionCharts({
+    expensesData,
+    requisitionsData,
+    title1 = "By Category",
+    title2 = "By Status",
+    className,
+}: DistributionChartsProps) {
+    const formattedExpenses = useMemo(
+        () => expensesData.map(([name, value]) => ({ name, value })),
+        [expensesData]
+    );
+    const formattedRequisitions = useMemo(
+        () => requisitionsData.map(([name, value]) => ({ name, value })),
+        [requisitionsData]
+    );
 
-    if (!expensesData.length && !requisitionsData.length) {
-        return null;
-    }
+    if (!expensesData.length && !requisitionsData.length) return null;
 
     const renderPieCard = (title: string, data: any[], colors: string[]) => (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-300">
-            <h2 className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-2 flex items-center gap-2">
-                {title}
-            </h2>
-            <div className="h-[280px] w-full mt-auto relative">
+        <div className="bg-white rounded-[8px] p-5 flex flex-col" style={CARD_STYLE}>
+            <p className="text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400 mb-4">{title}</p>
+            <div className="h-[260px] w-full">
                 {data.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
                                 data={data}
                                 cx="50%"
-                                cy="50%"
-                                innerRadius={75}
-                                outerRadius={95}
+                                cy="46%"
+                                innerRadius={68}
+                                outerRadius={88}
                                 paddingAngle={3}
                                 dataKey="value"
                             >
-                                {data.map((entry, index) => (
+                                {data.map((_, index) => (
                                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                                 ))}
                             </Pie>
-                            <Tooltip content={<CustomPieTooltip />} cursor={{fill: 'transparent'}} />
-                            <Legend 
-                                verticalAlign="bottom" 
-                                height={36} 
-                                iconType="circle"
-                                formatter={(value) => <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider ml-1 truncate max-w-[80px] inline-block align-bottom">{value.replace(/_/g, ' ')}</span>}
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+                            <Legend
+                                verticalAlign="bottom"
+                                height={40}
+                                iconType="square"
+                                iconSize={8}
+                                formatter={(value) => (
+                                    <span className="text-[9.5px] font-[500] text-gray-500 tracking-[0.04em] capitalize ml-1">
+                                        {String(value).replace(/_/g, ' ').toLowerCase()}
+                                    </span>
+                                )}
                             />
                         </PieChart>
                     </ResponsiveContainer>
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-300 uppercase tracking-widest">
-                        No Data available
+                    <div className="h-full flex flex-col items-center justify-center gap-2">
+                        <div className="w-[140px] h-[140px] rounded-full"
+                            style={{ border: '1.5px dashed rgba(0,0,0,0.1)' }} />
+                        <p className="text-[11px] font-[500] text-gray-300 uppercase tracking-[0.1em]">No data</p>
                     </div>
                 )}
             </div>
@@ -87,9 +110,9 @@ export function DistributionCharts({ expensesData, requisitionsData, className }
     );
 
     return (
-        <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-6", className)}>
-            {renderPieCard("Expense Allocation", formattedExpenses, COLORS_EXPENSES)}
-            {renderPieCard("Requested Resources", formattedRequisitions, COLORS_REQUISITIONS)}
+        <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", className)}>
+            {renderPieCard(title1, formattedExpenses, COLORS_CATEGORY)}
+            {renderPieCard(title2, formattedRequisitions, COLORS_STATUS)}
         </div>
     );
 }

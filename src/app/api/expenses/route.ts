@@ -18,7 +18,7 @@ const createExpenseSchemaAdmin = z.object({
     requisitionId: z.string().optional(),
     isReimbursable: z.boolean().default(true),
     isBillable: z.boolean().default(false),
-    costCenter: z.enum(['OFFICE', 'SSCAA']).default('OFFICE'),
+    costCenter: z.enum(['OFFICE']).default('OFFICE'),
 });
 
 // Validation schema for regular users (Limit controlled by Policy Engine)
@@ -34,7 +34,7 @@ const createExpenseSchemaUser = z.object({
     requisitionId: z.string().optional(),
     isReimbursable: z.boolean().default(true),
     isBillable: z.boolean().default(false),
-    costCenter: z.enum(['OFFICE', 'SSCAA']).default('OFFICE'),
+    costCenter: z.enum(['OFFICE']).default('OFFICE'),
 });
 
 /**

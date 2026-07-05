@@ -208,7 +208,7 @@ export function CreateCreditNoteModal({
                     <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100 flex items-start gap-3">
                         <PiCheckCircle className="text-xl text-emerald-600 mt-0.5 shrink-0" />
                         <div>
-                            <p className="text-sm font-bold text-emerald-900">Successfully Created {createdCNNumber}</p>
+                            <p className="text-sm font-semibold text-emerald-900">Successfully Created {createdCNNumber}</p>
                             <p className="text-xs text-emerald-700 mt-1">
                                 The credit note has been saved and posted to the General Ledger.
                                 <br />Customer balance has been updated.
@@ -217,21 +217,7 @@ export function CreateCreditNoteModal({
                     </div>
 
                     <div className="grid grid-cols-1 gap-3">
-                        <button
-                            onClick={() => handleOpenInStudio('CREDIT_NOTE')}
-                            className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-500 hover:shadow-md transition-all group group"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 transition-colors">
-                                    <PiReceipt className="text-xl text-indigo-600 group-hover:text-white" />
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-sm font-bold text-gray-900">Open in Statement Studio</p>
-                                    <p className="text-xs text-gray-500">View and print the credit note document</p>
-                                </div>
-                            </div>
-                            <PiArrowRight className="text-gray-400 group-hover:text-indigo-600" />
-                        </button>
+
 
                         <button
                             onClick={() => handleOpenInStudio('RECEIPT')}
@@ -242,7 +228,7 @@ export function CreateCreditNoteModal({
                                     <PiReceipt className="text-xl text-emerald-600 group-hover:text-white" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-sm font-bold text-gray-900">Create Receipt</p>
+                                    <p className="text-sm font-semibold text-gray-900">Create Receipt</p>
                                     <p className="text-xs text-gray-500">Generate a receipt for this credit application</p>
                                 </div>
                             </div>
@@ -282,23 +268,23 @@ export function CreateCreditNoteModal({
                     <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                         <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
                             <div className="space-y-1">
-                                <p className="text-[10px] uppercase font-bold text-gray-400">Customer</p>
-                                <p className="font-bold text-gray-900">{customerName}</p>
+                                <p className="text-[10px] uppercase font-semibold text-gray-400">Customer</p>
+                                <p className="font-semibold text-gray-900">{customerName}</p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-[10px] uppercase font-bold text-gray-400">Amount</p>
-                                <p className="font-bold text-gray-900 text-lg font-mono">{currency} {parseFloat(formData.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                <p className="text-[10px] uppercase font-semibold text-gray-400">Amount</p>
+                                <p className="font-semibold text-gray-900 text-lg font-mono">{currency} {parseFloat(formData.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-[10px] uppercase font-bold text-gray-400">Credit Note No.</p>
-                                <p className="font-bold text-gray-900">{formData.cnNumber || "(Auto-generated)"}</p>
+                                <p className="text-[10px] uppercase font-semibold text-gray-400">Credit Note No.</p>
+                                <p className="font-semibold text-gray-900">{formData.cnNumber || "(Auto-generated)"}</p>
                             </div>
                             <div className="space-y-1 col-span-2">
-                                <p className="text-[10px] uppercase font-bold text-gray-400">Invoice Reference</p>
+                                <p className="text-[10px] uppercase font-semibold text-gray-400">Invoice Reference</p>
                                 <p className="font-medium text-gray-900">{formData.invoiceRef}</p>
                             </div>
                             <div className="space-y-1 col-span-2">
-                                <p className="text-[10px] uppercase font-bold text-gray-400">Reason</p>
+                                <p className="text-[10px] uppercase font-semibold text-gray-400">Reason</p>
                                 <p className="font-medium text-gray-900 italic">"{formData.reason}"</p>
                             </div>
                         </div>
@@ -338,7 +324,7 @@ export function CreateCreditNoteModal({
                     {/* Sales Selection (if sales exist) */}
                     {sales.length > 0 && (
                         <div className="space-y-2">
-                            <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Against invoice (optional)</label>
+                            <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Against invoice (optional)</label>
                             <Select
                                 value={formData.saleId}
                                 onChange={val => setFormData({ ...formData, saleId: val })}
@@ -355,7 +341,7 @@ export function CreateCreditNoteModal({
                     )}
 
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Date</label>
+                        <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Date</label>
                         <DatePicker
                             value={formData.date ? new Date(formData.date) : undefined}
                             onChange={(date) => setFormData({ ...formData, date: format(date, 'yyyy-MM-dd') })}
@@ -365,7 +351,7 @@ export function CreateCreditNoteModal({
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">
+                        <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">
                             Invoice reference
                             {formData.saleId && <span className="text-[10px] text-indigo-600 ml-2">(auto-filled from selected invoice)</span>}
                         </label>
@@ -375,23 +361,23 @@ export function CreateCreditNoteModal({
                             onChange={e => setFormData({ ...formData, invoiceRef: e.target.value })}
                             required
                             disabled={!!formData.saleId}
-                            className={`border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#29258D]/10 focus-visible:border-gray-300 ${formData.saleId ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'
+                            className={`border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#6366F1]/10 focus-visible:border-gray-300 ${formData.saleId ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'
                                 }`}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Credit note no. (optional)</label>
+                        <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Credit note no. (optional)</label>
                         <Input
                             placeholder="e.g. CN-001 (Leave blank to auto-generate)"
                             value={formData.cnNumber}
                             onChange={e => setFormData({ ...formData, cnNumber: e.target.value })}
-                            className="bg-white border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#29258D]/10 focus-visible:border-gray-300"
+                            className="bg-white border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#6366F1]/10 focus-visible:border-gray-300"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Credit amount</label>
+                        <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Credit amount</label>
                         <Input
                             type="number"
                             step="0.01"
@@ -400,14 +386,14 @@ export function CreateCreditNoteModal({
                             value={formData.amount}
                             onChange={e => setFormData({ ...formData, amount: e.target.value })}
                             required
-                            className="bg-white border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#29258D]/10 focus-visible:border-gray-300"
+                            className="bg-white border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#6366F1]/10 focus-visible:border-gray-300"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Reason for credit note</label>
+                        <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Reason for credit note</label>
                         <textarea
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[5px] text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all resize-none h-24 shadow-none"
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[5px] text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#6366F1] transition-all resize-none h-24 shadow-none"
                             placeholder="e.g. Product return, pricing error, damaged goods..."
                             value={formData.reason}
                             onChange={e => setFormData({ ...formData, reason: e.target.value })}
@@ -419,7 +405,7 @@ export function CreateCreditNoteModal({
                         <div className="flex gap-3">
                             <PiReceipt className="text-amber-600 text-xl shrink-0 mt-0.5" />
                             <div className="text-xs text-amber-800">
-                                <p className="font-bold mb-1">About Credit Notes</p>
+                                <p className="font-semibold mb-1">About Credit Notes</p>
                                 <p className="text-amber-700">
                                     A credit note reduces the customer's outstanding balance and will be posted to the General Ledger.
                                     This transaction cannot be reversed once created (only voided).
@@ -435,14 +421,14 @@ export function CreateCreditNoteModal({
                         type="button"
                         onClick={handleClose}
                         disabled={isSubmitting}
-                        className="px-6 py-2.5 rounded-[5px] text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all border border-gray-200"
+                        className="px-6 py-2.5 rounded-[5px] text-xs font-semibold text-gray-500 hover:bg-gray-50 transition-all border border-gray-200"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-8 py-2.5 rounded-[5px] bg-[#29258D] text-white text-xs font-bold hover:bg-[#29258D]/90 transition-all shadow-lg shadow-[#29258D]/20 min-w-[160px] flex items-center justify-center gap-2"
+                        className="px-8 py-2.5 rounded-[5px] bg-[#6366F1] text-white text-xs font-semibold hover:bg-[#6366F1]/90 transition-all shadow-lg shadow-[#6366F1]/20 min-w-[160px] flex items-center justify-center gap-2"
                     >
                         Review Credit Note
                     </button>

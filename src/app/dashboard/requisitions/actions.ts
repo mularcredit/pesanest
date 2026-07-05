@@ -11,6 +11,8 @@ export async function fulfillRequisition(formData: FormData) {
     const requisitionId = formData.get("requisitionId") as string;
     const receiptUrl = formData.get("receiptUrl") as string;
     const notes = formData.get("notes") as string;
+    const etrNumber = (formData.get("etrNumber") as string)?.trim().toUpperCase() || null;
+    const etrVerified = formData.get("etrVerified") === "true";
 
     if (!requisitionId || !receiptUrl) {
         throw new Error("Requisition ID and Receipt URL are required");
@@ -34,6 +36,9 @@ export async function fulfillRequisition(formData: FormData) {
                 category: requisition.category,
                 expenseDate: new Date(),
                 receiptUrl: receiptUrl,
+                etrNumber: etrNumber || null,
+                etrVerified: etrVerified,
+                etrVerifiedAt: etrVerified ? new Date() : null,
                 status: 'APPROVED',
                 paymentMethod: 'PERSONAL_CARD',
                 isReimbursable: true
@@ -95,6 +100,11 @@ export async function updateRequisition(formData: FormData) {
     const branch = (formData.get("branch") as string)?.trim();
     const department = (formData.get("department") as string)?.trim();
     const expectedDateStr = formData.get("expectedDate") as string;
+    const amountStr = formData.get("amount") as string;
+    const currency = (formData.get("currency") as string)?.trim();
+    const category = (formData.get("category") as string)?.trim();
+    const paymentMethod = (formData.get("paymentMethod") as string)?.trim();
+    const paymentReference = (formData.get("paymentReference") as string)?.trim();
 
     if (!id) return { success: false, message: "Missing requisition ID" };
     if (!title || title.length < 5) return { success: false, message: "Title must be at least 5 characters" };
@@ -113,11 +123,14 @@ export async function updateRequisition(formData: FormData) {
         if (!isAdmin && requisition.userId !== session.user.id) {
             return { success: false, message: "You can only edit your own requisitions" };
         }
-        if (!isAdmin && !['PENDING', 'NEEDS_INFO'].includes(requisition.status)) {
+        if (!isAdmin && !['PENDING', 'NEEDS_INFO', 'ADJUSTMENT_REQUIRED'].includes(requisition.status)) {
             return { success: false, message: `This requisition cannot be edited (status: ${requisition.status})` };
         }
 
         const expectedDate = expectedDateStr ? new Date(expectedDateStr) : null;
+        const amount = amountStr ? parseFloat(amountStr) : undefined;
+
+        const isResubmitting = requisition.status === 'ADJUSTMENT_REQUIRED';
 
         await (prisma as any).requisition.update({
             where: { id },
@@ -128,11 +141,33 @@ export async function updateRequisition(formData: FormData) {
                 branch: branch || null,
                 department: department || null,
                 expectedDate: expectedDate,
+                ...(amount !== undefined && !isNaN(amount) ? { amount } : {}),
+                ...(currency ? { currency } : {}),
+                ...(category ? { category } : {}),
+                ...(paymentMethod ? { paymentMethod } : {}),
+                ...(paymentReference ? { paymentReference } : {}),
+                // Reset status to PENDING so it re-enters the approval queue
+                ...(isResubmitting ? { status: 'PENDING' } : {}),
             }
         });
 
+        // If it was an adjustment (or is already pending but has stuck adjustment approvals), 
+        // reset the approval records so they show up in the queue again.
+        if (requisition.status === 'ADJUSTMENT_REQUIRED' || requisition.status === 'PENDING') {
+            await prisma.approval.updateMany({
+                where: { 
+                    requisitionId: id,
+                    status: 'ADJUSTMENT'
+                },
+                data: {
+                    status: 'PENDING'
+                }
+            });
+        }
+
         revalidatePath("/dashboard/requisitions");
-        return { success: true, message: "Requisition updated successfully" };
+        revalidatePath("/dashboard/approvals");
+        return { success: true, message: "Requisition updated and resubmitted for approval" };
     } catch (e: any) {
         console.error("Failed to update requisition:", e);
         return { success: false, message: e.message || "Failed to update" };
@@ -177,7 +212,7 @@ export async function createItemPaymentBatch(itemId: string) {
         const payment = await prisma.payment.create({
             data: {
                 amount: itemTotal,
-                currency: req.currency || 'USD',
+                currency: req.currency || 'KES',
                 status: 'PENDING_AUTHORIZATION',
                 makerId: session.user.id,
                 method: 'BANK_TRANSFER',

@@ -10,12 +10,12 @@ import { checkEnforceClosure } from "@/lib/closure-check";
 const expenseSchema = z.object({
     title: z.string().min(3),
     amount: z.coerce.number().positive(),
-    currency: z.string().default("USD"),
+    currency: z.string().default('KES'),
     category: z.string().min(1),
     expenseDate: z.coerce.date(),
     merchant: z.string().optional(),
     description: z.string().optional(),
-    costCenter: z.enum(['OFFICE', 'SSCAA']).optional().default('OFFICE'),
+    costCenter: z.enum(['OFFICE']).optional().default('OFFICE'),
     accountId: z.string().optional(),
 });
 
@@ -24,6 +24,8 @@ export async function createExpense(formData: FormData) {
     if (!session?.user?.id) {
         throw new Error("Unauthorized");
     }
+
+    const etrNumber = (formData.get("etrNumber") as string)?.trim().toUpperCase() || null;
 
     const rawData = {
         title: formData.get("title") || "",
@@ -65,7 +67,8 @@ export async function createExpense(formData: FormData) {
                 description: validated.data.description,
                 costCenter: validated.data.costCenter,
                 accountId: validated.data.accountId,
-                status: "DRAFT", // Default to DRAFT
+                etrNumber: etrNumber || null,
+                status: "DRAFT",
             },
         });
     } catch (e) {

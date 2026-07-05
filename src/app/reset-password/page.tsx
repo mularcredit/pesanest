@@ -4,15 +4,14 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { BiLockAlt, BiArrowBack } from "react-icons/bi";
-import { PiCheckCircle } from "react-icons/pi";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { HiLockClosed, HiEye, HiEyeSlash, HiArrowLeft, HiArrowRight, HiCheckCircle } from "react-icons/hi2";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { cn } from "@/lib/utils";
 
 function ResetPasswordForm() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
@@ -88,30 +87,17 @@ function ResetPasswordForm() {
                 />
                 <div className={cn(
                     "absolute inset-0 backdrop-blur-[1px]",
-                    process.env.NEXT_PUBLIC_APP_NAME === "Pesanest" 
-                        ? "bg-gradient-to-br from-[#1e005a]/90 to-black/70" 
-                        : "bg-gradient-to-br from-[#29258D]/90 to-black/70"
+                    process.env.NEXT_PUBLIC_APP_NAME === "Pesanest"
+                        ? "bg-gradient-to-br from-[#1e005a]/90 to-black/70"
+                        : "bg-gradient-to-br from-[#6366F1]/90 to-black/70"
                 )}>
                     <div className="h-full flex flex-col justify-between p-12">
                         <Link href="/" className="flex items-center gap-3">
-                            <Image
-                                src={
-                                    process.env.NEXT_PUBLIC_APP_NAME === "Pesanest"
-                                        ? "/pesanest/pesanest-light-new.png"
-                                        : (process.env.NEXT_PUBLIC_LOGO_URL || "/capitalpay.png")
-                                }
-                                alt={process.env.NEXT_PUBLIC_APP_NAME || "Capital Pay"}
-                                width={140}
-                                height={32}
-                                className={cn(
-                                    "w-auto object-contain",
-                                    process.env.NEXT_PUBLIC_APP_NAME === "Pesanest" ? "h-14" : "h-8"
-                                )}
-                            />
+                            <BrandLogo width={140} height={32} color="#ffffff" />
                         </Link>
 
                         <div className="text-white">
-                            <h2 className="text-4xl font-bold mb-4">
+                            <h2 className="text-4xl font-semibold mb-4">
                                 Create New<br />Password
                             </h2>
                             <p className="text-lg text-white/80 max-w-md">
@@ -127,131 +113,131 @@ function ResetPasswordForm() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
-                <div className="w-full max-w-md">
+            <div className="flex-1 flex items-center justify-center p-8 bg-[#F5F5F5]">
+                <div className="w-full max-w-[420px]">
                     {/* Mobile Logo */}
                     <div className="lg:hidden mb-8 text-center">
                         <Link href="/" className="inline-block">
-                            <Image
-                                src={process.env.NEXT_PUBLIC_LOGO_URL || "/capitalpay.png"}
-                                alt={process.env.NEXT_PUBLIC_APP_NAME || "Capital Pay"}
-                                width={120}
-                                height={28}
-                                className={cn(
-                                    "w-auto object-contain",
-                                    process.env.NEXT_PUBLIC_APP_NAME === "Pesanest" ? "h-11" : "h-5"
-                                )}
-                            />
+                            <BrandLogo width={120} height={28} color="#6366F1" />
                         </Link>
                     </div>
 
                     {!success ? (
                         <>
-                            <div className="mb-8">
-                                <Link
-                                    href="/login"
-                                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-                                >
-                                    <BiArrowBack />
-                                    Back to Login
-                                </Link>
-                                <h1 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h1>
-                                <p className="text-gray-600 text-sm">
-                                    Enter your new password below.
-                                </p>
+                            <Link
+                                href="/login"
+                                className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-500 hover:text-zinc-900 mb-6 transition-colors"
+                            >
+                                <HiArrowLeft />
+                                Back to login
+                            </Link>
+
+                            {/* Eyebrow */}
+                            <div className="flex items-center gap-3 mb-7">
+                                <div className="w-5 h-[1.5px] bg-[#6366F1]" />
+                                <span className="text-[11px] text-[#6366F1] tracking-[2px] font-semibold uppercase">
+                                    New password
+                                </span>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-5">
+                            <h1 className="text-[28px] font-bold text-zinc-900 tracking-tight mb-2">Reset password</h1>
+                            <p className="text-[13px] font-light text-zinc-500 mb-10 leading-relaxed">
+                                Enter your new password below.
+                            </p>
+
+                            <form onSubmit={handleSubmit}>
                                 {error && (
-                                    <div className="p-3 rounded-lg bg-rose-50 text-rose-700 text-sm font-semibold text-center border border-rose-200">
+                                    <div className="mb-5 p-3 rounded-lg text-[11px] text-center bg-rose-50 text-rose-700 border border-rose-200">
                                         {error}
                                     </div>
                                 )}
 
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                                        New Password
-                                    </label>
-                                    <Input
-                                        type="password"
+                                <div className="mb-1.5 text-xs font-medium text-zinc-900">New password</div>
+                                <div className="relative mb-2">
+                                    <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
+                                    <input
+                                        type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="Enter new password"
                                         required
                                         minLength={8}
-                                        icon={<BiLockAlt className="text-gray-400" />}
-                                        className="pl-10"
+                                        className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
+                                        style={{ padding: "11px 44px 11px 44px" }}
                                     />
-                                    {password && (
-                                        <div className="mt-3 space-y-1.5">
-                                            <div className="flex items-center gap-2 text-xs">
-                                                <div className={`w-1.5 h-1.5 rounded-full ${password.length >= 8 ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                                                <span className={password.length >= 8 ? 'text-emerald-600 font-medium' : 'text-gray-500'}>
-                                                    At least 8 characters
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-xs">
-                                                <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(password) ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                                                <span className={/[A-Z]/.test(password) ? 'text-emerald-600 font-medium' : 'text-gray-500'}>
-                                                    One uppercase letter
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-xs">
-                                                <div className={`w-1.5 h-1.5 rounded-full ${/[0-9]/.test(password) ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                                                <span className={/[0-9]/.test(password) ? 'text-emerald-600 font-medium' : 'text-gray-500'}>
-                                                    One number
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-xs">
-                                                <div className={`w-1.5 h-1.5 rounded-full ${/[!@#$%^&*]/.test(password) ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                                                <span className={/[!@#$%^&*]/.test(password) ? 'text-emerald-600 font-medium' : 'text-gray-500'}>
-                                                    One special character
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6366F1]/40 hover:text-[#6366F1]/70 transition-colors"
+                                    >
+                                        {showPassword ? <HiEyeSlash className="text-base" /> : <HiEye className="text-base" />}
+                                    </button>
                                 </div>
+                                {password && (
+                                    <div className="mb-6 px-1 space-y-1.5 pt-2">
+                                        <div className="flex items-center gap-2 text-[11px]">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${password.length >= 8 ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
+                                            <span className={password.length >= 8 ? 'text-emerald-600 font-medium' : 'text-zinc-500'}>
+                                                At least 8 characters
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[11px]">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(password) ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
+                                            <span className={/[A-Z]/.test(password) ? 'text-emerald-600 font-medium' : 'text-zinc-500'}>
+                                                One uppercase letter
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[11px]">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${/[0-9]/.test(password) ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
+                                            <span className={/[0-9]/.test(password) ? 'text-emerald-600 font-medium' : 'text-zinc-500'}>
+                                                One number
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[11px]">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${/[!@#$%^&*]/.test(password) ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
+                                            <span className={/[!@#$%^&*]/.test(password) ? 'text-emerald-600 font-medium' : 'text-zinc-500'}>
+                                                One special character
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
 
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                                        Confirm Password
-                                    </label>
-                                    <Input
+                                <div className="mb-1.5 text-xs font-medium text-zinc-900">Confirm password</div>
+                                <div className="relative mb-8">
+                                    <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
+                                    <input
                                         type="password"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         placeholder="Confirm new password"
                                         required
-                                        icon={<BiLockAlt className="text-gray-400" />}
-                                        className="pl-10"
+                                        className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
+                                        style={{ padding: "11px 16px 11px 44px" }}
                                     />
                                 </div>
 
-                                <Button
+                                <button
                                     type="submit"
                                     disabled={loading || !token}
-                                    className={cn(
-                                        "w-full font-semibold",
-                                        process.env.NEXT_PUBLIC_APP_NAME === "Pesanest" ? "bg-[#5e48b8] hover:bg-[#5e48b8]/90" : "bg-[#29258D] hover:bg-[#29258D]/90"
-                                    )}
+                                    className="w-full flex items-center justify-center gap-2.5 transition-all disabled:opacity-60 bg-[#6366F1] hover:brightness-110 hover:-translate-y-0.5 text-white rounded-lg py-[13px] text-sm font-bold tracking-wide"
                                 >
-                                    {loading ? "Resetting..." : "Reset Password"}
-                                </Button>
+                                    {loading ? "Resetting..." : <>Reset password <HiArrowRight /></>}
+                                </button>
                             </form>
                         </>
                     ) : (
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <PiCheckCircle className="text-4xl text-emerald-600" />
+                            <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-100">
+                                <HiCheckCircle className="text-4xl text-emerald-600" />
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-3">Password Reset Successful!</h1>
-                            <p className="text-gray-600 mb-8">
-                                Your password has been reset successfully. Redirecting to login...
+                            <h1 className="text-[24px] font-bold text-zinc-900 tracking-tight mb-3">Password reset successful</h1>
+                            <p className="text-zinc-500 text-[13px] mb-8">
+                                Your password has been reset. Redirecting to login...
                             </p>
                             <Link href="/login">
-                                <Button className="bg-[#29258D] hover:bg-[#29258D]/90">
-                                    Go to Login
-                                </Button>
+                                <button className="inline-flex items-center justify-center gap-2.5 transition-all bg-[#6366F1] hover:brightness-110 text-white rounded-lg py-3 px-6 text-sm font-bold">
+                                    Go to login
+                                </button>
                             </Link>
                         </div>
                     )}

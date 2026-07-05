@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 interface AccountingActionsProps {
-    type: "NEW_ACCOUNT" | "MANUAL_JOURNAL" | "DELETE_ENTRY" | "SWITCH_TO_SSCAA";
+    type: "NEW_ACCOUNT" | "MANUAL_JOURNAL" | "DELETE_ENTRY";
     entryId?: string;
 }
 
@@ -178,23 +178,7 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
         }
     };
 
-    const handleSwitchToSSCAA = async () => {
-        if (!entryId) return;
-        setIsSubmitting(true);
-        try {
-            const res = await fetch(`/api/accounting/journal?id=${entryId}&action=SWITCH_TO_SSCAA`, {
-                method: "PATCH"
-            });
-            if (!res.ok) throw new Error("Failed to reassign record");
-            showToast("Record reassigned to SSCAA successfully", "success");
-            setIsOpen(false);
-            router.refresh();
-        } catch (error) {
-            showToast("Error reassigning record", "error");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+
 
     const totals = getTotals();
 
@@ -215,7 +199,7 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className={cn(
                             "relative bg-white border border-gray-200 w-full rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col",
-                            type === "DELETE_ENTRY" || type === "SWITCH_TO_SSCAA" ? "max-w-md" : "max-w-4xl"
+                            type === "DELETE_ENTRY" ? "max-w-md" : "max-w-4xl"
                         )}
                     >
                         {/* Header */}
@@ -226,15 +210,15 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                             <div className="flex items-center gap-4">
                                 <div className={cn(
                                     "p-3 rounded-xl",
-                                    type === "DELETE_ENTRY" ? "bg-red-50 text-red-600 p-2" : type === "SWITCH_TO_SSCAA" ? "bg-amber-50 text-amber-600 p-2" : "bg-[#F6F6F6] text-[#29258D]"
+                                    type === "DELETE_ENTRY" ? "bg-red-50 text-red-600 p-2" : "bg-[#F6F6F6] text-[#6366F1]"
                                 )}>
-                                    {type === "NEW_ACCOUNT" ? <PiBank className="text-2xl" /> : type === "MANUAL_JOURNAL" ? <PiNotebook className="text-2xl" /> : type === "SWITCH_TO_SSCAA" ? <img src="/line.png" alt="SSCAA" className="w-8 h-8 object-contain" /> : <PiTrash className="text-xl" />}
+                                    {type === "NEW_ACCOUNT" ? <PiBank className="text-2xl" /> : type === "MANUAL_JOURNAL" ? <PiNotebook className="text-2xl" /> : <PiTrash className="text-xl" />}
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-bold text-gray-900 mb-0.5">
-                                        {type === "NEW_ACCOUNT" ? "Create New Account" : type === "MANUAL_JOURNAL" ? "Post Journal Entry" : type === "SWITCH_TO_SSCAA" ? "Reassign to SSCAA" : "Delete Journal Entry"}
+                                    <h3 className="text-base font-semibold text-gray-900 mb-0.5">
+                                        {type === "NEW_ACCOUNT" ? "Create New Account" : type === "MANUAL_JOURNAL" ? "Post Journal Entry" : "Delete Journal Entry"}
                                     </h3>
-                                    {type !== "DELETE_ENTRY" && type !== "SWITCH_TO_SSCAA" && (
+                                    {type !== "DELETE_ENTRY" && (
                                         <p className="text-gray-500 text-xs font-medium">
                                             {type === "NEW_ACCOUNT" ? "Add a new GL code" : "Record double-entry transaction"}
                                         </p>
@@ -254,7 +238,7 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                             {type === "NEW_ACCOUNT" ? (
                                 <div className="space-y-6">
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Account Code</label>
+                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Account Code</label>
                                         <Input
                                             type="text"
                                             className="bg-white border-gray-200 h-11 font-mono"
@@ -263,7 +247,7 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Account Name</label>
+                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Account Name</label>
                                         <Input
                                             type="text"
                                             className="bg-white border-gray-200 h-11"
@@ -272,7 +256,7 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Type</label>
+                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Type</label>
                                         <select
                                             className="w-full px-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-sm font-medium"
                                             value={accountData.type}
@@ -311,17 +295,10 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                                         ))}
                                     </div>
                                 </div>
-                            ) : type === "SWITCH_TO_SSCAA" ? (
-                                <div className="py-2 text-center">
-                                    <h3 className="text-lg font-bold">Confirm Reassignment</h3>
-                                    <p className="text-gray-500 text-sm mt-1 px-4">
-                                        Switch this record from its current cost center to **South Sudan Civil Aviation**? 
-                                        This will update both the source record and its ledger mapping.
-                                    </p>
-                                </div>
+
                             ) : (
                                 <div className="py-2 text-center">
-                                    <h3 className="text-lg font-bold">Confirm Deletion</h3>
+                                    <h3 className="text-lg font-semibold">Confirm Deletion</h3>
                                     <p className="text-gray-500 text-sm mt-1 px-4">This will permanently remove this journal entry from the ledger.</p>
                                 </div>
                             )}
@@ -334,15 +311,11 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                         )}>
                             <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
                             {type === "DELETE_ENTRY" ? (
-                                <Button onClick={handleDeleteEntry} disabled={isSubmitting} className="bg-red-600 hover:bg-red-700 text-white font-bold">
+                                <Button onClick={handleDeleteEntry} disabled={isSubmitting} className="bg-red-600 hover:bg-red-700 text-white font-semibold">
                                     {isSubmitting ? "Deleting..." : "Confirm Delete"}
                                 </Button>
-                            ) : type === "SWITCH_TO_SSCAA" ? (
-                                <Button onClick={handleSwitchToSSCAA} disabled={isSubmitting} className="bg-amber-600 hover:bg-amber-700 text-white font-bold">
-                                    {isSubmitting ? "Processing..." : "Confirm Switch"}
-                                </Button>
                             ) : (
-                                <Button onClick={type === "NEW_ACCOUNT" ? handleCreateAccount : handleCreateJournal} disabled={isSubmitting} className="bg-[#29258D] text-white font-bold">
+                                <Button onClick={type === "NEW_ACCOUNT" ? handleCreateAccount : handleCreateJournal} disabled={isSubmitting} className="bg-[#6366F1] text-white font-semibold">
                                     {isSubmitting ? "Processing..." : "Submit"}
                                 </Button>
                             )}
@@ -356,18 +329,14 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
     return (
         <>
             {type === "NEW_ACCOUNT" ? (
-                <Button onClick={() => setIsOpen(true)} className="bg-[#29258D] text-white">
+                <Button onClick={() => setIsOpen(true)} className="bg-[#6366F1] text-white">
                     <PiPlus className="mr-2" /> New Account
                 </Button>
             ) : type === "MANUAL_JOURNAL" ? (
-                <Button onClick={() => setIsOpen(true)} className="bg-[#29258D] text-white">
+                <Button onClick={() => setIsOpen(true)} className="bg-[#6366F1] text-white">
                     <PiBookOpenText className="mr-2" /> Manual Journal
                 </Button>
-            ) : type === "SWITCH_TO_SSCAA" ? (
-                <Button onClick={() => setIsOpen(true)} variant="ghost" size="icon" title="Switch to SSCAA" className="text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-xl h-10 w-10 overflow-hidden p-1">
-                    <img src="/line.png" alt="CIVIL AVIATION" className="w-full h-full object-contain" />
-                </Button>
-            ) : (
+                            ) : (
                 <Button onClick={() => setIsOpen(true)} variant="ghost" size="icon" className="text-gray-400 hover:text-red-600">
                     <PiTrash />
                 </Button>

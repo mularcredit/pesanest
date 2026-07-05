@@ -21,13 +21,13 @@ interface Props {
     currency?: string;
 }
 
-const fmt = (amount: number, currency = 'USD') =>
+const fmt = (amount: number, currency = 'KES') =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
 
 export function ClickableReferenceCell({
     type, id, reference, saleId,
     invoiceUrl: serverInvoiceUrl,
-    date, description, amount, currency = 'USD'
+    date, description, amount, currency = 'KES'
 }: Props) {
     const [showModal, setShowModal] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -122,22 +122,22 @@ export function ClickableReferenceCell({
     };
 
     const headerBg = hasLinkedInvoice
-        ? 'bg-gradient-to-r from-[#29258D]/5 to-indigo-50'
+        ? 'bg-gradient-to-r from-[#6366F1]/5 to-indigo-50'
         : 'bg-gradient-to-r from-amber-50 to-orange-50';
 
-    const iconBg = hasLinkedInvoice ? 'bg-[#29258D]/10' : 'bg-amber-100';
-    const iconColor = hasLinkedInvoice ? 'text-[#29258D]' : 'text-amber-500';
+    const iconBg = hasLinkedInvoice ? 'bg-[#6366F1]/10' : 'bg-amber-100';
+    const iconColor = hasLinkedInvoice ? 'text-[#6366F1]' : 'text-amber-500';
 
     const modal = mounted && showModal ? createPortal(
         /* Backdrop — rendered directly at document.body, z-index beats everything */
         <div
             style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            className="bg-black/60 backdrop-blur-sm"
+            className="bg-black/30"
             onClick={closeModal}
         >
             <div
-                style={{ position: 'relative', zIndex: 10000 }}
-                className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+                style={{ position: 'relative', zIndex: 10000, border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}
+                className="bg-white rounded-[12px] w-full max-w-md mx-4 overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
@@ -147,10 +147,10 @@ export function ClickableReferenceCell({
                             <PiFileText className={`text-xl ${iconColor}`} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                                 {type === 'INVOICE' ? 'Invoice' : type === 'PAYMENT' ? 'Payment Reference' : 'Credit Note'}
                             </p>
-                            <h3 className="font-bold text-gray-900 font-mono text-sm">{reference}</h3>
+                            <h3 className="font-semibold text-gray-900 font-mono text-sm">{reference}</h3>
                         </div>
                     </div>
                     <button
@@ -171,16 +171,16 @@ export function ClickableReferenceCell({
                                 <div className="bg-gray-50 rounded-xl p-3">
                                     <div className="flex items-center gap-1.5 mb-1">
                                         <PiCalendar className="text-gray-400 text-xs" />
-                                        <span className="text-[10px] font-bold text-gray-400 uppercase">Date</span>
+                                        <span className="text-[10px] font-semibold text-gray-400 uppercase">Date</span>
                                     </div>
                                     <p className="text-sm font-semibold text-gray-800">{formattedDate}</p>
                                 </div>
                                 <div className="bg-gray-50 rounded-xl p-3">
                                     <div className="flex items-center gap-1.5 mb-1">
                                         <PiMoney className="text-gray-400 text-xs" />
-                                        <span className="text-[10px] font-bold text-gray-400 uppercase">Amount</span>
+                                        <span className="text-[10px] font-semibold text-gray-400 uppercase">Amount</span>
                                     </div>
-                                    <p className="text-sm font-bold text-gray-900">{amount ? fmt(amount, currency) : '—'}</p>
+                                    <p className="text-sm font-semibold text-gray-900">{amount ? fmt(amount, currency) : '—'}</p>
                                 </div>
                             </div>
 
@@ -188,14 +188,14 @@ export function ClickableReferenceCell({
                             <div className="border border-emerald-100 bg-emerald-50 rounded-xl p-4 flex items-center gap-3 mb-4">
                                 <PiCheckCircle className="text-emerald-500 text-2xl shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold text-emerald-800">Invoice Document Available</p>
+                                    <p className="text-xs font-semibold text-emerald-800">Invoice Document Available</p>
                                     <p className="text-[10px] text-emerald-600 truncate mt-0.5">{invoiceUrl.split('/').pop()}</p>
                                 </div>
                                 <a
                                     href={invoiceUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="shrink-0 px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-1"
+                                    className="shrink-0 px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-1"
                                 >
                                     Open <PiArrowUpRight />
                                 </a>
@@ -206,7 +206,7 @@ export function ClickableReferenceCell({
                                 <div className="border border-red-100 bg-red-50 rounded-xl p-4 mb-4 flex items-start gap-3">
                                     <PiWarning className="text-red-500 text-xl shrink-0 mt-0.5" />
                                     <div className="flex-1">
-                                        <p className="text-xs font-bold text-red-800 mb-1">Delete this document?</p>
+                                        <p className="text-xs font-semibold text-red-800 mb-1">Delete this document?</p>
                                         <p className="text-[10px] text-red-600 mb-3">This will permanently remove the uploaded file and cannot be undone.</p>
                                         <div className="flex gap-2">
                                             <button
@@ -218,7 +218,7 @@ export function ClickableReferenceCell({
                                             <button
                                                 onClick={handleDelete}
                                                 disabled={deleting}
-                                                className="flex-1 py-1.5 text-xs font-bold bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                                                className="flex-1 py-1.5 text-xs font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
                                             >
                                                 {deleting ? <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Deleting…</> : <><PiTrash /> Yes, Delete</>}
                                             </button>
@@ -253,7 +253,7 @@ export function ClickableReferenceCell({
                                 </button>
                                 <button
                                     onClick={closeModal}
-                                    className="flex-1 py-2 text-xs font-bold bg-[#29258D] text-white rounded-xl hover:bg-[#29258D]/90 transition-colors"
+                                    className="flex-1 py-2 text-xs font-semibold bg-[#6366F1] text-white rounded-xl hover:bg-[#6366F1]/90 transition-colors"
                                 >
                                     Close
                                 </button>
@@ -270,16 +270,16 @@ export function ClickableReferenceCell({
                                     <div className="bg-gray-50 rounded-xl p-3">
                                         <div className="flex items-center gap-1.5 mb-1">
                                             <PiCalendar className="text-gray-400 text-xs" />
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase">Date</span>
+                                            <span className="text-[10px] font-semibold text-gray-400 uppercase">Date</span>
                                         </div>
                                         <p className="text-sm font-semibold text-gray-800">{formattedDate}</p>
                                     </div>
                                     <div className="bg-gray-50 rounded-xl p-3">
                                         <div className="flex items-center gap-1.5 mb-1">
                                             <PiMoney className="text-gray-400 text-xs" />
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase">Amount</span>
+                                            <span className="text-[10px] font-semibold text-gray-400 uppercase">Amount</span>
                                         </div>
-                                        <p className="text-sm font-bold text-gray-900">{amount ? fmt(amount, currency) : '—'}</p>
+                                        <p className="text-sm font-semibold text-gray-900">{amount ? fmt(amount, currency) : '—'}</p>
                                     </div>
                                 </div>
                             )}
@@ -289,7 +289,7 @@ export function ClickableReferenceCell({
                                 <PiUpload className="text-3xl text-gray-400" />
                                 <span className="text-xs font-medium text-gray-700 text-center">
                                     {uploadFile
-                                        ? <><span className="text-indigo-600 font-bold">{uploadFile.name}</span><br /><span className="text-gray-400 text-[10px]">Click to change</span></>
+                                        ? <><span className="text-indigo-600 font-semibold">{uploadFile.name}</span><br /><span className="text-gray-400 text-[10px]">Click to change</span></>
                                         : <><span>Click to select file</span><br /><span className="text-gray-400 text-[10px]">PDF, JPG or PNG accepted</span></>
                                     }
                                 </span>
@@ -312,7 +312,7 @@ export function ClickableReferenceCell({
                                 <button
                                     disabled={!uploadFile || uploading}
                                     onClick={handleUpload}
-                                    className="flex-1 py-2 text-xs font-bold bg-[#29258D] text-white rounded-xl hover:bg-[#29258D]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="flex-1 py-2 text-xs font-semibold bg-[#6366F1] text-white rounded-xl hover:bg-[#6366F1]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {uploading ? (
                                         <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Uploading…</>
@@ -333,7 +333,7 @@ export function ClickableReferenceCell({
                 onClick={() => setShowModal(true)}
                 title={invoiceUrl ? 'View uploaded document' : hasLinkedInvoice ? 'View Invoice' : 'No invoice — click to upload'}
             >
-                <span className={`px-2 py-1 bg-white border rounded-md font-mono text-[10px] font-bold transition-colors shadow-sm cursor-pointer select-none ${badgeColor}`}>
+                <span className={`px-2 py-1 bg-white border rounded-md font-mono text-[10px] font-semibold transition-colors shadow-sm cursor-pointer select-none ${badgeColor}`}>
                     {reference}
                 </span>
             </button>

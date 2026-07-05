@@ -11,7 +11,9 @@ const invoiceSchema = z.object({
     invoiceDate: z.string(),
     dueDate: z.string(),
     amount: z.number().min(0),
-    currency: z.string().default("USD"),
+    taxRateId: z.string().optional().nullable(),
+    whtRateId: z.string().optional().nullable(),
+    currency: z.string().default('KES'),
     description: z.string().optional(),
     fileUrl: z.string().optional().nullable(),
     requisitionId: z.string().optional().nullable(),
@@ -34,38 +36,64 @@ export async function POST(req: Request) {
         const body = await req.json();
         const validatedData = invoiceSchema.parse(body);
 
-        // Check if invoice number already exists for this vendor (optional check, but good for data integrity)
         const existing = await prisma.invoice.findUnique({
             where: { invoiceNumber: validatedData.invoiceNumber }
         });
-
         if (existing) {
             return NextResponse.json({ error: "Invoice number already exists" }, { status: 400 });
         }
 
-        // Create Invoice with Line Items
+        // Resolve input VAT rate
+        let taxRate = null;
+        if (validatedData.taxRateId) {
+            taxRate = await (prisma as any).taxRate.findUnique({ where: { id: validatedData.taxRateId } });
+            if (!taxRate || taxRate.type !== 'VAT') {
+                return NextResponse.json({ error: "Invalid VAT rate" }, { status: 400 });
+            }
+        }
+
+        // Resolve WHT rate
+        let whtRate = null;
+        if (validatedData.whtRateId) {
+            whtRate = await (prisma as any).taxRate.findUnique({ where: { id: validatedData.whtRateId } });
+            if (!whtRate || whtRate.type !== 'WITHHOLDING') {
+                return NextResponse.json({ error: "Invalid WHT rate" }, { status: 400 });
+            }
+        }
+
+        // Calculate amounts
+        // `amount` in the request body is the GROSS amount (inclusive of VAT)
+        const grossAmount = validatedData.amount;
+        const taxAmount = taxRate
+            ? Math.round((grossAmount - grossAmount / (1 + taxRate.rate / 100)) * 100) / 100
+            : 0;
+        const subtotal = grossAmount - taxAmount;
+        const whtAmount = whtRate
+            ? Math.round(subtotal * (whtRate.rate / 100) * 100) / 100
+            : 0;
+
         const invoice = await prisma.invoice.create({
             data: {
                 vendorId: validatedData.vendorId,
                 invoiceNumber: validatedData.invoiceNumber,
                 invoiceDate: new Date(validatedData.invoiceDate),
                 dueDate: new Date(validatedData.dueDate),
-                amount: validatedData.amount,
+                subtotal,
+                amount: grossAmount,
+                taxAmount,
+                taxRateId: taxRate?.id || null,
+                whtRateId: whtRate?.id || null,
+                whtAmount,
                 currency: validatedData.currency,
                 description: validatedData.description,
                 requisitionId: validatedData.requisitionId,
                 fileUrl: validatedData.fileUrl,
                 createdById: session.user.id,
-                status: "PENDING_APPROVAL", // Start as pending
+                status: "PENDING_APPROVAL",
                 paymentStatus: "UNPAID",
-                items: {
-                    create: validatedData.items || []
-                }
+                items: { create: validatedData.items || [] }
             }
         });
-
-        // If linked to a requisition, we might want to update the requisition status or linking
-        // For now, straightforward creation.
 
         return NextResponse.json(invoice);
 

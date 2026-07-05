@@ -14,7 +14,7 @@ const CustomerImportSchema = z.object({
     address: z.string().optional(),
     city: z.string().optional(),
     country: z.string().optional(),
-    currency: z.string().default('USD')
+    currency: z.string().default('KES')
 })
 
 const SaleImportSchema = z.object({
@@ -72,7 +72,7 @@ export async function importCustomers(data: any[]) {
                         address: validated.address,
                         city: validated.city,
                         country: validated.country,
-                        currency: validated.currency || 'USD',
+                        currency: validated.currency || 'KES',
                         isActive: true
                     }
                 })

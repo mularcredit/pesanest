@@ -53,7 +53,7 @@ export function AnalyticsCharts({ categoryData, monthlyData, statusData }: Analy
                     'rgba(56, 189, 248, 0.7)',
                 ],
                 borderColor: [
-                    '#29258D',
+                    '#6366F1',
                     '#6366f1',
                     '#a855f7',
                     '#f472b6',
@@ -152,7 +152,7 @@ export function AnalyticsCharts({ categoryData, monthlyData, statusData }: Analy
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="overflow-hidden">
                 <CardHeader>
-                    <CardTitle className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <CardTitle className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                         Overview (Revenue vs Expenses)
                     </CardTitle>
                 </CardHeader>
@@ -165,7 +165,7 @@ export function AnalyticsCharts({ categoryData, monthlyData, statusData }: Analy
 
             <Card className="overflow-hidden">
                 <CardHeader>
-                    <CardTitle className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <CardTitle className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                         Expense Distribution
                     </CardTitle>
                 </CardHeader>
@@ -192,7 +192,7 @@ export function AnalyticsCharts({ categoryData, monthlyData, statusData }: Analy
 
             <Card className="overflow-hidden">
                 <CardHeader>
-                    <CardTitle className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <CardTitle className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                         By Category
                     </CardTitle>
                 </CardHeader>
@@ -205,7 +205,7 @@ export function AnalyticsCharts({ categoryData, monthlyData, statusData }: Analy
 
             <Card className="overflow-hidden">
                 <CardHeader>
-                    <CardTitle className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <CardTitle className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                         Approval Status
                     </CardTitle>
                 </CardHeader>

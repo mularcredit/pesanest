@@ -1,14 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PiBuildings, PiPlus, PiPencil, PiTrash, PiMapPin, PiUsers, PiCheck, PiX, PiSpinner, PiUploadSimple } from "react-icons/pi";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
+import {
+    PiBuildings, PiPlus, PiPencil, PiTrash, PiMapPin, PiUsers,
+    PiCheck, PiX, PiSpinner, PiUploadSimple, PiClock, PiWarningCircle,
+    PiArrowRight,
+} from "react-icons/pi";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface Region { id: string; name: string; code: string; branches: any[]; }
-interface Branch { id: string; name: string; code: string; address?: string; regionId: string; teamLeaderId?: string; isActive: boolean; region: Region; teamLeader?: { id: string; name: string; email: string }; wallet?: { balance: number; currency: string }; }
+interface Branch {
+    id: string; name: string; code: string; address?: string;
+    regionId: string; teamLeaderId?: string; isActive: boolean;
+    region: Region; teamLeader?: { id: string; name: string; email: string };
+    wallet?: { balance: number; currency: string };
+}
 interface User { id: string; name: string; email: string; role: string; }
 
+const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
+const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
+const LABEL_CLS = "block text-[11.5px] font-[500] text-gray-400 mb-1.5";
+
 export default function BranchesClient() {
+    const router = useRouter();
+    const { showToast } = useToast();
+    const [mounted, setMounted] = useState(false);
     const [branches, setBranches] = useState<Branch[]>([]);
     const [regions, setRegions] = useState<Region[]>([]);
     const [users, setUsers] = useState<User[]>([]);
@@ -18,19 +38,16 @@ export default function BranchesClient() {
     const [editBranch, setEditBranch] = useState<Branch | null>(null);
     const [saving, setSaving] = useState(false);
     const [activeRegion, setActiveRegion] = useState<string>("all");
-
     const [form, setForm] = useState({ name: "", code: "", address: "", regionId: "", teamLeaderId: "" });
     const [bulkText, setBulkText] = useState("");
     const [bulkError, setBulkError] = useState("");
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { setMounted(true); fetchData(); }, []);
 
     const fetchData = async () => {
         setLoading(true);
         const [bRes, rRes, uRes] = await Promise.all([
-            fetch("/api/branches"),
-            fetch("/api/regions"),
-            fetch("/api/team")
+            fetch("/api/branches"), fetch("/api/regions"), fetch("/api/team")
         ]);
         if (bRes.ok) { const d = await bRes.json(); setBranches(d.branches || []); }
         if (rRes.ok) { const d = await rRes.json(); setRegions(d.regions || []); }
@@ -38,8 +55,16 @@ export default function BranchesClient() {
         setLoading(false);
     };
 
-    const openCreate = () => { setEditBranch(null); setForm({ name: "", code: "", address: "", regionId: "", teamLeaderId: "" }); setShowModal(true); };
-    const openEdit = (b: Branch) => { setEditBranch(b); setForm({ name: b.name, code: b.code, address: b.address || "", regionId: b.regionId, teamLeaderId: b.teamLeaderId || "" }); setShowModal(true); };
+    const openCreate = () => {
+        setEditBranch(null);
+        setForm({ name: "", code: "", address: "", regionId: "", teamLeaderId: "" });
+        setShowModal(true);
+    };
+    const openEdit = (b: Branch) => {
+        setEditBranch(b);
+        setForm({ name: b.name, code: b.code, address: b.address || "", regionId: b.regionId, teamLeaderId: b.teamLeaderId || "" });
+        setShowModal(true);
+    };
 
     const saveBranch = async () => {
         if (!form.name || !form.code || !form.regionId) return;
@@ -61,16 +86,14 @@ export default function BranchesClient() {
         setBulkError("");
         let parsed: any[] = [];
         try {
-            // Try JSON first
             parsed = JSON.parse(bulkText);
         } catch {
-            // Try CSV
             const lines = bulkText.trim().split("\n");
-            const headers = lines[0].split(",").map(h => h.trim());
-            parsed = lines.slice(1).map(line => {
-                const vals = line.split(",").map(v => v.trim());
+            const headers = lines[0].split(",").map((h: string) => h.trim());
+            parsed = lines.slice(1).map((line: string) => {
+                const vals = line.split(",").map((v: string) => v.trim());
                 const obj: any = {};
-                headers.forEach((h, i) => { obj[h] = vals[i] || ""; });
+                headers.forEach((h: string, i: number) => { obj[h] = vals[i] || ""; });
                 return obj;
             });
         }
@@ -84,195 +107,309 @@ export default function BranchesClient() {
 
     const filtered = activeRegion === "all" ? branches : branches.filter(b => b.regionId === activeRegion);
 
-    return (
-        <div className="space-y-8 animate-fade-in-up pb-12 font-sans">
-            {/* Header */}
-            <div className="flex items-end justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2">
-                        <PiBuildings className="text-[#29258D]" /> Branch Management
-                    </h1>
-                    <p className="text-gray-500 text-sm mt-1">{branches.length} branches across {regions.length} regions</p>
-                </div>
-                <div className="flex gap-3">
-                    <button onClick={() => setShowBulkModal(true)} className="flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:opacity-50 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 shadow-sm h-10 px-4 py-2">
-                        <PiUploadSimple className="mr-2 text-lg" /> Bulk Import
+    const branchModal = (mounted && showModal) ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/30" onClick={() => !saving && setShowModal(false)} />
+            <div className="relative bg-white w-full max-w-md rounded-[12px] overflow-hidden"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
+                {/* Header */}
+                <div className="px-6 py-4 flex items-center justify-between"
+                    style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-[7px] bg-indigo-50 flex items-center justify-center shrink-0">
+                            <PiBuildings className="text-[#6366F1] text-[15px]" />
+                        </div>
+                        <div>
+                            <h2 className="text-[14px] font-[600] text-gray-900">
+                                {editBranch ? "Edit Branch" : "New Branch"}
+                            </h2>
+                            <p className="text-[11.5px] text-gray-400 mt-0.5">
+                                {editBranch ? "Update branch details" : "Create a new branch location"}
+                            </p>
+                        </div>
+                    </div>
+                    <button onClick={() => setShowModal(false)}
+                        className="p-1.5 rounded-[6px] text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors">
+                        <PiX className="text-[16px]" />
                     </button>
-                    <button onClick={openCreate} className="flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:opacity-50 shadow h-10 px-4 py-2 bg-[#29258D] text-white hover:bg-[#29258D]/90">
-                        <PiPlus className="mr-2 text-lg" /> New Branch
+                </div>
+
+                {/* Body */}
+                <div className="px-6 py-5 space-y-4">
+                    <div>
+                        <label className={LABEL_CLS}>Branch Name <span className="text-rose-400">*</span></label>
+                        <input value={form.name}
+                            onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                            className={INPUT_CLS} style={INPUT_STYLE}
+                            placeholder="e.g. Nairobi CBD Branch" />
+                    </div>
+                    <div>
+                        <label className={LABEL_CLS}>Branch Code <span className="text-rose-400">*</span></label>
+                        <input value={form.code}
+                            onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))}
+                            className={INPUT_CLS + " font-mono"} style={INPUT_STYLE}
+                            placeholder="e.g. NRB-001" />
+                    </div>
+                    <div>
+                        <label className={LABEL_CLS}>Region <span className="text-rose-400">*</span></label>
+                        <select value={form.regionId}
+                            onChange={e => setForm(p => ({ ...p, regionId: e.target.value }))}
+                            className={INPUT_CLS + " appearance-none cursor-pointer"} style={INPUT_STYLE}>
+                            <option value="">Select region...</option>
+                            {regions.map(r => <option key={r.id} value={r.id}>{r.name} ({r.code})</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className={LABEL_CLS}>Physical Address</label>
+                        <input value={form.address}
+                            onChange={e => setForm(p => ({ ...p, address: e.target.value }))}
+                            className={INPUT_CLS} style={INPUT_STYLE}
+                            placeholder="Postal or physical location" />
+                    </div>
+                    <div>
+                        <label className={LABEL_CLS}>Team Leader</label>
+                        <select value={form.teamLeaderId}
+                            onChange={e => setForm(p => ({ ...p, teamLeaderId: e.target.value }))}
+                            className={INPUT_CLS + " appearance-none cursor-pointer"} style={INPUT_STYLE}>
+                            <option value="">No leader assigned</option>
+                            {users.filter(u => !["SYSTEM_ADMIN", "FINANCE_APPROVER"].includes(u.role)).map(u => (
+                                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 flex gap-3" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                    <button onClick={() => setShowModal(false)} disabled={saving}
+                        className="flex-1 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        style={CARD_STYLE}>
+                        Cancel
+                    </button>
+                    <button onClick={saveBranch}
+                        disabled={saving || !form.name || !form.code || !form.regionId}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-white bg-[#6366F1] hover:bg-indigo-600 transition-colors disabled:opacity-50">
+                        {saving ? <PiClock className="animate-spin text-[14px]" /> : null}
+                        {saving ? "Saving..." : (editBranch ? "Update Branch" : "Create Branch")}
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    ) : null;
+
+    const bulkModal = (mounted && showBulkModal) ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/30" onClick={() => !saving && setShowBulkModal(false)} />
+            <div className="relative bg-white w-full max-w-xl rounded-[12px] overflow-hidden"
+                style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
+                {/* Header */}
+                <div className="px-6 py-4 flex items-center justify-between"
+                    style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-[7px] bg-indigo-50 flex items-center justify-center shrink-0">
+                            <PiUploadSimple className="text-[#6366F1] text-[15px]" />
+                        </div>
+                        <div>
+                            <h2 className="text-[14px] font-[600] text-gray-900">Bulk Import</h2>
+                            <p className="text-[11.5px] text-gray-400 mt-0.5">Import multiple branches via JSON or CSV</p>
+                        </div>
+                    </div>
+                    <button onClick={() => { setShowBulkModal(false); setBulkError(""); }}
+                        className="p-1.5 rounded-[6px] text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors">
+                        <PiX className="text-[16px]" />
+                    </button>
+                </div>
+
+                {/* Body */}
+                <div className="px-6 py-5 space-y-4">
+                    <p className="text-[12.5px] text-gray-500 leading-relaxed">
+                        Paste a JSON array or CSV. Each record needs <code className="bg-gray-100 px-1 rounded text-[11px]">name</code>, <code className="bg-gray-100 px-1 rounded text-[11px]">code</code>, and <code className="bg-gray-100 px-1 rounded text-[11px]">regionId</code>.
+                    </p>
+
+                    <div className="rounded-[6px] p-3 font-mono text-[11px] bg-gray-900 text-indigo-300 overflow-x-auto"
+                        style={{ border: '1px solid rgba(0,0,0,0.15)' }}>
+                        {`[{"name":"Branch A","code":"BRA-001","regionId":"..."},\n {"name":"Branch B","code":"BRB-001","regionId":"..."}]`}
+                    </div>
+
+                    <textarea value={bulkText} onChange={e => setBulkText(e.target.value)} rows={7}
+                        className={INPUT_CLS + " font-mono resize-none"} style={INPUT_STYLE}
+                        placeholder="Paste JSON or CSV data here..." />
+
+                    {bulkError && (
+                        <div className="flex items-start gap-2.5 px-4 py-3 rounded-[6px]"
+                            style={{ background: 'rgba(254,242,242,0.8)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                            <PiWarningCircle className="text-rose-500 text-[16px] shrink-0 mt-0.5" />
+                            <p className="text-[12px] font-[500] text-rose-600">{bulkError}</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 flex gap-3" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                    <button onClick={() => { setShowBulkModal(false); setBulkError(""); }} disabled={saving}
+                        className="flex-1 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                        style={CARD_STYLE}>
+                        Cancel
+                    </button>
+                    <button onClick={saveBulk} disabled={saving || !bulkText.trim()}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-white bg-[#6366F1] hover:bg-indigo-600 transition-colors disabled:opacity-50">
+                        {saving ? <PiClock className="animate-spin text-[14px]" /> : <PiCheck className="text-[14px]" />}
+                        {saving ? "Importing..." : "Import Branches"}
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    ) : null;
+
+    return (
+        <div className="space-y-6 pb-24">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Branch Management</h1>
+                    <p className="text-[12.5px] text-gray-400 mt-0.5">
+                        {branches.length} branches across {regions.length} regions
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => setShowBulkModal(true)}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
+                        style={CARD_STYLE}>
+                        <PiUploadSimple className="text-[14px]" /> Bulk Import
+                    </button>
+                    <button onClick={openCreate}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] text-white bg-[#6366F1] hover:bg-indigo-600 transition-colors">
+                        <PiPlus className="text-[14px]" /> New Branch
                     </button>
                 </div>
             </div>
 
             {/* Region filter tabs */}
-            <div className="flex gap-2 flex-wrap pb-2 border-b border-gray-100">
-                <button onClick={() => setActiveRegion("all")} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeRegion === "all" ? "bg-indigo-50 text-[#29258D] shadow-sm border border-indigo-100" : "bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-gray-200"}`}>
+            <div className="flex gap-2 flex-wrap pb-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                <button onClick={() => setActiveRegion("all")}
+                    className={cn(
+                        'px-3 py-1.5 rounded-[6px] text-[12.5px] font-[500] transition-all',
+                        activeRegion === "all"
+                            ? 'bg-indigo-50 text-[#6366F1]'
+                            : 'text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-800'
+                    )}
+                    style={{ border: activeRegion === "all" ? '1px solid rgba(99,102,241,0.2)' : '1px solid rgba(0,0,0,0.09)' }}>
                     All Regions
                 </button>
                 {regions.map(r => (
-                    <button key={r.id} onClick={() => setActiveRegion(r.id)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeRegion === r.id ? "bg-indigo-50 text-[#29258D] shadow-sm border border-indigo-100" : "bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-gray-200"}`}>
-                        {r.name} <span className="ml-1 opacity-70 text-xs">({r.branches?.length || 0})</span>
+                    <button key={r.id} onClick={() => setActiveRegion(r.id)}
+                        className={cn(
+                            'px-3 py-1.5 rounded-[6px] text-[12.5px] font-[500] transition-all',
+                            activeRegion === r.id
+                                ? 'bg-indigo-50 text-[#6366F1]'
+                                : 'text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-800'
+                        )}
+                        style={{ border: activeRegion === r.id ? '1px solid rgba(99,102,241,0.2)' : '1px solid rgba(0,0,0,0.09)' }}>
+                        {r.name}
+                        <span className="ml-1.5 text-[10.5px] opacity-60">({r.branches?.length || 0})</span>
                     </button>
                 ))}
             </div>
 
             {/* Branches Grid */}
             {loading ? (
-                <div className="flex items-center justify-center h-64"><PiSpinner className="text-[#29258D] text-4xl animate-spin" /></div>
+                <div className="bg-white rounded-[8px] py-20 flex flex-col items-center" style={CARD_STYLE}>
+                    <PiSpinner className="animate-spin text-[#6366F1] text-2xl mb-2" />
+                    <p className="text-[12.5px] text-gray-400">Loading branches...</p>
+                </div>
             ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
-                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                        <PiBuildings className="text-3xl text-gray-400" />
+                <div className="bg-white rounded-[8px] py-20 flex flex-col items-center" style={CARD_STYLE}>
+                    <div className="w-10 h-10 rounded-[8px] bg-gray-50 flex items-center justify-center mb-3"
+                        style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
+                        <PiBuildings className="text-gray-300 text-xl" />
                     </div>
-                    <p className="text-gray-900 font-medium">No branches found</p>
-                    <p className="text-gray-500 text-sm mt-1">Create a new branch to get started</p>
+                    <p className="text-[13px] font-[500] text-gray-700">No branches found</p>
+                    <p className="text-[12px] text-gray-400 mt-0.5">Create a new branch to get started</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filtered.map(b => (
-                        <motion.div key={b.id} layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-                            className="bg-white border border-gray-200 rounded-xl p-5 hover:border-[#29258D]/30 transition-all hover:shadow-md hover:shadow-indigo-500/5 group relative">
+                        <div key={b.id}
+                            onClick={() => router.push(`/dashboard/branches/${b.id}`)}
+                            className="bg-white rounded-[8px] p-5 hover:bg-indigo-50/30 transition-all group relative cursor-pointer"
+                            style={{ border: '1px solid rgba(0,0,0,0.09)', transition: 'background 0.15s, border-color 0.15s, box-shadow 0.15s' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(99,102,241,0.35)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(99,102,241,0.08)'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,0,0,0.09)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+                        >
+                            {/* Card top */}
                             <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded border tracking-wider text-gray-500 bg-gray-100 border-gray-200">{b.code}</span>
-                                        {b.isActive ?
-                                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-medium">Active</span> :
-                                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200 font-medium">Inactive</span>
-                                        }
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-[4px] text-gray-500 bg-gray-100 tracking-wider"
+                                            style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                            {b.code}
+                                        </span>
+                                        {b.isActive ? (
+                                            <span className="text-[10px] font-[500] px-2 py-0.5 rounded-[4px] text-emerald-600 bg-emerald-50"
+                                                style={{ border: '1px solid rgba(16,185,129,0.2)' }}>Active</span>
+                                        ) : (
+                                            <span className="text-[10px] font-[500] px-2 py-0.5 rounded-[4px] text-rose-500 bg-rose-50"
+                                                style={{ border: '1px solid rgba(239,68,68,0.2)' }}>Inactive</span>
+                                        )}
                                     </div>
-                                    <h3 className="text-gray-900 font-semibold text-lg group-hover:text-[#29258D] transition-colors">{b.name}</h3>
+                                    <h3 className="text-[14px] font-[600] text-gray-900 group-hover:text-[#6366F1] transition-colors truncate">
+                                        {b.name}
+                                    </h3>
                                 </div>
-                                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => openEdit(b)} className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-indigo-50 text-gray-400 hover:text-indigo-600 flex items-center justify-center text-lg transition-all border border-transparent hover:border-indigo-100">
-                                        <PiPencil />
-                                    </button>
-                                    <button onClick={() => deactivateBranch(b.id)} className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-600 flex items-center justify-center text-lg transition-all border border-transparent hover:border-rose-100">
-                                        <PiTrash />
-                                    </button>
+                                <div className="flex items-center gap-1 shrink-0 ml-2">
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={e => { e.stopPropagation(); openEdit(b); }}
+                                            className="w-7 h-7 rounded-[6px] bg-gray-50 hover:bg-indigo-50 text-gray-400 hover:text-[#6366F1] flex items-center justify-center transition-colors"
+                                            style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                            <PiPencil className="text-[13px]" />
+                                        </button>
+                                        <button onClick={e => { e.stopPropagation(); deactivateBranch(b.id); }}
+                                            className="w-7 h-7 rounded-[6px] bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 flex items-center justify-center transition-colors"
+                                            style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                            <PiTrash className="text-[13px]" />
+                                        </button>
+                                    </div>
+                                    {/* Arrow — always visible, shifts right on hover */}
+                                    <PiArrowRight className="text-[15px] text-gray-300 group-hover:text-[#6366F1] group-hover:translate-x-0.5 transition-all ml-1" />
                                 </div>
                             </div>
 
-                            <div className="space-y-2.5 text-sm">
-                                <div className="flex items-center gap-2.5 text-gray-500">
-                                    <PiMapPin className="text-gray-400 text-lg" />
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-[12.5px] text-gray-400">
+                                    <PiMapPin className="text-[13px] shrink-0" />
                                     <span className="truncate">{b.region?.name || "—"}</span>
                                 </div>
-                                <div className="flex items-center gap-2.5 text-gray-500">
-                                    <PiUsers className="text-gray-400 text-lg" />
-                                    <span className="truncate">{b.teamLeader?.name || <span className="text-gray-400 italic">No assigned leader</span>}</span>
+                                <div className="flex items-center gap-2 text-[12.5px] text-gray-400">
+                                    <PiUsers className="text-[13px] shrink-0" />
+                                    <span className="truncate">
+                                        {b.teamLeader?.name || <em className="text-gray-300 not-italic">No leader assigned</em>}
+                                    </span>
                                 </div>
                             </div>
 
                             {b.wallet && (
-                                <div className="mt-5 pt-4 border-t border-gray-100">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Branch Wallet</span>
-                                        <span className={`text-base font-bold ${b.wallet.balance > 0 ? "text-emerald-600" : "text-gray-700"}`}>
-                                            {b.wallet.currency} {b.wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                        </span>
-                                    </div>
+                                <div className="mt-4 pt-3 flex items-center justify-between"
+                                    style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                                    <span className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em]">
+                                        Branch Wallet
+                                    </span>
+                                    <span className={cn(
+                                        'text-[13px] font-[600]',
+                                        b.wallet.balance > 0 ? 'text-emerald-600' : 'text-gray-700'
+                                    )}>
+                                        {b.wallet.currency} {b.wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    </span>
                                 </div>
                             )}
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
             )}
 
-            {/* Create/Edit Modal */}
-            <AnimatePresence>
-                {showModal && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-white border border-gray-200 rounded-xl p-6 w-full max-w-md shadow-2xl">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-gray-900 font-bold text-xl">{editBranch ? "Edit Branch" : "New Branch"}</h2>
-                                <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors"><PiX className="text-lg" /></button>
-                            </div>
-                            <div className="space-y-5">
-                                <div>
-                                    <label className="text-gray-700 font-medium text-sm mb-1.5 block">Branch Name <span className="text-rose-500">*</span></label>
-                                    <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                                        className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] transition-all"
-                                        placeholder="e.g. Nairobi CBD Branch" />
-                                </div>
-                                <div>
-                                    <label className="text-gray-700 font-medium text-sm mb-1.5 block">Branch Code <span className="text-rose-500">*</span></label>
-                                    <input value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))}
-                                        className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] transition-all"
-                                        placeholder="e.g. NRB-001" />
-                                </div>
-                                <div>
-                                    <label className="text-gray-700 font-medium text-sm mb-1.5 block">Region <span className="text-rose-500">*</span></label>
-                                    <select value={form.regionId} onChange={e => setForm(p => ({ ...p, regionId: e.target.value }))}
-                                        className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] transition-all appearance-none cursor-pointer">
-                                        <option value="">Select region...</option>
-                                        {regions.map(r => <option key={r.id} value={r.id}>{r.name} ({r.code})</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-gray-700 font-medium text-sm mb-1.5 block">Address</label>
-                                    <input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))}
-                                        className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] transition-all"
-                                        placeholder="Physical address" />
-                                </div>
-                                <div>
-                                    <label className="text-gray-700 font-medium text-sm mb-1.5 block">Team Leader</label>
-                                    <select value={form.teamLeaderId} onChange={e => setForm(p => ({ ...p, teamLeaderId: e.target.value }))}
-                                        className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] transition-all appearance-none cursor-pointer">
-                                        <option value="">No Leader Assigned</option>
-                                        {users.filter(u => !["SYSTEM_ADMIN", "FINANCE_APPROVER"].includes(u.role)).map(u => (
-                                            <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="pt-2">
-                                    <button onClick={saveBranch} disabled={saving || !form.name || !form.code || !form.regionId}
-                                        className="w-full flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:opacity-50 shadow h-11 px-4 py-2 bg-[#29258D] text-white hover:bg-[#29258D]/90">
-                                        {saving ? <PiSpinner className="animate-spin text-lg" /> : (editBranch ? "Save Changes" : "Create Branch")}
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Bulk Import Modal */}
-            <AnimatePresence>
-                {showBulkModal && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-white border border-gray-200 rounded-xl p-6 w-full max-w-lg shadow-2xl">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-gray-900 font-bold text-xl">Bulk Import Branches</h2>
-                                <button onClick={() => { setShowBulkModal(false); setBulkError(""); }} className="text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors"><PiX className="text-lg" /></button>
-                            </div>
-                            <p className="text-gray-600 text-sm mb-4">Paste a JSON array or CSV data. Required fields: <code className="text-[#29258D] bg-indigo-50 px-1 py-0.5 rounded border border-indigo-100 font-mono text-xs">name, code, regionId</code></p>
-
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-xs font-mono text-gray-500 overflow-x-auto">
-                                {`[{"name":"Branch A","code":"BRA-001","regionId":"..."},\n {"name":"Branch B","code":"BRB-001","regionId":"..."}]`}
-                            </div>
-
-                            <textarea value={bulkText} onChange={e => setBulkText(e.target.value)} rows={8}
-                                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#29258D]/20 focus:border-[#29258D] resize-none transition-all"
-                                placeholder="Paste JSON or CSV here..." />
-
-                            {bulkError && <p className="text-rose-500 font-medium text-sm mt-3 bg-rose-50 p-3 rounded-lg border border-rose-100">{bulkError}</p>}
-
-                            <div className="pt-4 mt-2 border-t border-gray-100">
-                                <button onClick={saveBulk} disabled={saving || !bulkText.trim()}
-                                    className="w-full flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:opacity-50 shadow h-11 px-4 py-2 bg-[#29258D] text-white hover:bg-[#29258D]/90">
-                                    {saving ? <PiSpinner className="animate-spin mr-2 text-lg" /> : <PiUploadSimple className="mr-2 text-lg" />}
-                                    {saving ? "Importing..." : "Import Branches"}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {branchModal}
+            {bulkModal}
         </div>
     );
 }

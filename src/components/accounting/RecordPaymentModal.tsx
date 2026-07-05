@@ -144,7 +144,7 @@ export function RecordPaymentModal({
                 <div className="p-8 space-y-8 flex-1 overflow-y-auto">
 
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Amount received</label>
+                        <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Amount received</label>
                         <Input
                             type="number"
                             step="0.01"
@@ -153,7 +153,7 @@ export function RecordPaymentModal({
                             value={formData.amount}
                             onChange={e => setFormData({ ...formData, amount: e.target.value })}
                             required
-                            className="bg-white border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#29258D]/10 focus-visible:border-gray-300"
+                            className="bg-white border-gray-200 rounded-[5px] h-11 shadow-none focus-visible:ring-1 focus-visible:ring-[#6366F1]/10 focus-visible:border-gray-300"
                             autoFocus
                         />
                     </div>
@@ -161,7 +161,7 @@ export function RecordPaymentModal({
                     {/* Sales Allocation (if sales exist) */}
                     {sales.length > 0 && (
                         <div className="space-y-2">
-                            <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Allocate to invoice (optional)</label>
+                            <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Allocate to invoice (optional)</label>
                             <Select
                                 value={formData.saleId}
                                 onChange={val => setFormData({ ...formData, saleId: val })}
@@ -180,7 +180,7 @@ export function RecordPaymentModal({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Method Selection */}
                         <div className="space-y-3 col-span-2">
-                            <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Payment method</label>
+                            <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Payment method</label>
                             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                                 {PAYMENT_METHODS.map((method) => {
                                     const Icon = method.icon;
@@ -193,7 +193,7 @@ export function RecordPaymentModal({
                                             className={cn(
                                                 "flex flex-col items-center justify-center p-3 rounded-[5px] border transition-all duration-300 gap-2 h-20",
                                                 isSelected
-                                                    ? "border-[#29258D] bg-indigo-50/50 text-[#29258D] shadow-sm"
+                                                    ? "border-[#6366F1] bg-indigo-50/50 text-[#6366F1] shadow-sm"
                                                     : "border-gray-200 bg-white hover:border-indigo-200 text-gray-400 hover:text-indigo-600"
                                             )}
                                         >
@@ -202,7 +202,7 @@ export function RecordPaymentModal({
                                             ) : (
                                                 <Icon className="text-xl" />
                                             )}
-                                            <span className="text-[10px] font-bold">{method.label}</span>
+                                            <span className="text-[10px] font-semibold">{method.label}</span>
                                         </button>
                                     );
                                 })}
@@ -210,7 +210,7 @@ export function RecordPaymentModal({
                         </div>
 
                         <div className="space-y-2">
-                            <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Payment date</label>
+                            <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Payment date</label>
                             <div className="w-full">
                                 <DatePicker
                                     value={formData.paymentDate ? parseISO(formData.paymentDate) : undefined}
@@ -220,7 +220,7 @@ export function RecordPaymentModal({
                         </div>
 
                         <div className="space-y-2">
-                            <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">
+                            <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">
                                 Reference / transaction ID <span className="text-gray-400 font-normal">(optional)</span>
                             </label>
                             <Input
@@ -233,9 +233,9 @@ export function RecordPaymentModal({
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-gray-500 pl-1 mb-1.5">Internal notes</label>
+                        <label className="block text-[11px] font-semibold text-gray-500 pl-1 mb-1.5">Internal notes</label>
                         <textarea
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[5px] text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#29258D] transition-all resize-none h-24 shadow-none"
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[5px] text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#6366F1] transition-all resize-none h-24 shadow-none"
                             placeholder="Add any additional details about this payment..."
                             value={formData.notes}
                             onChange={e => setFormData({ ...formData, notes: e.target.value })}
@@ -249,14 +249,14 @@ export function RecordPaymentModal({
                         type="button"
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="px-6 py-2.5 rounded-[5px] text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all border border-gray-200"
+                        className="px-6 py-2.5 rounded-[5px] text-xs font-semibold text-gray-500 hover:bg-gray-50 transition-all border border-gray-200"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-8 py-2.5 rounded-[5px] bg-[#29258D] text-white text-xs font-bold hover:bg-[#29258D]/90 transition-all shadow-lg shadow-[#29258D]/20 min-w-[160px] flex items-center justify-center gap-2"
+                        className="px-8 py-2.5 rounded-[5px] bg-[#6366F1] text-white text-xs font-semibold hover:bg-[#6366F1]/90 transition-all shadow-lg shadow-[#6366F1]/20 min-w-[160px] flex items-center justify-center gap-2"
                     >
                         {isSubmitting ? (
                             <>
