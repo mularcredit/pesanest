@@ -9,16 +9,17 @@ export default async function SecurityPage() {
     const session = await auth();
     if (!session?.user) return redirect("/login");
 
-    const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { totpEnabled: true, failedLoginAttempts: true, lockedUntil: true } as any
-    }) as any;
+    const userRows = await prisma.$queryRaw<{ totpEnabled: boolean; failedLoginAttempts: number; lockedUntil: Date | null }[]>`
+        SELECT "totpEnabled", "failedLoginAttempts", "lockedUntil"
+        FROM "User" WHERE id = ${session.user.id} LIMIT 1
+    `.catch(() => [{ totpEnabled: false, failedLoginAttempts: 0, lockedUntil: null }]);
+    const user = userRows[0] ?? { totpEnabled: false, failedLoginAttempts: 0, lockedUntil: null };
 
-    const loginEvents = await (prisma as any).loginEvent.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: 'desc' },
-        take: 20
-    });
+    const loginEvents = await prisma.$queryRaw<any[]>`
+        SELECT * FROM "LoginEvent"
+        WHERE "userId" = ${session.user.id}
+        ORDER BY "createdAt" DESC LIMIT 20
+    `.catch(() => []);
 
     return (
         <div className="space-y-6 pb-24 max-w-2xl">
