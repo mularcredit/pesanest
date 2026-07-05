@@ -3,6 +3,7 @@ import type { NextAuthConfig } from "next-auth"
 // Edge-safe config — no Node.js-only imports.
 // Used by middleware; full auth.ts extends this.
 export const authConfig: NextAuthConfig = {
+    trustHost: true,
     pages: {
         signIn: '/login',
     },
