@@ -78,10 +78,10 @@ function LoginComponent() {
                 {/* Headline text */}
                 <div className="absolute inset-0 z-20 flex flex-col justify-center px-10">
                     <h2 className="text-[42px] font-[600] leading-[1.2] tracking-tight" style={{ color: '#ffffff' }}>
-                        Streamline your<br />business finances,<br />all in one place.
+                        Where every<br />shilling finds<br />its nest.
                     </h2>
                     <p className="text-[14px] mt-4 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        Manage expenses, invoices, and accounting with ease.
+                        Expenses, invoices, and books — all cozy in one place. No spreadsheet panic required.
                     </p>
                 </div>
 
@@ -116,10 +116,10 @@ function LoginComponent() {
                     </Link>
                     <div className="relative z-10">
                         <h2 className="text-2xl font-[700] text-white tracking-tight leading-snug">
-                            Streamline Your<br />Business Finances
+                            Where Every Shilling<br />Finds Its Nest.
                         </h2>
                         <p className="text-xs text-white/60 mt-2">
-                            Manage expenses, invoices, and accounting all in one platform.
+                            Expenses, invoices, and books — all cozy in one place. No spreadsheet panic required.
                         </p>
                     </div>
                 </div>
