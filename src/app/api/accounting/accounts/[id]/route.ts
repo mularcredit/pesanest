@@ -20,7 +20,7 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
     const { id } = await props.params;
     const account = await prisma.account.findUnique({
         where: { id },
-        include: { parent: true, children: true }
+        include: { parent: true, children: true } as any
     });
     if (!account) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(account);
