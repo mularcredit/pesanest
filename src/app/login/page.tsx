@@ -77,7 +77,7 @@ function LoginComponent() {
 
                 {/* Headline text */}
                 <div className="absolute left-0 right-0 z-20 px-10" style={{ top: '20%' }}>
-                    <h2 className="text-[44px] font-[700] leading-[1.15] tracking-tight" style={{ color: '#ffffff' }}>
+                    <h2 className="text-[58px] font-[800] leading-[1.1] tracking-tight" style={{ color: '#ffffff' }}>
                         Where every<br />shilling finds<br />its nest.
                     </h2>
                     <p className="text-[14px] mt-5 leading-relaxed max-w-[280px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
