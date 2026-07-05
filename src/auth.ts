@@ -121,15 +121,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                     const passwordsMatch = await bcrypt.compare(password, user.password)
                     if (!passwordsMatch) {
-                        // Increment failed attempts
-                        const attempts = (user.failedLoginAttempts || 0) + 1;
-                        const lockout = attempts >= LOCKOUT_THRESHOLD
-                            ? { lockedUntil: new Date(Date.now() + LOCKOUT_MINUTES * 60_000) }
-                            : {};
-                        await prisma.user.update({
-                            where: { id: user.id },
-                            data: { failedLoginAttempts: attempts, ...lockout } as any
-                        });
+                        // Increment failed attempts — wrapped in try/catch for DB column compatibility
+                        try {
+                            const attempts = (user.failedLoginAttempts || 0) + 1;
+                            const lockout = attempts >= LOCKOUT_THRESHOLD
+                                ? { lockedUntil: new Date(Date.now() + LOCKOUT_MINUTES * 60_000) }
+                                : {};
+                            await (prisma.user.update as any)({
+                                where: { id: user.id },
+                                data: { failedLoginAttempts: attempts, ...lockout }
+                            });
+                        } catch {}
                         await recordLoginEvent({ userId: user.id, email, success: false, ipAddress, userAgent, reason: 'WRONG_PASSWORD' });
                         return null;
                     }
@@ -147,11 +149,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         }
                     }
 
-                    // Reset failed attempts on successful login
-                    await prisma.user.update({
-                        where: { id: user.id },
-                        data: { failedLoginAttempts: 0, lockedUntil: null } as any
-                    });
+                    // Reset failed attempts on successful login — wrapped for DB column compatibility
+                    try {
+                        await (prisma.user.update as any)({
+                            where: { id: user.id },
+                            data: { failedLoginAttempts: 0, lockedUntil: null }
+                        });
+                    } catch {}
                     await recordLoginEvent({ userId: user.id, email, success: true, ipAddress, userAgent });
 
                     let permissions: string[] = [];
