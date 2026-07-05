@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-// Runs prisma migrate deploy. If the database is not empty (P3005),
-// baselines all known migrations first, then deploys.
 const { execSync } = require('child_process');
 
 const MIGRATIONS = [
@@ -15,21 +13,25 @@ function run(cmd) {
 }
 
 try {
-    run('npx prisma migrate deploy');
+    // Capture output so we can detect P3005
+    execSync('npx prisma migrate deploy', { stdio: 'pipe' });
+    console.log('Migrations applied successfully.');
 } catch (err) {
-    const output = (err.stdout || '') + (err.stderr || '') + (err.message || '');
+    const output = String(err.stdout || '') + String(err.stderr || '');
+    console.error(output);
+
     if (output.includes('P3005')) {
-        console.log('\nBaselining existing database — marking all migrations as applied...');
+        console.log('\nDatabase not empty — baselining all migrations as applied...');
         for (const m of MIGRATIONS) {
             try {
                 run(`npx prisma migrate resolve --applied ${m}`);
             } catch {
-                // already marked — ignore
+                // already marked — safe to ignore
             }
         }
-        console.log('\nRunning prisma migrate deploy after baseline...');
+        console.log('\nRe-running prisma migrate deploy...');
         run('npx prisma migrate deploy');
     } else {
-        throw err;
+        process.exit(1);
     }
 }
