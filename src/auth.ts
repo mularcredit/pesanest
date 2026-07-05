@@ -73,6 +73,7 @@ const LEGACY_PERMISSIONS: Record<string, string[]> = {
 };
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    trustHost: true,
     providers: [
         Credentials({
             async authorize(credentials, request) {
