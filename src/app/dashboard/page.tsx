@@ -33,15 +33,21 @@ export default async function DashboardPage() {
     const userId = session.user.id;
     const now = new Date();
 
-    const currentUser = await (prisma.user.findUnique as any)({
+    const currentUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { role: true, name: true, paystackCustomerCode: true }
+        select: { role: true, name: true }
     });
 
     if (!currentUser) return redirect("/api/auth/signout?callbackUrl=/login");
 
-    const isPrivileged = ['SYSTEM_ADMIN', 'FINANCE_APPROVER', 'MANAGER'].includes(currentUser?.role || '');
-    const isSystemAdmin = currentUser?.role === 'SYSTEM_ADMIN';
+    // Fetch paystack status via raw SQL to avoid Prisma client schema mismatch
+    const paystackRows = await prisma.$queryRaw<{ paystackCustomerCode: string | null }[]>`
+        SELECT "paystackCustomerCode" FROM "User" WHERE id = ${userId} LIMIT 1
+    `.catch(() => [{ paystackCustomerCode: null }]);
+    const currentUserWithPaystack = { ...currentUser, paystackCustomerCode: paystackRows[0]?.paystackCustomerCode ?? null };
+
+    const isPrivileged = ['SYSTEM_ADMIN', 'FINANCE_APPROVER', 'MANAGER'].includes(currentUserWithPaystack?.role || '');
+    const isSystemAdmin = currentUserWithPaystack?.role === 'SYSTEM_ADMIN';
     const expenseFilter = isPrivileged ? {} : { userId };
 
     const firstDayThisMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -90,7 +96,7 @@ export default async function DashboardPage() {
         b.currency?.toUpperCase() === targetCurrency.toUpperCase()
     );
     if (balanceData) liveBalance = balanceData.balance / 100;
-    const paystackConnected = !!currentUser?.paystackCustomerCode;
+    const paystackConnected = !!currentUserWithPaystack?.paystackCustomerCode;
 
     // ── Requisitions are the single source of truth for all financial data ──
     const thisMonthReqs  = allRequisitions.filter((r: any) => new Date(r.createdAt) >= firstDayThisMonth);
@@ -416,7 +422,7 @@ export default async function DashboardPage() {
                         categories={categories.map((c: { name: string }) => c.name)}
                         branches={branchesData.map((b: { id: string; name: string }) => ({ id: b.id, name: b.name }))}
                         isPaystack={paystackConnected}
-                        holderName={currentUser?.name || "Corporate Wallet"}
+                        holderName={currentUserWithPaystack?.name || "Corporate Wallet"}
                     />
 
                     {/* Approval ring chart */}
