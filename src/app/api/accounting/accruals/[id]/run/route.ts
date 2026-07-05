@@ -22,17 +22,20 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     const body = await req.json().catch(() => ({}));
     const asOf = body.asOf ? new Date(body.asOf) : new Date();
 
-    const schedule = await (prisma as any).accrualSchedule.findUnique({
-        where: { id: params.id },
-        include: {
-            debitAccount: true,
-            creditAccount: true,
-            recognitions: {
-                where: { status: 'PENDING', periodDate: { lte: asOf } },
-                orderBy: { periodDate: 'asc' }
-            }
-        }
-    });
+    const scheduleRows = await prisma.$queryRaw<any[]>`
+        SELECT s.*, da.id as "debitAccountId_ref", ca.id as "creditAccountId_ref"
+        FROM "AccrualSchedule" s
+        LEFT JOIN "Account" da ON s."debitAccountId" = da.id
+        LEFT JOIN "Account" ca ON s."creditAccountId" = ca.id
+        WHERE s.id = ${params.id}
+    `.catch(() => []);
+    const scheduleBase = scheduleRows[0] ?? null;
+    const pendingRecs = scheduleBase ? await prisma.$queryRaw<any[]>`
+        SELECT * FROM "AccrualRecognition"
+        WHERE "scheduleId" = ${params.id} AND status = 'PENDING' AND "periodDate" <= ${asOf}
+        ORDER BY "periodDate" ASC
+    `.catch(() => []) : [];
+    const schedule = scheduleBase ? { ...scheduleBase, recognitions: pendingRecs } : null;
 
     if (!schedule) return NextResponse.json({ error: "Accrual schedule not found" }, { status: 404 });
     if (schedule.status !== 'ACTIVE') {
@@ -58,22 +61,21 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
             ]
         });
 
-        await (prisma as any).accrualRecognition.update({
-            where: { id: rec.id },
-            data: { status: 'POSTED', journalEntryId: entry.id }
-        });
+        await prisma.$executeRaw`
+            UPDATE "AccrualRecognition" SET status = 'POSTED', "journalEntryId" = ${entry.id} WHERE id = ${rec.id}
+        `;
         posted++;
     }
 
     // Mark schedule complete if all recognitions are now posted
-    const remaining = await (prisma as any).accrualRecognition.count({
-        where: { scheduleId: params.id, status: 'PENDING' }
-    });
+    const remainingRows = await prisma.$queryRaw<{ count: bigint }[]>`
+        SELECT COUNT(*) as count FROM "AccrualRecognition" WHERE "scheduleId" = ${params.id} AND status = 'PENDING'
+    `.catch(() => [{ count: BigInt(0) }]);
+    const remaining = Number(remainingRows[0]?.count ?? 0);
     if (remaining === 0) {
-        await (prisma as any).accrualSchedule.update({
-            where: { id: params.id },
-            data: { status: 'COMPLETED' }
-        });
+        await prisma.$executeRaw`
+            UPDATE "AccrualSchedule" SET status = 'COMPLETED', "updatedAt" = NOW() WHERE id = ${params.id}
+        `;
     }
 
     return NextResponse.json({ posted, remaining });

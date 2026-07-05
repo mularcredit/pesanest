@@ -10,21 +10,32 @@ export default async function AccrualsPage() {
     const session = await auth();
     if (!session?.user) return redirect('/login');
 
-    const [schedules, accounts] = await Promise.all([
-        (prisma as any).accrualSchedule.findMany({
-            include: {
-                debitAccount: { select: { id: true, code: true, name: true } },
-                creditAccount: { select: { id: true, code: true, name: true } },
-                recognitions: { orderBy: { periodDate: 'asc' } }
-            },
-            orderBy: { createdAt: 'desc' }
-        }),
+    const [scheduleRows, recognitionRows, accounts] = await Promise.all([
+        prisma.$queryRaw<any[]>`
+            SELECT s.*,
+                da.id as "da_id", da.code as "da_code", da.name as "da_name",
+                ca.id as "ca_id", ca.code as "ca_code", ca.name as "ca_name"
+            FROM "AccrualSchedule" s
+            LEFT JOIN "Account" da ON s."debitAccountId" = da.id
+            LEFT JOIN "Account" ca ON s."creditAccountId" = ca.id
+            ORDER BY s."createdAt" DESC
+        `.catch(() => []),
+        prisma.$queryRaw<any[]>`
+            SELECT * FROM "AccrualRecognition" ORDER BY "periodDate" ASC
+        `.catch(() => []),
         prisma.account.findMany({
             where: { isActive: true },
             orderBy: { code: 'asc' },
             select: { id: true, code: true, name: true, type: true }
         })
     ]);
+
+    const schedules = scheduleRows.map((s: any) => ({
+        ...s,
+        debitAccount: { id: s.da_id, code: s.da_code, name: s.da_name },
+        creditAccount: { id: s.ca_id, code: s.ca_code, name: s.ca_name },
+        recognitions: recognitionRows.filter((r: any) => r.scheduleId === s.id),
+    }));
 
     return (
         <div className="p-6 md:p-8 space-y-8 min-h-screen">
