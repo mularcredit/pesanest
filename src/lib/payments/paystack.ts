@@ -107,13 +107,13 @@ export class PaystackService {
     /**
      * Initialize a Top-Up transaction (receives payment from user)
      */
-    async initializeTransaction(amount: number, email: string, reference?: string) {
+    async initializeTransaction(amount: number, email: string, reference?: string, callbackUrl?: string) {
         const amountInSubunits = Math.round(amount * 100);
         const payload: any = {
             amount: amountInSubunits,
             email,
             currency: 'KES',
-            callback_url: `${process.env.NEXTAUTH_URL}/dashboard/wallet?verify_tx=true`,
+            callback_url: callbackUrl || `${process.env.NEXTAUTH_URL}/dashboard/wallet`,
         };
 
         if (reference) {

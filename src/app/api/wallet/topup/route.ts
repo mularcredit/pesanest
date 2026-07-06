@@ -40,10 +40,17 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // Derive callback URL from the actual request origin so it always matches
+        // the running port (local dev varies; production uses NEXTAUTH_URL as fallback)
+        const origin = req.headers.get('origin') || req.headers.get('x-forwarded-proto') && req.headers.get('host')
+            ? `${req.headers.get('x-forwarded-proto') || 'http'}://${req.headers.get('host')}`
+            : process.env.NEXTAUTH_URL || 'http://localhost:3000';
+
         const paystackTx = await paystackService.initializeTransaction(
-            amount, 
-            session.user.email || 'user@example.com', 
-            reference
+            amount,
+            session.user.email || 'user@example.com',
+            reference,
+            `${origin}/dashboard/wallet`
         );
 
         return NextResponse.json({ 
