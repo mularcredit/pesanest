@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 import {
     PiX, PiCheck, PiArrowsLeftRight,
     PiSpinner, PiCaretDown, PiHandCoins,
-    PiWifiHigh,
+    PiWifiHigh, PiArrowsClockwise,
 } from "react-icons/pi";
 import Image from "next/image";
 import { createPortal } from "react-dom";
@@ -30,11 +30,15 @@ export function WalletCard({
     const handleSync = async () => {
         setIsSyncing(true);
         try {
-            const res  = await fetch('/api/wallet/sync');
+            const res  = await fetch('/api/wallet/sync', { method: 'POST' });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to sync');
-            showToast(`Synced · KES ${data.balance.toFixed(2)}`, 'success');
-            setTimeout(() => window.location.reload(), 800);
+            if (data.credited > 0) {
+                showToast(`Credited KES ${Number(data.totalCredited).toLocaleString()} from ${data.credited} pending topup${data.credited > 1 ? 's' : ''}`, 'success');
+            } else {
+                showToast('No pending topups to verify', 'info');
+            }
+            setTimeout(() => window.location.reload(), 900);
         } catch (err: any) {
             showToast(err.message, 'error');
         } finally {
@@ -167,18 +171,27 @@ export function WalletCard({
                 </div>
 
                 {/* ── ACTIONS ── */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                     <Link href="/dashboard/requisitions"
                         className="flex items-center justify-center gap-1.5 py-2.5 rounded-[8px] text-[12px] font-[600] transition-all hover:brightness-105 active:scale-[0.98]"
                         style={{ background: '#6366f1', color: '#fff' }}>
                         <PiHandCoins className="text-[13px]" />
-                        Requisitions
+                        Requests
                     </Link>
                     <button onClick={() => setIsAllocateOpen(true)}
                         className="flex items-center justify-center gap-1.5 py-2.5 rounded-[8px] text-[12px] font-[600] text-gray-700 bg-white transition-all hover:bg-gray-50 active:scale-[0.98]"
                         style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
                         <PiArrowsLeftRight className="text-[13px]" />
                         Allocate
+                    </button>
+                    <button onClick={handleSync} disabled={isSyncing}
+                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-[8px] text-[12px] font-[600] text-gray-700 bg-white transition-all hover:bg-gray-50 active:scale-[0.98] disabled:opacity-50"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}
+                        title="Verify any pending topups and refresh balance">
+                        {isSyncing
+                            ? <PiSpinner className="text-[13px] animate-spin" />
+                            : <PiArrowsClockwise className="text-[13px]" />}
+                        Sync
                     </button>
                 </div>
             </div>
