@@ -15,16 +15,12 @@ export default async function WalletPage() {
 
     const isAdmin = (session.user as any).role === "SYSTEM_ADMIN";
 
-    const [wallet, categories, branchesData] = await Promise.all([
+    const [wallet, branchesData] = await Promise.all([
         prisma.wallet.findUnique({
             where: { userId: session.user.id },
             include: {
                 transactions: { orderBy: { createdAt: 'desc' }, take: 200 }
             }
-        }),
-        prisma.category.findMany({
-            where: { isActive: true },
-            select: { name: true }
         }),
         prisma.branch.findMany({
             where: { isActive: true },
@@ -32,8 +28,57 @@ export default async function WalletPage() {
         })
     ]);
 
-    let liveBalance = wallet?.balance ?? 0;
-    let liveBalanceLive = false;
+    // Auto-verify any pending topups on every page load (force-dynamic ensures fresh run)
+    if (wallet) {
+        const pendingTopups = wallet.transactions.filter(
+            tx => tx.type === 'DEPOSIT' &&
+            !tx.description.includes('[COMPLETED]') &&
+            tx.reference !== null
+        );
+        if (pendingTopups.length > 0) {
+            console.log(`[Wallet] Found ${pendingTopups.length} pending topup(s) for user ${session.user.id}`);
+        }
+        for (const tx of pendingTopups) {
+            try {
+                const verification = await paystackService.verifyTransaction(tx.reference!);
+                if (verification.status !== 'success') {
+                    // Mark abandoned/failed refs so they stop being retried
+                    if (verification.status === 'abandoned' || verification.status === 'failed') {
+                        await prisma.walletTransaction.update({
+                            where: { id: tx.id },
+                            data: { description: `Wallet Top Up [${verification.status.toUpperCase()}]` }
+                        });
+                        tx.description = `Wallet Top Up [${verification.status.toUpperCase()}]`;
+                    }
+                    continue;
+                }
+                await prisma.$transaction([
+                    prisma.wallet.update({ where: { id: tx.walletId }, data: { balance: { increment: tx.amount } } }),
+                    prisma.walletTransaction.update({ where: { id: tx.id }, data: { description: 'Wallet Top Up [COMPLETED]' } }),
+                ]);
+                (wallet as any).balance += tx.amount;
+                tx.description = 'Wallet Top Up [COMPLETED]';
+                console.log(`[Wallet] Auto-credited ${tx.amount} from ${tx.reference}`);
+            } catch (err: any) {
+                // Paystack doesn't know this reference — orphaned record, mark it so it's not retried
+                if (err?.message?.includes('not found') || err?.message?.includes('Transaction reference')) {
+                    await prisma.walletTransaction.update({
+                        where: { id: tx.id },
+                        data: { description: 'Wallet Top Up [NOT FOUND]' }
+                    }).catch(() => {});
+                    tx.description = 'Wallet Top Up [NOT FOUND]';
+                } else {
+                    console.error(`[Wallet] Auto-verify failed for ${tx.reference}:`, err);
+                }
+            }
+        }
+    }
+
+    const dbBalance = wallet?.balance ?? 0;
+
+    // Paystack is the source of truth for the displayed balance
+    let liveBalance = dbBalance;
+    let paystackBalance: number | null = null;
     try {
         const paystackBalances = await paystackService.getBalance();
         const targetCurrency = wallet?.currency || 'KES';
@@ -41,10 +86,10 @@ export default async function WalletPage() {
             b.currency?.toUpperCase() === targetCurrency.toUpperCase()
         );
         if (balanceData) {
-            liveBalance = balanceData.balance / 100;
-            liveBalanceLive = true;
+            paystackBalance = balanceData.balance / 100;
+            liveBalance = paystackBalance; // card shows live Paystack balance
         }
-    } catch { /* keep DB balance on error */ }
+    } catch { /* fall back to DB balance */ }
 
     if (!wallet) {
         return (
@@ -77,21 +122,6 @@ export default async function WalletPage() {
         };
     });
 
-    let vRunning = wallet.balance;
-    const txVirtual = wallet.transactions.map(tx => {
-        const balAfter = vRunning;
-        vRunning -= tx.amount;
-        return {
-            id: tx.id,
-            createdAt: tx.createdAt.toISOString(),
-            description: tx.description,
-            type: tx.type,
-            reference: tx.reference,
-            amount: tx.amount,
-            runningBalance: balAfter,
-        };
-    });
-
     return (
         <>
             <Suspense fallback={null}>
@@ -99,15 +129,13 @@ export default async function WalletPage() {
             </Suspense>
             <WalletPageClient
                 liveBalance={liveBalance}
-                liveBalanceLive={liveBalanceLive}
-                virtualBalance={wallet.balance}
+                paystackBalance={paystackBalance}
+                dbBalance={dbBalance}
                 currency={wallet.currency}
-                categories={categories.map(c => c.name)}
                 branches={branchesData.map(b => ({ id: b.id, name: b.name }))}
                 holderName={session.user.name || "Corporate Wallet"}
                 isAdmin={isAdmin}
                 txLedger={txLedger}
-                txVirtual={txVirtual}
             />
         </>
     );

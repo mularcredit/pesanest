@@ -14,7 +14,6 @@ interface Branch {
 interface AllocationRow {
     branchId: string;
     amount: string;
-    category: string;
     description: string;
 }
 
@@ -25,18 +24,16 @@ interface Props {
     corporateBalance: number;
     currency: string;
     branches: Branch[];
-    categories: string[];
 }
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
-const DEFAULT_CATEGORY = "Operational";
 
 function fmtAmt(n: number) {
     return new Intl.NumberFormat("en-US", { minimumFractionDigits: 2 }).format(n);
 }
 
 export function BulkAllocateModal({
-    open, onClose, onSuccess, corporateBalance, currency, branches, categories,
+    open, onClose, onSuccess, corporateBalance, currency, branches,
 }: Props) {
     const [search, setSearch] = useState("");
     const [rows, setRows] = useState<AllocationRow[]>([]);
@@ -68,7 +65,6 @@ export function BulkAllocateModal({
             setRows(prev => [...prev, {
                 branchId: b.id,
                 amount: "",
-                category: DEFAULT_CATEGORY,
                 description: "",
             }]);
         }
@@ -85,7 +81,7 @@ export function BulkAllocateModal({
     const totalAllocating = rows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
     const remaining = corporateBalance - totalAllocating;
     const isOverBudget = totalAllocating > corporateBalance;
-    const hasValidRows = rows.length > 0 && rows.every(r => parseFloat(r.amount) > 0 && r.category);
+    const hasValidRows = rows.length > 0 && rows.every(r => parseFloat(r.amount) > 0);
 
     function handleSubmit() {
         if (!hasValidRows || isOverBudget) return;
@@ -94,7 +90,6 @@ export function BulkAllocateModal({
         const allocations = rows.map(r => ({
             branchId: r.branchId,
             amount: parseFloat(r.amount),
-            category: r.category,
             description: r.description || undefined,
         }));
 
@@ -120,8 +115,6 @@ export function BulkAllocateModal({
             }
         });
     }
-
-    const catOptions = categories.length > 0 ? categories : ["Operational", "Logistics", "Marketing", "Payroll", "Other"];
 
     return (
         <div
@@ -216,10 +209,9 @@ export function BulkAllocateModal({
                         {/* Column headers */}
                         {rows.length > 0 && (
                             <div className="shrink-0 grid gap-2 px-4 py-2.5"
-                                style={{ gridTemplateColumns: '1fr 130px 150px 32px', borderBottom: HAIRLINE, background: 'rgba(0,0,0,0.015)' }}>
+                                style={{ gridTemplateColumns: '1fr 130px 32px', borderBottom: HAIRLINE, background: 'rgba(0,0,0,0.015)' }}>
                                 <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Branch</p>
                                 <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Amount ({currency})</p>
-                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Category</p>
                                 <span />
                             </div>
                         )}
@@ -246,7 +238,7 @@ export function BulkAllocateModal({
                                             key={row.branchId}
                                             className="grid items-center gap-2 px-4 py-3 hover:bg-gray-50/40 transition-colors"
                                             style={{
-                                                gridTemplateColumns: '1fr 130px 150px 32px',
+                                                gridTemplateColumns: '1fr 130px 32px',
                                                 borderBottom: i < rows.length - 1 ? HAIRLINE : 'none',
                                             }}
                                         >
@@ -273,20 +265,6 @@ export function BulkAllocateModal({
                                                         className="flex-1 px-2 py-1.5 text-[12.5px] font-[500] tabular-nums text-gray-900 outline-none bg-white w-0 min-w-0"
                                                     />
                                                 </div>
-                                            </div>
-
-                                            {/* Category */}
-                                            <div>
-                                                <select
-                                                    value={row.category}
-                                                    onChange={e => updateRow(row.branchId, "category", e.target.value)}
-                                                    className="w-full px-2 py-1.5 text-[12px] text-gray-700 rounded-[5px] outline-none bg-white cursor-pointer"
-                                                    style={{ border: HAIRLINE }}
-                                                >
-                                                    {catOptions.map(c => (
-                                                        <option key={c} value={c}>{c}</option>
-                                                    ))}
-                                                </select>
                                             </div>
 
                                             {/* Remove */}

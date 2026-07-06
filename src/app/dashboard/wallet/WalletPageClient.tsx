@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { BiHistory } from "react-icons/bi";
 import { PiArrowsLeftRight } from "react-icons/pi";
@@ -22,18 +21,16 @@ export type LedgerRow = {
 
 type Props = {
     liveBalance: number;
-    liveBalanceLive: boolean;
-    virtualBalance: number;
+    paystackBalance: number | null;
+    dbBalance: number;
     currency: string;
-    categories: string[];
     branches: { id: string; name: string }[];
     holderName: string;
     isAdmin: boolean;
     txLedger: LedgerRow[];
-    txVirtual: LedgerRow[];
 };
 
-type Tab = "overview" | "live" | "virtual";
+type Tab = "overview" | "transactions";
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
 const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
@@ -46,17 +43,15 @@ function fmtAmt(n: number) {
 }
 
 export function WalletPageClient({
-    liveBalance, liveBalanceLive, virtualBalance, currency, categories, branches,
-    holderName, isAdmin, txLedger, txVirtual,
+    liveBalance, paystackBalance, dbBalance, currency, branches,
+    holderName, isAdmin, txLedger,
 }: Props) {
-    const router = useRouter();
     const [tab, setTab] = useState<Tab>("overview");
     const [bulkOpen, setBulkOpen] = useState(false);
 
     const tabs: { id: Tab; label: string }[] = [
         { id: "overview", label: "Overview" },
-        { id: "live", label: `Live Ledger${txLedger.length ? ` (${txLedger.length})` : ""}` },
-        { id: "virtual", label: `Virtual Ledger${txVirtual.length ? ` (${txVirtual.length})` : ""}` },
+        { id: "transactions", label: `Transactions${txLedger.length ? ` (${txLedger.length})` : ""}` },
     ];
 
     return (
@@ -66,10 +61,7 @@ export function WalletPageClient({
                 <div>
                     <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Corporate Wallet</h1>
                     <p className="text-[12.5px] text-gray-400 mt-0.5">
-                        {liveBalanceLive
-                            ? `Live Paystack balance · ${txLedger.length} ${txLedger.length === 1 ? 'entry' : 'entries'}`
-                            : `Paystack unavailable — showing DB balance · ${txLedger.length} ${txLedger.length === 1 ? 'entry' : 'entries'}`
-                        }
+                        {`${txLedger.length} ${txLedger.length === 1 ? 'transaction' : 'transactions'} · balance auto-synced`}
                     </p>
                 </div>
                 {branches.length > 0 && (
@@ -98,13 +90,10 @@ export function WalletPageClient({
                         {t.label}
                     </button>
                 ))}
-                {/* Push action buttons to far right */}
-                {tab !== "overview" && (
-                    <div className="ml-auto flex items-center gap-2 px-4">
-                        {tab === "virtual" && isAdmin && <VirtualTopUpButton />}
-                        {tab === "live" && <TopUpButton />}
-                    </div>
-                )}
+                <div className="ml-auto flex items-center gap-2 px-4">
+                    {isAdmin && <VirtualTopUpButton />}
+                    <TopUpButton />
+                </div>
             </div>
 
             {/* Tab content */}
@@ -113,56 +102,45 @@ export function WalletPageClient({
                     <div className="p-6">
                         <div className="flex flex-col lg:flex-row gap-5 items-start">
                             {/* Wallet card */}
-                            <div className="w-full lg:w-[400px] shrink-0 space-y-3">
+                            <div className="w-full lg:w-[400px] shrink-0">
                                 <WalletCard
                                     balance={liveBalance}
                                     currency={currency === 'USD' ? 'KES' : currency}
-                                    categories={categories}
-                                    branches={branches}
+                                        branches={branches}
                                     holderName={holderName}
                                     isPaystack={true}
                                 />
-                                <div className="bg-white rounded-[8px] flex items-center justify-between px-4 py-3.5" style={CARD_STYLE}>
-                                    <div>
-                                        <p className="text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400">Virtual Balance</p>
-                                        <p className="text-[11.5px] text-gray-400 mt-0.5 max-w-[200px] leading-snug">
-                                            Used for allocations, separate from live Paystack balance
-                                        </p>
-                                    </div>
-                                    <p className="text-[15px] font-[600] text-[#6366F1] font-mono tabular-nums whitespace-nowrap ml-4">
-                                        KES {new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 }).format(virtualBalance)}
-                                    </p>
-                                </div>
                             </div>
 
                             {/* Summary KPIs */}
                             <div className="flex-1 min-w-0 space-y-4">
-                                {/* Balance comparison */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    {[
-                                        {
-                                            label: "Live Balance",
-                                            value: `KES ${fmtAmt(liveBalance)}`,
-                                            sub: liveBalanceLive ? "From Paystack" : "Paystack unavailable",
-                                            color: liveBalanceLive ? "text-emerald-600" : "text-amber-500"
-                                        },
-                                        { label: "Virtual Balance", value: `KES ${fmtAmt(virtualBalance)}`, sub: "Allocation ledger", color: "text-[#6366F1]" },
-                                    ].map(k => (
-                                        <div key={k.label} className="bg-white rounded-[8px] px-4 py-4" style={CARD_STYLE}>
-                                            <p className="text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400 mb-1">{k.label}</p>
-                                            <p className={`text-[18px] font-[700] tabular-nums ${k.color}`}>{k.value}</p>
-                                            <p className="text-[11px] text-gray-400 mt-0.5">{k.sub}</p>
-                                        </div>
-                                    ))}
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {(() => {
+                                        const totalIn = txLedger.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+                                        return [
+                                            {
+                                                label: "Paystack Balance",
+                                                value: paystackBalance !== null ? `KES ${fmtAmt(paystackBalance)}` : `KES ${fmtAmt(liveBalance)}`,
+                                                sub: paystackBalance !== null ? "Live · from Paystack" : "Paystack unavailable",
+                                                color: "text-emerald-600",
+                                            },
+                                            { label: "Total Deposited", value: `KES ${fmtAmt(totalIn)}`, sub: "All-time top-ups", color: "text-[#6366F1]" },
+                                            { label: "In-app Ledger", value: `KES ${fmtAmt(dbBalance)}`, sub: "Allocation balance", color: "text-gray-700" },
+                                        ].map(k => (
+                                            <div key={k.label} className="bg-white rounded-[8px] px-4 py-4" style={CARD_STYLE}>
+                                                <p className="text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400 mb-1">{k.label}</p>
+                                                <p className={`text-[18px] font-[700] tabular-nums ${k.color}`}>{k.value}</p>
+                                                <p className="text-[11px] text-gray-400 mt-0.5">{k.sub}</p>
+                                            </div>
+                                        ));
+                                    })()}
                                 </div>
 
                                 {/* Quick stats */}
                                 <div className="flex overflow-hidden rounded-[8px] bg-white" style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
                                     {(() => {
-                                        const credits = txLedger.filter(t => t.amount > 0);
-                                        const debits = txLedger.filter(t => t.amount < 0);
-                                        const totalIn = credits.reduce((s, t) => s + t.amount, 0);
-                                        const totalOut = debits.reduce((s, t) => s + Math.abs(t.amount), 0);
+                                        const totalIn = txLedger.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+                                        const totalOut = txLedger.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
                                         return [
                                             { label: "Total Credit", value: `KES ${fmtAmt(totalIn)}`, color: "text-emerald-600" },
                                             { label: "Total Debit", value: `KES ${fmtAmt(totalOut)}`, color: "text-rose-600" },
@@ -182,9 +160,9 @@ export function WalletPageClient({
                                     <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
                                         <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: HAIRLINE }}>
                                             <p className="text-[12.5px] font-[600] text-gray-900">Recent Activity</p>
-                                            <button onClick={() => setTab("live")}
+                                            <button onClick={() => setTab("transactions")}
                                                 className="text-[11.5px] text-[#6366F1] font-[500] hover:underline">
-                                                View full ledger →
+                                                View all →
                                             </button>
                                         </div>
                                         {txLedger.slice(0, 5).map((tx, i, arr) => {
@@ -210,34 +188,49 @@ export function WalletPageClient({
                     </div>
                 )}
 
-                {tab === "live" && (
-                    <LedgerTable rows={txLedger} currency={currency} empty="No live transactions recorded yet." />
-                )}
-
-                {tab === "virtual" && (
-                    <LedgerTable rows={txVirtual} currency={currency} empty="No virtual transactions recorded yet." />
+                {tab === "transactions" && (
+                    <LedgerTable rows={txLedger} currency={currency} />
                 )}
             </div>
 
             <BulkAllocateModal
                 open={bulkOpen}
                 onClose={() => setBulkOpen(false)}
-                onSuccess={() => router.refresh()}
+                onSuccess={() => window.location.reload()}
                 corporateBalance={liveBalance}
                 currency={currency}
                 branches={branches}
-                categories={categories}
             />
         </div>
     );
 }
 
-function LedgerTable({ rows, currency, empty }: { rows: LedgerRow[]; currency: string; empty: string }) {
+function SourceBadge({ reference, type }: { reference: string | null; type: string }) {
+    if (reference?.startsWith('VTOPUP-')) {
+        return (
+            <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[9px] font-[700] uppercase tracking-[0.08em]"
+                style={{ background: '#f0f0ff', color: '#6366f1' }}>
+                Virtual
+            </span>
+        );
+    }
+    if (reference?.startsWith('TOPUP-') || type === 'DEPOSIT') {
+        return (
+            <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[9px] font-[700] uppercase tracking-[0.08em]"
+                style={{ background: '#f0fdf4', color: '#16a34a' }}>
+                Live
+            </span>
+        );
+    }
+    return null;
+}
+
+function LedgerTable({ rows, currency }: { rows: LedgerRow[]; currency: string }) {
     if (rows.length === 0) {
         return (
             <div className="py-16 flex flex-col items-center gap-2">
                 <BiHistory className="text-gray-200 text-2xl" />
-                <p className="text-[12.5px] text-gray-400">{empty}</p>
+                <p className="text-[12.5px] text-gray-400">No transactions recorded yet.</p>
             </div>
         );
     }
@@ -268,9 +261,12 @@ function LedgerTable({ rows, currency, empty }: { rows: LedgerRow[]; currency: s
                                 <td className="px-5 py-3 text-[11.5px] text-gray-400 font-mono whitespace-nowrap">
                                     {fmtDate(tx.createdAt)}
                                 </td>
-                                <td className="px-5 py-3 max-w-[220px]">
-                                    <p className="text-[12.5px] font-[500] text-gray-900 truncate">{tx.description}</p>
-                                    <p className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.05em] mt-0.5">
+                                <td className="px-5 py-3 max-w-[240px]">
+                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                        <p className="text-[12.5px] font-[500] text-gray-900 truncate">{tx.description}</p>
+                                        <SourceBadge reference={tx.reference} type={tx.type} />
+                                    </div>
+                                    <p className="text-[10px] font-[500] text-gray-400 uppercase tracking-[0.05em]">
                                         {tx.type.replace(/_/g, ' ')}
                                     </p>
                                 </td>
@@ -299,7 +295,6 @@ function LedgerTable({ rows, currency, empty }: { rows: LedgerRow[]; currency: s
                         );
                     })}
                 </tbody>
-                {/* Totals footer */}
                 <tfoot>
                     <tr style={{ borderTop: '2px solid rgba(0,0,0,0.08)', background: 'rgba(0,0,0,0.015)' }}>
                         <td colSpan={3} className="px-5 py-3 text-[11px] font-[600] uppercase tracking-[0.07em] text-gray-400">Totals</td>

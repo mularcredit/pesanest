@@ -6,7 +6,6 @@ import { postWalletAllocation } from '@/lib/accounting/wallet-gl';
 interface AllocationLine {
     branchId: string;
     amount: number;
-    category: string;
     description?: string;
 }
 
@@ -28,9 +27,9 @@ export async function POST(req: NextRequest) {
 
         // Validate each line
         for (const line of allocations) {
-            if (!line.branchId || !line.amount || line.amount <= 0 || !line.category) {
+            if (!line.branchId || !line.amount || line.amount <= 0) {
                 return NextResponse.json(
-                    { error: `Invalid allocation: branchId, amount > 0, and category are required for every line` },
+                    { error: `Invalid allocation: branchId and amount > 0 are required for every line` },
                     { status: 400 }
                 );
             }
@@ -54,7 +53,7 @@ export async function POST(req: NextRequest) {
             const processed: { branchId: string; amount: number; reference: string }[] = [];
 
             for (let i = 0; i < allocations.length; i++) {
-                const { branchId, amount, category, description } = allocations[i];
+                const { branchId, amount, description } = allocations[i];
                 const ref = `BULK-${timestamp}-${i}`;
 
                 // Upsert branch wallet
@@ -78,7 +77,7 @@ export async function POST(req: NextRequest) {
                         userId,
                         type: 'DEDUCTION',
                         amount: -amount,
-                        description: description || `Bulk allocation to branch for ${category}`,
+                        description: description || `Bulk allocation to branch`,
                         reference: `${ref}-OUT`
                     }
                 });
@@ -95,7 +94,7 @@ export async function POST(req: NextRequest) {
                         branchWalletId: branchWallet.id,
                         type: 'FUNDING',
                         amount,
-                        description: description || `Bulk allocation from HQ for ${category}`,
+                        description: description || `Bulk allocation from HQ`,
                         reference: `${ref}-IN`,
                     }
                 });
