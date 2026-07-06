@@ -38,23 +38,28 @@ export async function POST(req: NextRequest) {
 
         const wallet = await prisma.wallet.findUnique({ where: { id: transaction.walletId } });
 
-        await prisma.$transaction(async (tx) => {
-            await (tx as any).wallet.update({
+        // Critical: update wallet balance and mark transaction complete (atomic)
+        await prisma.$transaction([
+            prisma.wallet.update({
                 where: { id: transaction.walletId },
                 data: { balance: { increment: transaction.amount } }
-            });
-
-            await (tx as any).walletTransaction.update({
+            }),
+            prisma.walletTransaction.update({
                 where: { id: transaction.id },
                 data: { description: `Wallet Top Up [COMPLETED]` }
-            });
+            }),
+        ]);
 
-            await postPaystackTopup(tx as any, {
+        // Non-critical: GL journal entry — failure here must NOT roll back the balance update
+        try {
+            await postPaystackTopup(prisma as any, {
                 amount: transaction.amount,
-                walletGlAccountId: (wallet as any)?.glAccountId,
+                walletGlAccountId: wallet?.glAccountId,
                 reference,
             });
-        });
+        } catch (glErr) {
+            console.error('[Wallet GL] GL posting failed (non-critical):', glErr);
+        }
 
         return NextResponse.json({ success: true, amount: transaction.amount });
 
