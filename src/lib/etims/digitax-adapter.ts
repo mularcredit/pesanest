@@ -1,29 +1,32 @@
 /**
  * DigiTax Invoice Verification Adapter
  *
- * Verifies eTIMS/KRA fiscal invoices via DigiTax's Invoice Verification API.
+ * API docs: https://ke.docs.digitax.tech/docs/invoice-verification
+ * Base URL:  https://api.digitax.tech
+ * Endpoint:  POST /ke/v2/invoice-verifications
+ * Auth:      X-API-Key header
  *
- * Required env vars for live mode:
- *   DIGITAX_BASE_URL       — e.g. https://api.digitaxafrica.com
- *   DIGITAX_BUSINESS_ID    — your business key from DigiTax
- *   DIGITAX_API_KEY        — your API secret from DigiTax
+ * Required env vars (already set in .env):
+ *   DIGITAX_API_KEY     — KEN_LIVE_api_key_...
+ *   DIGITAX_BUSINESS_ID — BUSINESSKEY_... (sent as X-Business-ID header)
  *
- * Without DIGITAX_BASE_URL the adapter runs in stub mode, simulating
- * successful verification for any well-formed eTIMS number.
+ * Live mode activates automatically — no DIGITAX_BASE_URL toggle needed.
+ * Set DIGITAX_STUB=true to force stub mode during local dev/testing.
  */
 
-const DIGITAX_ENABLED = !!process.env.DIGITAX_BASE_URL;
-const DIGITAX_BASE_URL = process.env.DIGITAX_BASE_URL || '';
-const DIGITAX_BUSINESS_ID = process.env.DIGITAX_BUSINESS_ID || '';
+const DIGITAX_BASE_URL = 'https://api.digitax.tech';
 const DIGITAX_API_KEY = process.env.DIGITAX_API_KEY || '';
+const DIGITAX_BUSINESS_ID = process.env.DIGITAX_BUSINESS_ID || '';
+const DIGITAX_STUB = process.env.DIGITAX_STUB === 'true';
 
 export interface DigiTaxVerifyInput {
-    fiscalInvoiceNo: string;
-    supplierPin?: string;
-    supplierName?: string;
-    invoiceDate?: string;
-    totalAmount?: number;
-    vatAmount?: number;
+    fiscalInvoiceNo: string;   // maps to invoice_number
+    supplierPin?: string;      // maps to supplier_pin
+    totalAmount?: number;      // maps to amount (integer pence/cents)
+    referenceNumber?: string;  // maps to reference_number
+    supplierName?: string;     // informational only, not sent to API
+    invoiceDate?: string;      // informational only, not sent to API
+    vatAmount?: number;        // informational only, not sent to API
 }
 
 export type VerificationStatus = 'VERIFIED' | 'FAILED' | 'NEEDS_REVIEW';
@@ -41,9 +44,6 @@ export interface DigiTaxVerifyResult {
     raw?: any;
 }
 
-// KRA PIN format: letter + 9 digits + letter (e.g. A001234567X)
-const KRA_PIN_RE = /^[A-Z]\d{9}[A-Z]$/i;
-
 export class DigiTaxAdapter {
     static async verifyInvoice(input: DigiTaxVerifyInput): Promise<DigiTaxVerifyResult> {
         const invoiceNo = input.fiscalInvoiceNo?.trim();
@@ -56,7 +56,7 @@ export class DigiTaxAdapter {
             };
         }
 
-        if (!DIGITAX_ENABLED) {
+        if (DIGITAX_STUB || !DIGITAX_API_KEY) {
             return DigiTaxAdapter._stubVerify(input, invoiceNo);
         }
 
@@ -70,7 +70,7 @@ export class DigiTaxAdapter {
             return {
                 verified: false,
                 status: 'NEEDS_REVIEW',
-                failureReason: 'Stub mode — invoice number format looks invalid. Set DIGITAX_BASE_URL to enable live verification.',
+                failureReason: 'Stub mode — invoice number format looks invalid.',
             };
         }
 
@@ -83,26 +83,28 @@ export class DigiTaxAdapter {
             invoiceDate: input.invoiceDate,
             totalAmount: input.totalAmount,
             vatAmount: input.vatAmount,
-            failureReason: 'Stub mode — not verified against live DigiTax. Set DIGITAX_BASE_URL for real validation.',
+            failureReason: !DIGITAX_API_KEY
+                ? 'Stub mode — DIGITAX_API_KEY not set. Add it to .env for live verification.'
+                : 'Stub mode — DIGITAX_STUB=true. Remove it for live verification.',
         };
     }
 
     private static async _liveVerify(input: DigiTaxVerifyInput, invoiceNo: string): Promise<DigiTaxVerifyResult> {
         try {
+            // Build request body per DigiTax API spec
             const payload: Record<string, any> = {
-                businessKey: DIGITAX_BUSINESS_ID,
-                invoiceNumber: invoiceNo,
+                invoice_number: invoiceNo,
             };
-            if (input.supplierPin && KRA_PIN_RE.test(input.supplierPin)) payload.supplierPin = input.supplierPin;
-            if (input.totalAmount !== undefined) payload.totalAmount = input.totalAmount;
-            if (input.invoiceDate) payload.invoiceDate = input.invoiceDate;
+            if (input.supplierPin) payload.supplier_pin = input.supplierPin;
+            if (input.totalAmount !== undefined) payload.amount = Math.round(input.totalAmount); // API expects integer
+            if (input.referenceNumber) payload.reference_number = input.referenceNumber;
 
-            const res = await fetch(`${DIGITAX_BASE_URL}/v1/invoice/verify`, {
+            const res = await fetch(`${DIGITAX_BASE_URL}/ke/v2/invoice-verifications`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${DIGITAX_API_KEY}`,
-                    'X-Business-Key': DIGITAX_BUSINESS_ID,
+                    'X-API-Key': DIGITAX_API_KEY,
+                    'X-Business-ID': DIGITAX_BUSINESS_ID,
                 },
                 body: JSON.stringify(payload),
             });
@@ -112,22 +114,25 @@ export class DigiTaxAdapter {
             if (!res.ok) {
                 return {
                     verified: false,
-                    status: 'FAILED',
-                    failureReason: data.message || `DigiTax API error: HTTP ${res.status}`,
+                    status: res.status === 404 ? 'FAILED' : 'NEEDS_REVIEW',
+                    failureReason: data.message || data.error || `DigiTax API error: HTTP ${res.status}`,
                     raw: data,
                 };
             }
 
-            if (data.verified || data.success) {
+            // 201 = verified successfully
+            const verified = res.status === 201 || data.verified === true || data.status === 'verified';
+
+            if (verified) {
                 return {
                     verified: true,
                     status: 'VERIFIED',
-                    referenceId: data.referenceId || data.reference,
-                    supplierName: data.supplierName || input.supplierName,
-                    supplierPin: data.supplierPin || input.supplierPin,
-                    invoiceDate: data.invoiceDate || input.invoiceDate,
-                    totalAmount: data.totalAmount ?? input.totalAmount,
-                    vatAmount: data.vatAmount ?? input.vatAmount,
+                    referenceId: data.id || data.reference_id || data.reference,
+                    supplierName: data.supplier_name || data.supplierName || input.supplierName,
+                    supplierPin: data.supplier_pin || data.supplierPin || input.supplierPin,
+                    invoiceDate: data.invoice_date || data.invoiceDate || input.invoiceDate,
+                    totalAmount: data.amount ?? input.totalAmount,
+                    vatAmount: data.vat_amount ?? input.vatAmount,
                     raw: data,
                 };
             }
