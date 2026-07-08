@@ -419,7 +419,6 @@ export default async function DashboardPage() {
                     <WalletCard
                         balance={liveBalance}
                         currency={wallet?.currency === 'USD' ? 'KES' : (wallet?.currency ?? 'KES')}
-                        categories={categories.map((c: { name: string }) => c.name)}
                         branches={branchesData.map((b: { id: string; name: string }) => ({ id: b.id, name: b.name }))}
                         isPaystack={paystackConnected}
                         holderName={currentUserWithPaystack?.name || "Corporate Wallet"}

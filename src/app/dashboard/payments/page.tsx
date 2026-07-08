@@ -153,6 +153,12 @@ export default async function PaymentsPage() {
         where: paidPaymentWhere as any,
         include: {
             maker: { select: { name: true, email: true, profileImage: true } },
+            expenses: {
+                include: {
+                    user: { select: { name: true, email: true } },
+                    receiptVerification: true,
+                }
+            },
             _count: {
                 select: { invoices: true, expenses: true }
             }

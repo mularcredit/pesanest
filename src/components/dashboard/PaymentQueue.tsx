@@ -38,6 +38,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { estimatePaystackPayoutFee } from "@/lib/payments/paymentFees";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import { ReconcileModal, BatchForReconcile } from "@/components/dashboard/ReconcileModal";
 
 // Types
 interface UserBasic {
@@ -45,6 +46,19 @@ interface UserBasic {
     email: string | null;
     department?: string | null;
     bankAccount?: string | null;
+}
+
+interface ReceiptVerificationSummary {
+    id: string;
+    status: string;
+    supplierName: string | null;
+    supplierPin: string | null;
+    fiscalInvoiceNo: string | null;
+    invoiceDate: string | null;
+    amountVerified: number | null;
+    vatAmountVerified: number | null;
+    verificationRef: string | null;
+    failureReason: string | null;
 }
 
 interface Expense {
@@ -55,8 +69,10 @@ interface Expense {
     category: string;
     merchant: string | null;
     receiptUrl: string | null;
+    etrNumber?: string | null;
     updatedAt: Date;
     user: UserBasic;
+    receiptVerification?: ReceiptVerificationSummary | null;
 }
 
 interface Invoice {
@@ -95,7 +111,6 @@ interface PaymentBatch {
     id: string;
     amount: number;
     currency: string;
-// ...
     status: string;
     method: string;
     notes: string | null;
@@ -107,6 +122,7 @@ interface PaymentBatch {
         requisitions?: number;
         monthlyBudgets?: number;
     };
+    expenses?: Expense[];
 }
 
 interface PaymentQueueProps {
@@ -284,6 +300,7 @@ export function PaymentQueue({
     };
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [reconcileBatch, setReconcileBatch] = useState<BatchForReconcile | null>(null);
 
     const handleAuthorization = (paymentId: string, action: 'AUTHORIZE' | 'REJECT' | 'DISBURSE' | 'CLOSE') => {
         const batch = [...pendingPayments, ...authorizedPayments, ...paidPayments].find(p => p.id === paymentId);
@@ -399,7 +416,7 @@ export function PaymentQueue({
         });
     };
 
-    return (
+    return (<>
         <div className="flex -mt-[22px] -mx-[26px] -mb-[52px] min-h-[calc(100vh-64px)] animate-fade-in-up">
 
             {/* Left Sidebar */}
@@ -1120,7 +1137,11 @@ export function PaymentQueue({
                                                         </td>
                                                         <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(batch.amount, batch.currency)}</td>
                                                         <td className="px-4 py-3 text-right">
-                                                            <button onClick={() => handleAuthorization(batch.id, 'CLOSE')} disabled={isProcessing} className="px-3 py-2 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all flex items-center justify-center shadow-none disabled:opacity-50 w-full">
+                                                            <button
+                                                                onClick={() => setReconcileBatch({ id: batch.id, amount: batch.amount, currency: batch.currency, expenses: batch.expenses as any })}
+                                                                disabled={isProcessing}
+                                                                className="px-3 py-2 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all flex items-center justify-center shadow-none disabled:opacity-50 w-full"
+                                                            >
                                                                 Reconcile
                                                             </button>
                                                         </td>
@@ -1518,5 +1539,19 @@ export function PaymentQueue({
                 document.body
             )}
         </div>
-    );
+
+        {/* eTIMS Receipt Verification Modal */}
+        {mounted && reconcileBatch && (
+            <ReconcileModal
+                batch={reconcileBatch}
+                isSystemAdmin={isSystemAdmin}
+                onClose={() => setReconcileBatch(null)}
+                onComplete={() => {
+                    setReconcileBatch(null);
+                    showToast('Payment batch reconciled successfully', 'success');
+                    router.refresh();
+                }}
+            />
+        )}
+    </>);
 }
