@@ -41,6 +41,7 @@ import {
     PiBriefcase,
     PiTag,
     PiLock,
+    PiDeviceMobile,
 } from "react-icons/pi";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useMemo } from "react";
@@ -139,6 +140,7 @@ const menuCategories: MenuCategory[] = [
             { name: "Data Import", href: "/dashboard/settings/import", icon: PiUploadSimple },
             { name: "Account Security", href: "/dashboard/settings/security", icon: PiLock },
             { name: "System config", href: "/dashboard/settings", icon: PiGear },
+            { name: "SMS Notifications", href: "/dashboard/sms", icon: PiDeviceMobile },
         ]
     }
 ];

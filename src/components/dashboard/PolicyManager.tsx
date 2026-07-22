@@ -266,15 +266,12 @@ export function PolicyManager({ policies }: PolicyManagerProps) {
                                         selectedTemplate.type === 'SPENDING_LIMIT' ? 'Daily Limit (KES)' :
                                         selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'Prohibited Keywords' : 'Limit Value'}
                                 </label>
-                                <div className="relative">
-                                    {selectedTemplate.type !== 'KEYWORD_RESTRICTION' && (
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-[500]">KES</span>
-                                    )}
+                                <div>
                                     <input
                                         type={selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'text' : 'number'}
                                         value={configValue}
                                         onChange={(e) => setConfigValue(e.target.value)}
-                                        className={`w-full ${selectedTemplate.type === 'KEYWORD_RESTRICTION' ? 'px-3' : 'pl-11 pr-3'} py-[10px] rounded-[6px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white`}
+                                        className={`w-full px-3 py-[10px] rounded-[6px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white`}
                                         style={{ border: '1px solid rgba(0,0,0,0.09)' }}
                                         placeholder={selectedTemplate.type === 'KEYWORD_RESTRICTION' ? "alcohol, wine, beer..." : "0"}
                                     />

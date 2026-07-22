@@ -208,9 +208,8 @@ export function AssetManager({ assets, stats }: { assets: any[]; stats: any }) {
                         {/* Purchase Price */}
                         <div>
                             <label className={LABEL_CLASS}>Purchase price (KES) <span className="text-rose-400">*</span></label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-[500]">KES</span>
-                                <input type="number" className={cn(INPUT_CLASS, 'pl-11 tabular-nums')} style={INPUT_STYLE}
+                            <div>
+                                <input type="number" className={cn(INPUT_CLASS, 'pl-3 tabular-nums')} style={INPUT_STYLE}
                                     placeholder="0.00" value={newAsset.purchasePrice}
                                     onChange={e => setNewAsset({ ...newAsset, purchasePrice: e.target.value })} />
                             </div>
@@ -369,11 +368,10 @@ export function AssetManager({ assets, stats }: { assets: any[]; stats: any }) {
                     </div>
                     <div>
                         <label className={LABEL_CLASS}>Proceeds <span className="text-gray-300">(KES — leave blank if none)</span></label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-[500]">KES</span>
+                        <div>
                             <input type="number" step="0.01" min="0" value={disposeForm.proceeds}
                                 onChange={e => setDisposeForm(f => ({ ...f, proceeds: e.target.value }))}
-                                placeholder="0.00" className={cn(INPUT_CLASS, 'pl-11 tabular-nums')} style={INPUT_STYLE} />
+                                placeholder="0.00" className={cn(INPUT_CLASS, 'pl-3 tabular-nums')} style={INPUT_STYLE} />
                         </div>
                     </div>
                     <div>
@@ -423,9 +421,8 @@ export function AssetManager({ assets, stats }: { assets: any[]; stats: any }) {
 
             {/* Toolbar */}
             <div className="flex flex-col md:flex-row gap-3 items-center">
-                <div className="relative w-full md:w-80 shrink-0">
-                    <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
-                    <input className="w-full pl-8 pr-3 py-[9px] rounded-[6px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                <div className="w-full md:w-80 shrink-0">
+                    <input className="w-full pl-3 pr-3 py-[9px] rounded-[6px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
                         style={INPUT_STYLE}
                         placeholder="Search by name, tag or serial…"
                         value={searchQuery} onChange={e => handleSearch(e.target.value)} />

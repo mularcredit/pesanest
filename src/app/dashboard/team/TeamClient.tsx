@@ -85,14 +85,13 @@ export function TeamClient({ initialUsers }: TeamClientProps) {
         <div className="space-y-6">
             {/* Toolbar */}
             <div className="flex items-center justify-between gap-4">
-                <div className="relative w-64">
-                    <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[14px]" />
+                <div className="w-64">
                     <input
                         type="text"
                         placeholder="Search users..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-[9px] rounded-[6px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white"
+                        className="w-full pl-3 pr-4 py-[9px] rounded-[6px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white"
                         style={{ border: '1px solid rgba(0,0,0,0.09)' }}
                     />
                 </div>

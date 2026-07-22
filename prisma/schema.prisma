@@ -28,33 +28,32 @@ model User {
   accountStatus         String              @default("PENDING")
   resetToken            String?
   resetTokenExpiry      DateTime?
-  paystackRecipientCode String?
-  paystackCustomerCode  String?
   regionId              String?
   branchId              String?
-  totpSecret            String?
-  totpEnabled           Boolean             @default(false)
   failedLoginAttempts   Int                 @default(0)
   lockedUntil           DateTime?
+  paystackCustomerCode  String?
+  paystackRecipientCode String?
+  totpEnabled           Boolean             @default(false)
+  totpSecret            String?
   approvals             Approval[]
   assets                Asset[]
   leadBranch            Branch?
   expenses              Expense[]
   createdInvoices       Invoice[]
   itemApprovals         ItemApproval[]
+  loginEvents           LoginEvent[]
   monthlyBudgets        MonthlyBudget[]
   notifications         Notification[]
   checkedPayments       Payment[]           @relation("PaymentChecker")
   madePayments          Payment[]           @relation("PaymentMaker")
   requisitions          Requisition[]
-
   createdSchedules      Schedule[]          @relation("ScheduleCreator")
   customRole            Role?               @relation(fields: [customRoleId], references: [id])
   manager               User?               @relation("ManagerSubordinates", fields: [managerId], references: [id])
   subordinates          User[]              @relation("ManagerSubordinates")
   wallet                Wallet?
   walletTransactions    WalletTransaction[]
-  loginEvents           LoginEvent[]
 
   @@index([email])
   @@index([managerId])
@@ -147,17 +146,17 @@ model RolePermission {
 }
 
 model Wallet {
-  id                   String              @id @default(cuid())
-  userId               String              @unique
-  balance              Float               @default(0)
-  currency             String              @default("KES")
-  glAccountId          String?             @unique
-  lastPaystackBalance  Float               @default(0)
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
-  user         User                @relation(fields: [userId], references: [id])
-  transactions WalletTransaction[]
-  glAccount    Account?            @relation("HQWalletGL", fields: [glAccountId], references: [id])
+  id                  String              @id @default(cuid())
+  userId              String              @unique
+  balance             Float               @default(0)
+  currency            String              @default("KES")
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  glAccountId         String?             @unique
+  lastPaystackBalance Float               @default(0)
+  glAccount           Account?            @relation("HQWalletGL", fields: [glAccountId], references: [id])
+  user                User                @relation(fields: [userId], references: [id])
+  transactions        WalletTransaction[]
 }
 
 model WalletTransaction {
@@ -198,6 +197,9 @@ model Requisition {
   paymentMethod         String?
   paymentReference      String?
   receiptUrl            String?
+  etrNumber             String?
+  etrVerified           Boolean           @default(false)
+  etrVerifiedAt         DateTime?
   approvals             Approval[]
   expenses              Expense[]
   invoices              Invoice[]
@@ -300,36 +302,36 @@ model BudgetItem {
 }
 
 model Expense {
-  id             String         @id @default(cuid())
-  userId         String
-  requisitionId  String?
-  title          String
-  description    String?
-  amount         Float
-  currency       String         @default("KES")
-  category       String
-  expenseDate    DateTime
-  merchant       String?
-  paymentMethod  String         @default("PERSONAL_CARD")
-  isReimbursable Boolean        @default(true)
-  isBillable     Boolean        @default(false)
-  receiptUrl     String?
-  etrNumber      String?
-  etrVerified    Boolean        @default(false)
-  etrVerifiedAt  DateTime?
-  status         String         @default("DRAFT")
-  paidAt         DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  paymentId      String?
-  costCenter     String         @default("OFFICE")
-  accountId      String?
-  approvals            Approval[]
-  payment              Payment?              @relation(fields: [paymentId], references: [id])
-  requisition          Requisition?          @relation(fields: [requisitionId], references: [id])
-  user                 User                  @relation(fields: [userId], references: [id])
-  journalEntries       JournalEntry[]
-  receiptVerification  ReceiptVerification?
+  id                  String               @id @default(cuid())
+  userId              String
+  requisitionId       String?
+  title               String
+  description         String?
+  amount              Float
+  currency            String               @default("KES")
+  category            String
+  expenseDate         DateTime
+  merchant            String?
+  paymentMethod       String               @default("PERSONAL_CARD")
+  isReimbursable      Boolean              @default(true)
+  isBillable          Boolean              @default(false)
+  receiptUrl          String?
+  status              String               @default("DRAFT")
+  paidAt              DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  paymentId           String?
+  costCenter          String               @default("OFFICE")
+  accountId           String?
+  etrNumber           String?
+  etrVerified         Boolean              @default(false)
+  etrVerifiedAt       DateTime?
+  approvals           Approval[]
+  payment             Payment?             @relation(fields: [paymentId], references: [id])
+  requisition         Requisition?         @relation(fields: [requisitionId], references: [id])
+  user                User                 @relation(fields: [userId], references: [id])
+  journalEntries      JournalEntry[]
+  receiptVerification ReceiptVerification?
 
   @@index([userId])
   @@index([status])
@@ -340,8 +342,7 @@ model Expense {
 model ReceiptVerification {
   id                  String    @id @default(cuid())
   expenseId           String    @unique
-  expense             Expense   @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  status              String    // PENDING | VERIFIED | FAILED | NEEDS_REVIEW
+  status              String
   receiptUrl          String?
   supplierName        String?
   supplierPin         String?
@@ -355,6 +356,7 @@ model ReceiptVerification {
   verifiedAt          DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+  expense             Expense   @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
   @@index([expenseId])
 }
@@ -424,12 +426,12 @@ model BranchWallet {
   branchId     String                    @unique
   balance      Float                     @default(0)
   currency     String                    @default("KES")
-  glAccountId  String?
   createdAt    DateTime                  @default(now())
   updatedAt    DateTime                  @updatedAt
+  glAccountId  String?
   branch       Branch                    @relation(fields: [branchId], references: [id])
-  transactions BranchWalletTransaction[]
   glAccount    Account?                  @relation("BranchWalletGL", fields: [glAccountId], references: [id])
+  transactions BranchWalletTransaction[]
 
   @@index([glAccountId])
 }
@@ -456,13 +458,8 @@ model Invoice {
   invoiceNumber  String            @unique
   invoiceDate    DateTime
   dueDate        DateTime
-  subtotal       Decimal           @default(0) @db.Decimal(18, 2)
   amount         Decimal           @db.Decimal(18, 2)
   taxAmount      Decimal           @default(0) @db.Decimal(18, 2)
-  taxRateId      String?
-  whtRateId      String?
-  whtAmount      Decimal           @default(0) @db.Decimal(18, 2)
-  whtCertNumber  String?
   currency       String            @default("KES")
   description    String?
   notes          String?
@@ -476,15 +473,20 @@ model Invoice {
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   paymentId      String?
+  subtotal       Decimal           @default(0) @db.Decimal(18, 2)
+  taxRateId      String?
+  whtAmount      Decimal           @default(0) @db.Decimal(18, 2)
+  whtCertNumber  String?
+  whtRateId      String?
   approvals      Approval[]
   createdBy      User              @relation(fields: [createdById], references: [id])
   payment        Payment?          @relation(fields: [paymentId], references: [id])
   requisition    Requisition?      @relation(fields: [requisitionId], references: [id])
+  taxRate        TaxRate?          @relation("InvoiceTaxRate", fields: [taxRateId], references: [id])
   vendor         Vendor            @relation(fields: [vendorId], references: [id])
+  whtRate        TaxRate?          @relation("InvoiceWHT", fields: [whtRateId], references: [id])
   items          InvoiceLineItem[]
   journalEntries JournalEntry[]
-  taxRate        TaxRate?          @relation("InvoiceTaxRate", fields: [taxRateId], references: [id])
-  whtRate        TaxRate?          @relation("InvoiceWHT", fields: [whtRateId], references: [id])
 
   @@index([vendorId])
   @@index([status])
@@ -556,10 +558,10 @@ model Vendor {
   bankRouting            String?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
-  paystackRecipientCode  String?
   description            String?
   branchId               String?
   preferredPaymentMethod String?
+  paystackRecipientCode  String?
   invoices               Invoice[]
   branch                 Branch?   @relation(fields: [branchId], references: [id])
 
@@ -593,28 +595,28 @@ model Customer {
 }
 
 model Sale {
-  id                  String            @id @default(cuid())
-  customerId          String
-  invoiceNumber       String            @unique
-  issueDate           DateTime
-  dueDate             DateTime
-  subtotal            Decimal           @default(0) @db.Decimal(18, 2)
-  taxAmount           Decimal           @default(0) @db.Decimal(18, 2)
-  totalAmount         Decimal           @db.Decimal(18, 2)
-  taxRateId           String?
-  currency            String            @default("KES")
-  status              String            @default("DRAFT")
-  notes               String?
-  invoiceUrl          String?
-  etimsInvoiceNumber  String?
-  etimsControlUnit    String?
-  etimsStatus         String            @default("NOT_REQUIRED")
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  payments            CustomerPayment[]
-  customer            Customer          @relation(fields: [customerId], references: [id])
-  items               SaleItem[]
-  taxRate             TaxRate?          @relation("SaleTaxRate", fields: [taxRateId], references: [id])
+  id                 String            @id @default(cuid())
+  customerId         String
+  invoiceNumber      String            @unique
+  issueDate          DateTime
+  dueDate            DateTime
+  totalAmount        Decimal           @db.Decimal(18, 2)
+  taxAmount          Decimal           @default(0) @db.Decimal(18, 2)
+  currency           String            @default("KES")
+  status             String            @default("DRAFT")
+  notes              String?
+  invoiceUrl         String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  etimsControlUnit   String?
+  etimsInvoiceNumber String?
+  etimsStatus        String            @default("NOT_REQUIRED")
+  subtotal           Decimal           @default(0) @db.Decimal(18, 2)
+  taxRateId          String?
+  payments           CustomerPayment[]
+  customer           Customer          @relation(fields: [customerId], references: [id])
+  taxRate            TaxRate?          @relation("SaleTaxRate", fields: [taxRateId], references: [id])
+  items              SaleItem[]
 
   @@index([customerId])
   @@index([invoiceNumber])
@@ -671,30 +673,30 @@ model CreditNote {
 }
 
 model Account {
-  id           String        @id @default(cuid())
-  code         String        @unique
-  name         String
-  type         String
-  subtype      String?
-  currency     String        @default("KES")
-  description  String?
-  isActive     Boolean       @default(true)
-  isArchived   Boolean       @default(false)
-  parentId     String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  journalLines         JournalLine[]
-  bankAccount          BankAccount?
-  hqWallet             Wallet?                 @relation("HQWalletGL")
-  branchWallets        BranchWallet[]          @relation("BranchWalletGL")
-  accrualDebits        AccrualSchedule[]       @relation("AccrualDebit")
-  accrualCredits       AccrualSchedule[]       @relation("AccrualCredit")
+  id                    String                 @id @default(cuid())
+  code                  String                 @unique
+  name                  String
+  type                  String
+  subtype               String?
+  currency              String                 @default("KES")
+  description           String?
+  isActive              Boolean                @default(true)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  isArchived            Boolean                @default(false)
+  parentId              String?
+  qboAccountType        String?
+  qboId                 String?
+  parent                Account?               @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children              Account[]              @relation("AccountHierarchy")
+  accrualCredits        AccrualSchedule[]      @relation("AccrualCredit")
+  accrualDebits         AccrualSchedule[]      @relation("AccrualDebit")
+  bankAccount           BankAccount?
+  branchWallets         BranchWallet[]         @relation("BranchWalletGL")
+  journalLines          JournalLine[]
+  periodBalances        PeriodBalance[]
   recurringJournalLines RecurringJournalLine[]
-  parent               Account?                @relation("AccountHierarchy", fields: [parentId], references: [id])
-  children             Account[]               @relation("AccountHierarchy")
-  periodBalances       PeriodBalance[]
-  qboId           String?
-  qboAccountType  String?
+  hqWallet              Wallet?                @relation("HQWalletGL")
 
   @@index([parentId])
   @@index([isArchived])
@@ -702,7 +704,6 @@ model Account {
 
 model JournalEntry {
   id              String         @id @default(cuid())
-  entryNumber     String?        @unique
   date            DateTime
   description     String
   reference       String?
@@ -716,10 +717,11 @@ model JournalEntry {
   createdBy       String?
   monthlyBudgetId String?
   requisitionId   String?
-  reversalOfId    String?
-  isBackdated     Boolean        @default(false)
-  approvedBy      String?
   approvedAt      DateTime?
+  approvedBy      String?
+  entryNumber     String?        @unique
+  isBackdated     Boolean        @default(false)
+  reversalOfId    String?
   creditNote      CreditNote?    @relation(fields: [creditNoteId], references: [id])
   expense         Expense?       @relation(fields: [expenseId], references: [id])
   invoice         Invoice?       @relation(fields: [invoiceId], references: [id])
@@ -742,8 +744,8 @@ model JournalLine {
   credit       Float        @default(0)
   costCentreId String?
   account      Account      @relation(fields: [accountId], references: [id])
-  entry        JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
   costCentre   CostCentre?  @relation(fields: [costCentreId], references: [id])
+  entry        JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
 
   @@index([entryId])
   @@index([accountId])
@@ -759,7 +761,7 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   glCode      String?
-  qboId       String?   // QuickBooks Category/Item ID
+  qboId       String?
 }
 
 model Policy {
@@ -853,15 +855,13 @@ model TaxRate {
   effectiveTo   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  sales         Sale[]    @relation("SaleTaxRate")
   invoices      Invoice[] @relation("InvoiceTaxRate")
   whtInvoices   Invoice[] @relation("InvoiceWHT")
+  sales         Sale[]    @relation("SaleTaxRate")
 
   @@index([code])
   @@index([isActive])
 }
-
-
 
 model SystemSetting {
   id          String   @id @default(cuid())
@@ -923,16 +923,16 @@ model BankAccount {
 }
 
 model BankStatement {
-  id              String              @id @default(cuid())
-  bankAccountId   String
-  periodStart     DateTime
-  periodEnd       DateTime
-  openingBalance  Decimal             @db.Decimal(18, 2)
-  closingBalance  Decimal             @db.Decimal(18, 2)
-  importedAt      DateTime            @default(now())
-  importedBy      String?
-  bankAccount     BankAccount         @relation(fields: [bankAccountId], references: [id])
-  lines           BankStatementLine[]
+  id             String              @id @default(cuid())
+  bankAccountId  String
+  periodStart    DateTime
+  periodEnd      DateTime
+  openingBalance Decimal             @db.Decimal(18, 2)
+  closingBalance Decimal             @db.Decimal(18, 2)
+  importedAt     DateTime            @default(now())
+  importedBy     String?
+  bankAccount    BankAccount         @relation(fields: [bankAccountId], references: [id])
+  lines          BankStatementLine[]
 
   @@index([bankAccountId])
 }
@@ -969,12 +969,10 @@ model ReconciliationMatch {
   @@index([journalEntryId])
 }
 
-// ─── Phase 3: Accrual Completeness ────────────────────────────────────────────
-
 model AccrualSchedule {
   id              String               @id @default(cuid())
   name            String
-  type            String               // ACCRUAL | PREPAYMENT | DEFERRED_INCOME
+  type            String
   totalAmount     Decimal              @db.Decimal(18, 2)
   debitAccountId  String
   creditAccountId String
@@ -987,9 +985,9 @@ model AccrualSchedule {
   createdBy       String?
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
-  debitAccount    Account              @relation("AccrualDebit", fields: [debitAccountId], references: [id])
-  creditAccount   Account              @relation("AccrualCredit", fields: [creditAccountId], references: [id])
   recognitions    AccrualRecognition[]
+  creditAccount   Account              @relation("AccrualCredit", fields: [creditAccountId], references: [id])
+  debitAccount    Account              @relation("AccrualDebit", fields: [debitAccountId], references: [id])
 
   @@index([status])
   @@index([type])
@@ -1033,13 +1031,11 @@ model RecurringJournalLine {
   description String?
   debit       Decimal                  @default(0) @db.Decimal(18, 2)
   credit      Decimal                  @default(0) @db.Decimal(18, 2)
-  template    RecurringJournalTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   account     Account                  @relation(fields: [accountId], references: [id])
+  template    RecurringJournalTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
   @@index([templateId])
 }
-
-// ─── Phase 4: Scale & Breadth ─────────────────────────────────────────────────
 
 model CostCentre {
   id          String        @id @default(cuid())
@@ -1055,18 +1051,18 @@ model CostCentre {
 }
 
 model PeriodBalance {
-  id           String           @id @default(cuid())
-  periodId     String
-  accountId    String
-  openingDebit Decimal          @default(0) @db.Decimal(18, 2)
-  openingCredit Decimal         @default(0) @db.Decimal(18, 2)
-  periodDebit  Decimal          @default(0) @db.Decimal(18, 2)
-  periodCredit Decimal          @default(0) @db.Decimal(18, 2)
-  closingDebit Decimal          @default(0) @db.Decimal(18, 2)
-  closingCredit Decimal         @default(0) @db.Decimal(18, 2)
-  snapshotAt   DateTime         @default(now())
-  account      Account          @relation(fields: [accountId], references: [id])
-  period       AccountingPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  id            String           @id @default(cuid())
+  periodId      String
+  accountId     String
+  openingDebit  Decimal          @default(0) @db.Decimal(18, 2)
+  openingCredit Decimal          @default(0) @db.Decimal(18, 2)
+  periodDebit   Decimal          @default(0) @db.Decimal(18, 2)
+  periodCredit  Decimal          @default(0) @db.Decimal(18, 2)
+  closingDebit  Decimal          @default(0) @db.Decimal(18, 2)
+  closingCredit Decimal          @default(0) @db.Decimal(18, 2)
+  snapshotAt    DateTime         @default(now())
+  account       Account          @relation(fields: [accountId], references: [id])
+  period        AccountingPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
 
   @@unique([periodId, accountId])
   @@index([periodId])
@@ -1082,9 +1078,23 @@ model LoginEvent {
   userAgent String?
   reason    String?
   createdAt DateTime @default(now())
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([email])
   @@index([createdAt])
+}
+
+model SmsLog {
+  id          String   @id @default(cuid())
+  to          String
+  message     String
+  status      String
+  messageId   String?
+  errorReason String?
+  event       String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([status])
 }

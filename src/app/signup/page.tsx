@@ -168,8 +168,7 @@ export default function SignupPage() {
                     <form onSubmit={handleSubmit}>
                         {/* Full name */}
                         <div className="mb-1.5 text-xs font-medium text-zinc-900">Full name</div>
-                        <div className="relative mb-5">
-                            <HiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
+                        <div className="mb-5">
                             <input
                                 type="text"
                                 value={name}
@@ -177,14 +176,13 @@ export default function SignupPage() {
                                 placeholder="John Doe"
                                 required
                                 className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
-                                style={{ padding: "11px 16px 11px 44px" }}
+                                style={{ padding: "11px 16px" }}
                             />
                         </div>
 
                         {/* Email */}
                         <div className="mb-1.5 text-xs font-medium text-zinc-900">Email address</div>
-                        <div className="relative mb-5">
-                            <HiEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
+                        <div className="mb-5">
                             <input
                                 type="email"
                                 value={email}
@@ -192,14 +190,13 @@ export default function SignupPage() {
                                 placeholder="you@company.com"
                                 required
                                 className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
-                                style={{ padding: "11px 16px 11px 44px" }}
+                                style={{ padding: "11px 16px" }}
                             />
                         </div>
 
                         {/* Password */}
                         <div className="mb-1.5 text-xs font-medium text-zinc-900">Password</div>
                         <div className="relative mb-2">
-                            <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
                             <input
                                 type={showPassword ? "text" : "password"}
                                 value={password}
@@ -208,7 +205,7 @@ export default function SignupPage() {
                                 required
                                 minLength={8}
                                 className={`w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border focus:bg-[#6366F1]/[0.04] ${passwordError ? "border-rose-400 focus:border-rose-500" : "border-[#6366F1]/30 focus:border-[#6366F1]"}`}
-                                style={{ padding: "11px 44px 11px 44px" }}
+                                style={{ padding: "11px 44px 11px 16px" }}
                             />
                             <button
                                 type="button"

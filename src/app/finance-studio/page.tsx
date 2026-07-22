@@ -525,13 +525,12 @@ function FinanceStudioContent() {
                                     </div>
                                     <div>
                                         <InputLabel>Amount (KES)</InputLabel>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] font-[600]">KES</span>
+                                        <div>
                                             <input
                                                 type="number"
                                                 value={creditNoteData.amount || ''}
                                                 onChange={(e) => setCreditNoteData({ ...creditNoteData, amount: parseFloat(e.target.value) || 0 })}
-                                                className="w-full rounded-[7px] pl-10 pr-3 py-2.5 text-[12.5px] font-mono tabular-nums text-gray-900 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
+                                                className="w-full rounded-[7px] pl-3 pr-3 py-2.5 text-[12.5px] font-mono tabular-nums text-gray-900 bg-white outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-all"
                                                 style={{ border: HAIRLINE }}
                                                 placeholder="0.00"
                                             />

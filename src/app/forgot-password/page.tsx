@@ -117,8 +117,7 @@ export default function ForgotPasswordPage() {
                                 )}
 
                                 <div className="mb-1.5 text-xs font-medium text-zinc-900">Email address</div>
-                                <div className="relative mb-8">
-                                    <HiEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
+                                <div className="mb-8">
                                     <input
                                         type="email"
                                         value={email}
@@ -126,7 +125,7 @@ export default function ForgotPasswordPage() {
                                         placeholder="you@company.com"
                                         required
                                         className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
-                                        style={{ padding: "11px 16px 11px 44px" }}
+                                        style={{ padding: "11px 16px" }}
                                     />
                                 </div>
 

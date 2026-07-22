@@ -232,6 +232,31 @@ export async function POST(req: NextRequest) {
         revalidatePath('/dashboard/invoices');
         revalidatePath('/dashboard');
 
+        // Non-critical: SMS to submitter
+        const submitterUserId = (updatedItem as any).userId ?? (updatedItem as any).createdById ?? null;
+        if (submitterUserId) {
+            import('@/lib/sms/sms-service').then(async ({ smsService }) => {
+                const submitter = await prisma.user.findUnique({
+                    where: { id: submitterUserId },
+                    select: { name: true, phoneNumber: true },
+                });
+                if (submitter?.phoneNumber) {
+                    const title = (updatedItem as any).title
+                        ?? (updatedItem as any).invoiceNumber
+                        ?? `${itemType.toLowerCase()} #${itemId.slice(-6).toUpperCase()}`;
+                    await smsService.sendApprovalDecision(
+                        submitter.phoneNumber,
+                        submitter.name ?? 'User',
+                        itemType as any,
+                        title,
+                        (updatedItem as any).amount ?? 0,
+                        action as any,
+                        body.comments ?? null,
+                    );
+                }
+            }).catch(() => {});
+        }
+
         return NextResponse.json({
             success: true,
             action,

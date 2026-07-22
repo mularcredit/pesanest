@@ -203,14 +203,13 @@ export function AIAssistant() {
                                 </div>
 
                                 {!selected && (
-                                    <div className="relative">
-                                        <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                    <div>
                                         <input
                                             ref={inputRef}
                                             value={search}
                                             onChange={e => setSearch(e.target.value)}
                                             placeholder="Search topics…"
-                                            className="w-full rounded-[8px] pl-8 pr-3 py-2 text-[12.5px] text-gray-900 outline-none focus:ring-2 focus:ring-[#6366F1]/15"
+                                            className="w-full rounded-[8px] pl-3 pr-3 py-2 text-[12.5px] text-gray-900 outline-none focus:ring-2 focus:ring-[#6366F1]/15"
                                             style={{ border: HAIRLINE, background: '#fafafa' }}
                                         />
                                     </div>

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useToast } from "@/components/ui/ToastProvider";
+import { useState, useRef, useEffect } from "react";
+
 import {
     PiX, PiCheck, PiArrowsLeftRight,
     PiSpinner, PiCaretDown, PiHandCoins,
-    PiWifiHigh, PiArrowsClockwise,
+    PiWifiHigh,
 } from "react-icons/pi";
+import { useToast } from "@/components/ui/ToastProvider";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -14,37 +15,15 @@ import Link from "next/link";
 interface WalletCardProps {
     balance: number;
     currency?: string;
-    categories: string[];
     branches: { id: string, name: string }[];
     isPaystack?: boolean;
     holderName?: string;
 }
 
 export function WalletCard({
-    balance, currency = 'KES', categories, branches, isPaystack = false, holderName = "Card Holder"
+    balance, currency = 'KES', branches, isPaystack = false, holderName = "Card Holder"
 }: WalletCardProps) {
     const [isAllocateOpen, setIsAllocateOpen] = useState(false);
-    const [isSyncing, setIsSyncing]           = useState(false);
-    const { showToast } = useToast();
-
-    const handleSync = async () => {
-        setIsSyncing(true);
-        try {
-            const res  = await fetch('/api/wallet/sync', { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to sync');
-            if (data.credited > 0) {
-                showToast(`Credited KES ${Number(data.totalCredited).toLocaleString()} from ${data.credited} pending topup${data.credited > 1 ? 's' : ''}`, 'success');
-            } else {
-                showToast('No pending topups to verify', 'info');
-            }
-            setTimeout(() => window.location.reload(), 900);
-        } catch (err: any) {
-            showToast(err.message, 'error');
-        } finally {
-            setIsSyncing(false);
-        }
-    };
 
     const getCardDetails = () => {
         let hash = 0;
@@ -171,7 +150,7 @@ export function WalletCard({
                 </div>
 
                 {/* ── ACTIONS ── */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                     <Link href="/dashboard/requisitions"
                         className="flex items-center justify-center gap-1.5 py-2.5 rounded-[8px] text-[12px] font-[600] transition-all hover:brightness-105 active:scale-[0.98]"
                         style={{ background: '#6366f1', color: '#fff' }}>
@@ -184,15 +163,6 @@ export function WalletCard({
                         <PiArrowsLeftRight className="text-[13px]" />
                         Allocate
                     </button>
-                    <button onClick={handleSync} disabled={isSyncing}
-                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-[8px] text-[12px] font-[600] text-gray-700 bg-white transition-all hover:bg-gray-50 active:scale-[0.98] disabled:opacity-50"
-                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}
-                        title="Verify any pending topups and refresh balance">
-                        {isSyncing
-                            ? <PiSpinner className="text-[13px] animate-spin" />
-                            : <PiArrowsClockwise className="text-[13px]" />}
-                        Sync
-                    </button>
                 </div>
             </div>
 
@@ -200,8 +170,84 @@ export function WalletCard({
                 <AllocateModal
                     onClose={() => setIsAllocateOpen(false)}
                     branches={branches}
-                    categories={categories}
                 />
+            )}
+        </>
+    );
+}
+
+// ── CUSTOM SELECT ──
+
+function CustomSelect({ value, onChange, options, placeholder, inputClass, style }: {
+    value: string;
+    onChange: (val: string) => void;
+    options: { value: string; label: string }[];
+    placeholder: string;
+    inputClass: string;
+    style?: React.CSSProperties;
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const listRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (
+                listRef.current && !listRef.current.contains(e.target as Node) &&
+                triggerRef.current && !triggerRef.current.contains(e.target as Node)
+            ) setIsOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    const handleToggle = () => {
+        if (!isOpen && triggerRef.current) {
+            const r = triggerRef.current.getBoundingClientRect();
+            setCoords({ top: r.bottom + 4, left: r.left, width: r.width });
+        }
+        setIsOpen(v => !v);
+    };
+
+    const selected = options.find(o => o.value === value);
+
+    return (
+        <>
+            <button ref={triggerRef} type="button" onClick={handleToggle}
+                className={inputClass + " flex items-center justify-between cursor-pointer text-left"}
+                style={style}>
+                <span className={selected ? 'text-gray-900' : 'text-gray-300'}>
+                    {selected ? selected.label : placeholder}
+                </span>
+                <PiCaretDown className={`text-gray-400 text-[13px] shrink-0 transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isOpen && typeof document !== 'undefined' && createPortal(
+                <div ref={listRef}
+                    style={{
+                        position: 'fixed',
+                        top: coords.top,
+                        left: coords.left,
+                        width: coords.width,
+                        zIndex: 99999,
+                        background: '#fff',
+                        border: '1px solid rgba(0,0,0,0.09)',
+                        borderRadius: '6px',
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                        maxHeight: '200px',
+                        overflowY: 'auto',
+                    }}>
+                    {options.map(opt => (
+                        <button key={opt.value} type="button"
+                            onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 12px', fontSize: '13px', color: value === opt.value ? '#6366F1' : '#374151', fontWeight: value === opt.value ? 500 : 400, background: 'transparent', border: 'none', cursor: 'pointer' }}
+                            onMouseEnter={e => (e.currentTarget.style.background = '#f9fafb')}
+                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>,
+                document.body
             )}
         </>
     );
@@ -209,15 +255,13 @@ export function WalletCard({
 
 // ── ALLOCATE MODAL ──
 
-function AllocateModal({ onClose, branches, categories }: {
+function AllocateModal({ onClose, branches }: {
     onClose: () => void;
     branches: { id: string; name: string }[];
-    categories: string[];
 }) {
     const { showToast } = useToast();
     const [selectedBranchId,   setSelectedBranchId]   = useState('');
     const [selectedBranchName, setSelectedBranchName] = useState('');
-    const [selectedCategory,   setSelectedCategory]   = useState('');
     const [amount,             setAmount]             = useState('');
     const [description,        setDescription]        = useState('');
     const [isSubmitting,       setIsSubmitting]       = useState(false);
@@ -228,7 +272,7 @@ function AllocateModal({ onClose, branches, categories }: {
     const BORDER: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
 
     const handleAllocate = async () => {
-        if (!selectedBranchId || !amount || !selectedCategory) {
+        if (!selectedBranchId || !amount) {
             setError('Please fill in all required fields');
             return;
         }
@@ -241,8 +285,7 @@ function AllocateModal({ onClose, branches, categories }: {
                 body: JSON.stringify({
                     branchId:    selectedBranchId,
                     amount:      parseFloat(amount),
-                    category:    selectedCategory,
-                    description: description || `Allocated to ${selectedBranchName} for ${selectedCategory}`,
+                    description: description || `Allocation to ${selectedBranchName}`,
                 }),
             });
             const data = await res.json();
@@ -288,44 +331,26 @@ function AllocateModal({ onClose, branches, categories }: {
                     )}
                     <div>
                         <label className={LABEL}>Target Branch <span className="text-rose-400">*</span></label>
-                        <div className="relative">
-                            <select className={INPUT + " appearance-none pr-8 cursor-pointer"} style={BORDER}
-                                value={selectedBranchId}
-                                onChange={e => {
-                                    setSelectedBranchId(e.target.value);
-                                    const b = branches.find(x => x.id === e.target.value);
-                                    if (b) setSelectedBranchName(b.name);
-                                }}>
-                                <option value="">Select target branch</option>
-                                {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                            </select>
-                            <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[13px]" />
-                        </div>
+                        <CustomSelect
+                            value={selectedBranchId}
+                            onChange={val => {
+                                setSelectedBranchId(val);
+                                const b = branches.find(x => x.id === val);
+                                if (b) setSelectedBranchName(b.name);
+                            }}
+                            options={branches.map(b => ({ value: b.id, label: b.name }))}
+                            placeholder="Select target branch"
+                            inputClass={INPUT}
+                            style={BORDER}
+                        />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className={LABEL}>Category <span className="text-rose-400">*</span></label>
-                            <div className="relative">
-                                <select className={INPUT + " appearance-none pr-8 cursor-pointer"} style={BORDER}
-                                    value={selectedCategory}
-                                    onChange={e => setSelectedCategory(e.target.value)}>
-                                    <option value="">Select category</option>
-                                    {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                </select>
-                                <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[13px]" />
-                            </div>
-                        </div>
-                        <div>
-                            <label className={LABEL}>Amount <span className="text-rose-400">*</span></label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-[500]">KES</span>
-                                <input type="number" step="0.01" value={amount}
-                                    onChange={e => setAmount(e.target.value)}
-                                    className={INPUT + " pl-12"} style={BORDER}
-                                    placeholder="0.00" name="allocateAmtNew" id="allocateAmtNew"
-                                    autoComplete="off" data-form-type="other" />
-                            </div>
-                        </div>
+                    <div>
+                        <label className={LABEL}>Amount <span className="text-rose-400">*</span></label>
+                        <input type="number" step="0.01" value={amount}
+                            onChange={e => setAmount(e.target.value)}
+                            className={INPUT + " pl-3"} style={BORDER}
+                            placeholder="0.00" name="allocateAmtNew" id="allocateAmtNew"
+                            autoComplete="off" data-form-type="other" />
                     </div>
                     <div>
                         <label className={LABEL}>Notes <span className="text-gray-300">(optional)</span></label>
@@ -345,7 +370,7 @@ function AllocateModal({ onClose, branches, categories }: {
                         Cancel
                     </button>
                     <button onClick={handleAllocate}
-                        disabled={isSubmitting || !selectedBranchId || !amount || !selectedCategory}
+                        disabled={isSubmitting || !selectedBranchId || !amount}
                         className="flex items-center gap-2 px-5 py-2 text-[12.5px] font-[600] text-white bg-[#6366F1] rounded-[6px] hover:bg-indigo-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                         {isSubmitting
                             ? <><PiSpinner className="animate-spin text-[14px]" /> Processing…</>

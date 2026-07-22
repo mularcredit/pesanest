@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { updateVendor } from '@/app/actions/vendors';
 import { useToast } from '@/components/ui/ToastProvider';
 import { PhoneInput } from '@/components/ui/PhoneInput';
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface EditVendorModalProps {
     isOpen: boolean;
@@ -33,6 +34,9 @@ const KNOWN_TERMS = ['Due on Receipt', 'Net 7', 'Net 15', 'Net 30', 'Net 45', 'N
 export function EditVendorModal({ isOpen, onClose, vendor }: EditVendorModalProps) {
     const { showToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [category, setCategory] = useState(vendor.category);
+    const [currency, setCurrency] = useState(vendor.currency);
+    const [paymentTerms, setPaymentTerms] = useState(vendor.paymentTerms || '');
 
     async function handleSubmit(formData: FormData) {
         setIsSubmitting(true);
@@ -93,29 +97,41 @@ export function EditVendorModal({ isOpen, onClose, vendor }: EditVendorModalProp
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className={LABEL_CLASS}>Category <span className="text-rose-400">*</span></label>
-                                <select name="category" required defaultValue={vendor.category}
-                                    className={cn(INPUT_CLASS, 'cursor-pointer')} style={INPUT_STYLE}>
-                                    <option value="">Select…</option>
-                                    <option value="Travel">Travel</option>
-                                    <option value="Accommodation">Accommodation</option>
-                                    <option value="Meals & Entertainment">Meals &amp; Entertainment</option>
-                                    <option value="Logistics">Logistics</option>
-                                    <option value="Communication">Communication</option>
-                                    <option value="Services">Services</option>
-                                    <option value="Software">Software</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                <input type="hidden" name="category" value={category} />
+                                <CustomSelect
+                                    value={category}
+                                    onChange={val => setCategory(val)}
+                                    options={[
+                                        { value: 'Travel', label: 'Travel' },
+                                        { value: 'Accommodation', label: 'Accommodation' },
+                                        { value: 'Meals & Entertainment', label: 'Meals & Entertainment' },
+                                        { value: 'Logistics', label: 'Logistics' },
+                                        { value: 'Communication', label: 'Communication' },
+                                        { value: 'Services', label: 'Services' },
+                                        { value: 'Software', label: 'Software' },
+                                        { value: 'Other', label: 'Other' },
+                                    ]}
+                                    placeholder="Select…"
+                                    className={INPUT_CLASS}
+                                    style={INPUT_STYLE}
+                                />
                             </div>
                             <div>
                                 <label className={LABEL_CLASS}>Currency</label>
-                                <select name="currency" defaultValue={vendor.currency}
-                                    className={cn(INPUT_CLASS, 'cursor-pointer')} style={INPUT_STYLE}>
-                                    <option value="KES">KES</option>
-                                    <option value="USD">USD</option>
-                                    <option value="SSP">SSP</option>
-                                    <option value="EUR">EUR</option>
-                                    <option value="GBP">GBP</option>
-                                </select>
+                                <input type="hidden" name="currency" value={currency} />
+                                <CustomSelect
+                                    value={currency}
+                                    onChange={val => setCurrency(val)}
+                                    options={[
+                                        { value: 'KES', label: 'KES' },
+                                        { value: 'USD', label: 'USD' },
+                                        { value: 'SSP', label: 'SSP' },
+                                        { value: 'EUR', label: 'EUR' },
+                                        { value: 'GBP', label: 'GBP' },
+                                    ]}
+                                    className={INPUT_CLASS}
+                                    style={INPUT_STYLE}
+                                />
                             </div>
                         </div>
 
@@ -139,19 +155,25 @@ export function EditVendorModal({ isOpen, onClose, vendor }: EditVendorModalProp
 
                         <div>
                             <label className={LABEL_CLASS}>Payment terms</label>
-                            <select name="paymentTerms" defaultValue={vendor.paymentTerms || ''}
-                                className={cn(INPUT_CLASS, 'cursor-pointer')} style={INPUT_STYLE}>
-                                <option value="">Select…</option>
-                                <option value="Due on Receipt">Due on Receipt</option>
-                                <option value="Net 7">Net 7</option>
-                                <option value="Net 15">Net 15</option>
-                                <option value="Net 30">Net 30</option>
-                                <option value="Net 45">Net 45</option>
-                                <option value="Net 60">Net 60</option>
-                                {vendor.paymentTerms && !KNOWN_TERMS.includes(vendor.paymentTerms) && (
-                                    <option value={vendor.paymentTerms}>{vendor.paymentTerms}</option>
-                                )}
-                            </select>
+                            <input type="hidden" name="paymentTerms" value={paymentTerms} />
+                            <CustomSelect
+                                value={paymentTerms}
+                                onChange={val => setPaymentTerms(val)}
+                                options={[
+                                    { value: 'Due on Receipt', label: 'Due on Receipt' },
+                                    { value: 'Net 7', label: 'Net 7' },
+                                    { value: 'Net 15', label: 'Net 15' },
+                                    { value: 'Net 30', label: 'Net 30' },
+                                    { value: 'Net 45', label: 'Net 45' },
+                                    { value: 'Net 60', label: 'Net 60' },
+                                    ...(vendor.paymentTerms && !KNOWN_TERMS.includes(vendor.paymentTerms)
+                                        ? [{ value: vendor.paymentTerms, label: vendor.paymentTerms }]
+                                        : []),
+                                ]}
+                                placeholder="Select…"
+                                className={INPUT_CLASS}
+                                style={INPUT_STYLE}
+                            />
                         </div>
 
                         <div className="h-2" />

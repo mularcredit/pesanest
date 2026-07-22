@@ -115,11 +115,10 @@ export function VendorsClient({ vendors }: VendorsClientProps) {
 
                 {/* Toolbar */}
                 <div className="flex items-center gap-3">
-                    <div className="relative flex-1 max-w-xs">
-                        <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                    <div className="flex-1 max-w-xs">
                         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                             placeholder="Search vendors…"
-                            className="w-full rounded-[6px] pl-8 pr-3 py-[9px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                            className="w-full rounded-[6px] pl-3 pr-3 py-[9px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
                             style={{ border: '1px solid rgba(0,0,0,0.09)' }} />
                     </div>
                     <p className="text-[12px] text-gray-400 shrink-0">{filtered.length} vendor{filtered.length !== 1 ? 's' : ''}</p>

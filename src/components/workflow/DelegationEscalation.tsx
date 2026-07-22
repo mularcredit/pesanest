@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PiUserSwitch, PiX } from 'react-icons/pi';
 import { useRouter } from 'next/navigation';
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface DelegateModalProps {
     approvalId: string;
@@ -228,15 +229,16 @@ export function EscalationPanel({ onTrigger }: EscalationPanelProps) {
                     <label className="block text-sm font-semibold text-gds-text-main mb-2">
                         Action
                     </label>
-                    <select
+                    <CustomSelect
                         value={action}
-                        onChange={(e) => setAction(e.target.value as any)}
+                        onChange={val => setAction(val as any)}
+                        options={[
+                            { value: 'notify', label: 'Send Reminder' },
+                            { value: 'escalate', label: 'Escalate to Manager' },
+                            { value: 'auto-approve', label: 'Auto-Approve' },
+                        ]}
                         className="w-full bg-[var(--gds-input-bg)] border border-[var(--gds-border)] rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-emerald-500"
-                    >
-                        <option value="notify">Send Reminder</option>
-                        <option value="escalate">Escalate to Manager</option>
-                        <option value="auto-approve">Auto-Approve</option>
-                    </select>
+                    />
                 </div>
             </div>
 

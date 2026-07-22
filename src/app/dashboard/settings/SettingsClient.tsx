@@ -12,7 +12,6 @@ import {
     PiFloppyDisk,
     PiStorefront,
     PiBuildings,
-    PiCaretDown,
     PiCheck,
     PiToggleRight,
     PiToggleLeft,
@@ -27,6 +26,7 @@ import { signOut } from "next-auth/react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import QuickBooksMapping from "@/components/integrations/QuickBooksMapping";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
 const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
@@ -53,6 +53,9 @@ export function SettingsClient({ user, organizationSettings }: SettingsClientPro
     const activeTab = searchParams.get('tab') || (isAdmin ? 'organization' : 'profile');
 
     const [isSaving, setIsSaving] = useState(false);
+    const [timezone, setTimezone] = useState("Africa/Nairobi (EAT) GMT+3");
+    const [dateFormat, setDateFormat] = useState("DD/MM/YYYY (24/01/2026)");
+    const [currency, setCurrency] = useState("KES - Kenyan Shilling");
 
     const [formData, setFormData] = useState({
         name: user.name || '',
@@ -240,14 +243,17 @@ export function SettingsClient({ user, organizationSettings }: SettingsClientPro
                                 </div>
                                 <div>
                                     <label className={LABEL_CLS}>Primary Currency</label>
-                                    <div className="relative">
-                                        <select className={INPUT_CLS + " appearance-none cursor-pointer pr-8"} style={INPUT_STYLE}>
-                                            <option>KES - Kenyan Shilling</option>
-                                            <option>USD - US Dollar</option>
-                                            <option>SSP - South Sudanese Pound</option>
-                                        </select>
-                                        <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px] pointer-events-none" />
-                                    </div>
+                                    <CustomSelect
+                                        value={currency}
+                                        onChange={val => setCurrency(val)}
+                                        options={[
+                                            { value: "KES - Kenyan Shilling", label: "KES - Kenyan Shilling" },
+                                            { value: "USD - US Dollar", label: "USD - US Dollar" },
+                                            { value: "SSP - South Sudanese Pound", label: "SSP - South Sudanese Pound" },
+                                        ]}
+                                        className={INPUT_CLS}
+                                        style={INPUT_STYLE}
+                                    />
                                 </div>
                                 <div>
                                     <label className={LABEL_CLS}>Fiscal Year End</label>
@@ -334,16 +340,17 @@ export function SettingsClient({ user, organizationSettings }: SettingsClientPro
                                     </div>
                                     <div>
                                         <label className={LABEL_CLS}>Language</label>
-                                        <div className="relative">
-                                            <select value={formData.language}
-                                                onChange={(e) => handleInputChange('language', e.target.value)}
-                                                className={INPUT_CLS + " appearance-none cursor-pointer pr-8"} style={INPUT_STYLE}>
-                                                <option>English (UK)</option>
-                                                <option>Swahili</option>
-                                                <option>French</option>
-                                            </select>
-                                            <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px] pointer-events-none" />
-                                        </div>
+                                        <CustomSelect
+                                            value={formData.language}
+                                            onChange={val => handleInputChange('language', val)}
+                                            options={[
+                                                { value: "English (UK)", label: "English (UK)" },
+                                                { value: "Swahili", label: "Swahili" },
+                                                { value: "French", label: "French" },
+                                            ]}
+                                            className={INPUT_CLS}
+                                            style={INPUT_STYLE}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -408,24 +415,30 @@ export function SettingsClient({ user, organizationSettings }: SettingsClientPro
                             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
                                     <label className={LABEL_CLS}>Time Zone</label>
-                                    <div className="relative">
-                                        <select className={INPUT_CLS + " appearance-none cursor-pointer pr-8"} style={INPUT_STYLE}>
-                                            <option>Africa/Nairobi (EAT) GMT+3</option>
-                                            <option>Africa/Juba (CAT) GMT+2</option>
-                                        </select>
-                                        <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px] pointer-events-none" />
-                                    </div>
+                                    <CustomSelect
+                                        value={timezone}
+                                        onChange={val => setTimezone(val)}
+                                        options={[
+                                            { value: "Africa/Nairobi (EAT) GMT+3", label: "Africa/Nairobi (EAT) GMT+3" },
+                                            { value: "Africa/Juba (CAT) GMT+2", label: "Africa/Juba (CAT) GMT+2" },
+                                        ]}
+                                        className={INPUT_CLS}
+                                        style={INPUT_STYLE}
+                                    />
                                 </div>
                                 <div>
                                     <label className={LABEL_CLS}>Date Format</label>
-                                    <div className="relative">
-                                        <select className={INPUT_CLS + " appearance-none cursor-pointer pr-8"} style={INPUT_STYLE}>
-                                            <option>DD/MM/YYYY (24/01/2026)</option>
-                                            <option>MM/DD/YYYY (01/24/2026)</option>
-                                            <option>YYYY-MM-DD (2026-01-24)</option>
-                                        </select>
-                                        <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px] pointer-events-none" />
-                                    </div>
+                                    <CustomSelect
+                                        value={dateFormat}
+                                        onChange={val => setDateFormat(val)}
+                                        options={[
+                                            { value: "DD/MM/YYYY (24/01/2026)", label: "DD/MM/YYYY (24/01/2026)" },
+                                            { value: "MM/DD/YYYY (01/24/2026)", label: "MM/DD/YYYY (01/24/2026)" },
+                                            { value: "YYYY-MM-DD (2026-01-24)", label: "YYYY-MM-DD (2026-01-24)" },
+                                        ]}
+                                        className={INPUT_CLS}
+                                        style={INPUT_STYLE}
+                                    />
                                 </div>
                             </div>
                         </div>

@@ -2,9 +2,11 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import {
-    PiDownloadSimple, PiScales, PiPrinter,
+    PiScales,
     PiTrendUp, PiTrendDown, PiCheckCircle, PiWarningCircle,
 } from 'react-icons/pi';
+import { ReportExportButton } from '@/components/accounting/ReportExportButton';
+import type { ReportExportData } from '@/components/accounting/ReportExportButton';
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
 
@@ -64,6 +66,29 @@ export default async function TrialBalancePage() {
 
     const asOf = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
+    const exportData: ReportExportData = {
+        title: 'Trial Balance',
+        subtitle: `As at ${asOf}`,
+        company: 'Company',
+        currency: 'KES',
+        sections: [
+            ...TYPE_ORDER.filter(t => byType[t]?.length > 0).map(type => ({
+                title: TYPE_META[type].label,
+                lines: [
+                    ...byType[type].map(r => ({ code: r.code, name: r.name, current: r.balance, indent: true as const })),
+                    { name: `${TYPE_META[type].label} Subtotal`, current: byType[type].reduce((s: number, r: { balance: number }) => s + r.balance, 0), isBold: true as const, isSubtotal: true as const },
+                ],
+            })),
+            {
+                title: 'Totals',
+                lines: [
+                    { name: 'Total Debits', current: totalDebits, isBold: true },
+                    { name: 'Total Credits', current: totalCredits, isBold: true },
+                ],
+            },
+        ],
+    };
+
     return (
         <div className="pb-20 space-y-5">
 
@@ -79,16 +104,7 @@ export default async function TrialBalancePage() {
                     <p className="text-[12px] text-gray-400 pl-[38px]">As at {asOf}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-[12px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
-                        style={{ border: HAIRLINE }}>
-                        <PiPrinter className="text-[14px]" /> Print
-                    </button>
-                    <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-[12px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
-                        style={{ border: HAIRLINE }}>
-                        <PiDownloadSimple className="text-[14px]" /> Export
-                    </button>
-                </div>
+                <ReportExportButton data={exportData} />
             </div>
 
             {/* ── KPI strip ── */}

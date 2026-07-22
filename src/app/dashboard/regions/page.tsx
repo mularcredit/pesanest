@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { PiGlobe, PiPlus, PiBuildings, PiUsers, PiPencil, PiX, PiSpinner } from "react-icons/pi";
 import { cn } from "@/lib/utils";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface Region {
     id: string; name: string; code: string; isActive: boolean;
@@ -88,14 +89,14 @@ export default function RegionsPage() {
                     </div>
                     <div>
                         <label className={LABEL_CLS}>Regional Manager</label>
-                        <select value={form.managerId}
-                            onChange={e => setForm(p => ({ ...p, managerId: e.target.value }))}
-                            className={INPUT_CLS + " appearance-none cursor-pointer"} style={INPUT_STYLE}>
-                            <option value="">No manager assigned</option>
-                            {users.map(u => (
-                                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                            ))}
-                        </select>
+                        <CustomSelect
+                            value={form.managerId}
+                            onChange={val => setForm(p => ({ ...p, managerId: val }))}
+                            options={users.map(u => ({ value: u.id, label: `${u.name} (${u.email})` }))}
+                            placeholder="No manager assigned"
+                            className={INPUT_CLS}
+                            style={INPUT_STYLE}
+                        />
                         <div className="mt-2 flex items-start gap-2 px-3 py-2 rounded-[6px]"
                             style={{ background: 'rgba(238,242,255,0.7)', border: '1px solid rgba(99,102,241,0.15)' }}>
                             <PiUsers className="text-[#6366F1] text-[13px] shrink-0 mt-0.5" />

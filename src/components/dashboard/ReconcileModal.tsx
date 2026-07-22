@@ -33,11 +33,24 @@ export interface ExpenseInBatch {
     receiptVerification?: ReceiptVerificationSummary | null;
 }
 
+export interface RequisitionInBatch {
+    id: string;
+    title: string;
+    amount: number;
+    currency: string;
+    category: string;
+    receiptUrl: string | null;
+    etrNumber: string | null;
+    etrVerified: boolean;
+    user: { name: string | null };
+}
+
 export interface BatchForReconcile {
     id: string;
     amount: number;
     currency: string;
     expenses?: ExpenseInBatch[];
+    requisitions?: RequisitionInBatch[];
 }
 
 interface ExpenseVerificationState {
@@ -127,23 +140,33 @@ function initState(exp: ExpenseInBatch): ExpenseVerificationState {
 
 export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Props) {
     const expenses = batch.expenses ?? [];
+    const requisitions = batch.requisitions ?? [];
 
     const [states, setStates] = useState<Record<string, ExpenseVerificationState>>(() => {
         const init: Record<string, ExpenseVerificationState> = {};
         expenses.forEach(e => { init[e.id] = initState(e); });
+        requisitions.forEach(r => {
+            init[r.id] = {
+                uploading: false, verifying: false, receiptFile: null,
+                receiptUrl: r.receiptUrl ?? undefined,
+                fiscalInvoiceNo: r.etrNumber ?? '',
+                supplierPin: '', supplierName: '', invoiceDate: '',
+                totalAmount: String(r.amount), vatAmount: '',
+                status: r.etrVerified ? 'VERIFIED' : undefined,
+            };
+        });
         return init;
     });
     const [completing, setCompleting] = useState(false);
 
-    const update = useCallback((expenseId: string, patch: Partial<ExpenseVerificationState>) => {
-        setStates(prev => ({ ...prev, [expenseId]: { ...prev[expenseId], ...patch } }));
+    const update = useCallback((id: string, patch: Partial<ExpenseVerificationState>) => {
+        setStates(prev => ({ ...prev, [id]: { ...prev[id], ...patch } }));
     }, []);
 
     async function handleVerify(expense: ExpenseInBatch) {
         const ev = states[expense.id];
         if (!ev.fiscalInvoiceNo.trim()) return;
 
-        // Upload receipt if a new file was selected
         let receiptUrl = ev.receiptUrl;
         if (ev.receiptFile) {
             update(expense.id, { uploading: true });
@@ -152,26 +175,18 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
                 fd.append('file', ev.receiptFile);
                 const up = await fetch('/api/upload', { method: 'POST', body: fd });
                 const upData = await up.json();
-                if (up.ok) {
-                    receiptUrl = upData.url;
-                    update(expense.id, { receiptUrl, uploading: false });
-                } else {
-                    update(expense.id, { uploading: false });
-                }
-            } catch {
-                update(expense.id, { uploading: false });
-            }
+                if (up.ok) { receiptUrl = upData.url; update(expense.id, { receiptUrl, uploading: false }); }
+                else update(expense.id, { uploading: false });
+            } catch { update(expense.id, { uploading: false }); }
         }
 
         update(expense.id, { verifying: true, status: undefined, failureReason: undefined });
-
         try {
             const res = await fetch('/api/payments/verify-receipt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    expenseId: expense.id,
-                    receiptUrl,
+                    expenseId: expense.id, receiptUrl,
                     fiscalInvoiceNo: ev.fiscalInvoiceNo.trim(),
                     supplierPin: ev.supplierPin.trim() || undefined,
                     supplierName: ev.supplierName.trim() || undefined,
@@ -192,6 +207,34 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
         }
     }
 
+    async function handleVerifyRequisition(req: RequisitionInBatch) {
+        const ev = states[req.id];
+        if (!ev.fiscalInvoiceNo.trim()) return;
+        update(req.id, { verifying: true, status: undefined, failureReason: undefined });
+        try {
+            const res = await fetch('/api/payments/verify-receipt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    requisitionId: req.id,
+                    fiscalInvoiceNo: ev.fiscalInvoiceNo.trim(),
+                    supplierPin: ev.supplierPin.trim() || undefined,
+                    supplierName: ev.supplierName.trim() || undefined,
+                    totalAmount: ev.totalAmount ? parseFloat(ev.totalAmount) : undefined,
+                }),
+            });
+            const data = await res.json();
+            update(req.id, {
+                verifying: false,
+                status: res.ok ? data.status : 'FAILED',
+                failureReason: data.error || data.failureReason || undefined,
+                referenceId: data.referenceId || undefined,
+            });
+        } catch (err: any) {
+            update(req.id, { verifying: false, status: 'FAILED', failureReason: err.message });
+        }
+    }
+
     async function handleComplete(force = false) {
         setCompleting(true);
         try {
@@ -209,10 +252,11 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
         }
     }
 
-    const verifiedCount = expenses.filter(e => states[e.id]?.status === 'VERIFIED').length;
-    const allVerified = expenses.length === 0 || verifiedCount === expenses.length;
-    const hasUnresolved = expenses.some(e => {
-        const s = states[e.id]?.status;
+    const allItems = [...expenses.map(e => e.id), ...requisitions.map(r => r.id)];
+    const verifiedCount = allItems.filter(id => states[id]?.status === 'VERIFIED').length;
+    const allVerified = allItems.length === 0 || verifiedCount === allItems.length;
+    const hasUnresolved = allItems.some(id => {
+        const s = states[id]?.status;
         return !s || s === 'FAILED' || s === 'NEEDS_REVIEW';
     });
 
@@ -237,11 +281,11 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        {expenses.length > 0 && (
+                        {allItems.length > 0 && (
                             <span className="text-[11px] font-[500] text-gray-500">
                                 <span className="font-[700] text-emerald-600">{verifiedCount}</span>
                                 <span className="text-gray-300 mx-1">/</span>
-                                {expenses.length} verified
+                                {allItems.length} verified
                             </span>
                         )}
                         <button onClick={() => !completing && onClose()}
@@ -252,25 +296,35 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
                 </div>
 
                 {/* Progress bar */}
-                {expenses.length > 0 && (
+                {allItems.length > 0 && (
                     <div className="h-1 bg-gray-100 shrink-0">
                         <div
                             className="h-1 bg-emerald-500 transition-all duration-500"
-                            style={{ width: `${(verifiedCount / expenses.length) * 100}%` }}
+                            style={{ width: `${(verifiedCount / allItems.length) * 100}%` }}
                         />
                     </div>
                 )}
 
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5 min-h-0">
-                    {expenses.length === 0 ? (
+                    {allItems.length === 0 ? (
                         <div className="py-10 text-center">
                             <PiReceipt className="text-[32px] text-gray-300 mx-auto mb-3" />
-                            <p className="text-[13px] font-[500] text-gray-500">No expense items in this batch.</p>
-                            <p className="text-[11.5px] text-gray-400 mt-1">You can proceed to close this batch directly.</p>
+                            <p className="text-[13px] font-[500] text-gray-500">No items requiring eTIMS verification.</p>
+                            <p className="text-[11.5px] text-gray-400 mt-1 mb-6">This batch contains only direct invoices — no receipts to verify.</p>
+                            <button
+                                onClick={() => handleComplete(false)}
+                                disabled={completing}
+                                className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-[600] text-white rounded-[8px] transition-colors disabled:opacity-40"
+                                style={{ backgroundColor: completing ? '#4f46e5' : '#6366F1' }}
+                            >
+                                {completing && <PiClock className="animate-spin text-[12px]" />}
+                                {completing ? 'Closing…' : 'Close Batch'}
+                            </button>
                         </div>
                     ) : (
-                        expenses.map((expense, i) => {
+                    <>
+                        {expenses.map((expense, i) => {
                             const ev = states[expense.id];
                             const isVerifying = ev.uploading || ev.verifying;
                             const canVerify = ev.fiscalInvoiceNo.trim().length > 0 && !isVerifying;
@@ -446,24 +500,109 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
                                     </div>
                                 </div>
                             );
-                        })
+                        })}
+
+                    {/* Requisitions */}
+                    {requisitions.map((req, i) => {
+                        const ev = states[req.id];
+                        if (!ev) return null;
+                        const isVerifying = ev.verifying;
+                        const canVerify = ev.fiscalInvoiceNo.trim().length > 0 && !isVerifying;
+                        return (
+                            <div key={req.id} className="rounded-[10px] overflow-hidden"
+                                style={{ border: ev.status === 'VERIFIED' ? '1px solid #bbf7d0' : ev.status === 'FAILED' ? '1px solid #fecdd3' : '1px solid rgba(0,0,0,0.09)' }}>
+                                <div className="flex items-start justify-between px-4 py-3"
+                                    style={{ borderBottom: HAIRLINE, background: ev.status === 'VERIFIED' ? '#f0fdf4' : ev.status === 'FAILED' ? '#fff1f2' : '#fafafa' }}>
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-[600] text-indigo-400 uppercase tracking-widest">REQ #{i + 1}</span>
+                                            <p className="text-[13px] font-[600] text-gray-900 truncate">{req.title}</p>
+                                        </div>
+                                        <p className="text-[11px] text-gray-400 mt-0.5">
+                                            {req.user.name} · {fmt(req.amount, req.currency)} · {req.category}
+                                        </p>
+                                    </div>
+                                    <div className="shrink-0 ml-3 mt-0.5">
+                                        <StatusBadge status={ev.status} />
+                                    </div>
+                                </div>
+                                <div className="px-4 py-4 space-y-3">
+                                    {ev.failureReason && (
+                                        <div className="flex items-start gap-2 px-3 py-2 rounded-[6px]"
+                                            style={{ background: '#fff1f2', border: '1px solid #fecdd3' }}>
+                                            <PiWarningCircle className="text-rose-500 text-[13px] mt-0.5 shrink-0" />
+                                            <p className="text-[11px] text-rose-700">{ev.failureReason}</p>
+                                        </div>
+                                    )}
+                                    {ev.referenceId && ev.status === 'VERIFIED' && (
+                                        <div className="flex items-center gap-2 px-3 py-2 rounded-[6px]"
+                                            style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                                            <PiCheckCircle className="text-emerald-600 text-[13px] shrink-0" />
+                                            <p className="text-[11px] text-emerald-700 font-mono">Ref: {ev.referenceId}</p>
+                                        </div>
+                                    )}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="col-span-2 sm:col-span-1">
+                                            <label className="block text-[10.5px] font-[600] text-gray-500 uppercase tracking-[0.07em] mb-1">
+                                                CU / Fiscal Invoice No. <span className="text-rose-400">*</span>
+                                            </label>
+                                            <input type="text" value={ev.fiscalInvoiceNo}
+                                                onChange={e => update(req.id, { fiscalInvoiceNo: e.target.value, status: undefined })}
+                                                placeholder="e.g. CU12345678"
+                                                disabled={isVerifying}
+                                                className="w-full px-3 py-2 text-[12.5px] text-gray-800 rounded-[6px] outline-none focus:ring-2 focus:ring-indigo-200 transition-all disabled:opacity-50"
+                                                style={{ border: '1px solid rgba(0,0,0,0.12)' }} />
+                                        </div>
+                                        <div className="col-span-2 sm:col-span-1">
+                                            <label className="block text-[10.5px] font-[600] text-gray-500 uppercase tracking-[0.07em] mb-1">Supplier KRA PIN</label>
+                                            <input type="text" value={ev.supplierPin}
+                                                onChange={e => update(req.id, { supplierPin: e.target.value })}
+                                                placeholder="e.g. P051234567X"
+                                                disabled={isVerifying}
+                                                className="w-full px-3 py-2 text-[12.5px] text-gray-800 rounded-[6px] outline-none focus:ring-2 focus:ring-indigo-200 transition-all disabled:opacity-50"
+                                                style={{ border: '1px solid rgba(0,0,0,0.12)' }} />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <label className="block text-[10.5px] font-[600] text-gray-500 uppercase tracking-[0.07em] mb-1">Supplier Name</label>
+                                            <input type="text" value={ev.supplierName}
+                                                onChange={e => update(req.id, { supplierName: e.target.value })}
+                                                placeholder="Vendor name"
+                                                disabled={isVerifying}
+                                                className="w-full px-3 py-2 text-[12.5px] text-gray-800 rounded-[6px] outline-none focus:ring-2 focus:ring-indigo-200 transition-all disabled:opacity-50"
+                                                style={{ border: '1px solid rgba(0,0,0,0.12)' }} />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-end pt-1">
+                                        <button onClick={() => handleVerifyRequisition(req)}
+                                            disabled={!canVerify}
+                                            className="px-4 py-2 text-[12px] font-[600] text-white rounded-[6px] hover:opacity-90 transition-colors disabled:opacity-40 flex items-center gap-2 shrink-0"
+                                            style={{ backgroundColor: '#6366F1' }}>
+                                            {ev.verifying && <PiClock className="animate-spin text-[12px]" />}
+                                            {ev.verifying ? 'Verifying…' : 'Verify Receipt'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                    </>
                     )}
                 </div>
 
                 {/* Footer */}
                 <div className="shrink-0 px-6 py-4 flex items-center justify-between gap-4" style={{ borderTop: HAIRLINE }}>
                     <div className="min-w-0">
-                        {!allVerified && expenses.length > 0 && (
+                        {!allVerified && allItems.length > 0 && (
                             <p className="text-[11.5px] text-amber-600 flex items-start gap-1.5">
                                 <PiWarningCircle className="text-[13px] mt-0.5 shrink-0" />
                                 <span>
                                     {hasUnresolved
-                                        ? `${expenses.length - verifiedCount} receipt(s) still need verification.${isSystemAdmin ? ' You can override below.' : ''}`
+                                        ? `${allItems.length - verifiedCount} receipt(s) still need verification.${isSystemAdmin ? ' You can override below.' : ''}`
                                         : 'All receipts verified.'}
                                 </span>
                             </p>
                         )}
-                        {allVerified && expenses.length > 0 && (
+                        {allVerified && allItems.length > 0 && (
                             <p className="text-[11.5px] text-emerald-600 flex items-center gap-1.5">
                                 <PiCheckCircle className="text-[13px]" />
                                 All receipts verified — ready to close.
@@ -480,7 +619,7 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
                         </button>
 
                         {/* Admin override when not all verified */}
-                        {!allVerified && isSystemAdmin && expenses.length > 0 && (
+                        {!allVerified && isSystemAdmin && allItems.length > 0 && (
                             <button
                                 onClick={() => handleComplete(true)}
                                 disabled={completing}
@@ -491,14 +630,17 @@ export function ReconcileModal({ batch, isSystemAdmin, onClose, onComplete }: Pr
                             </button>
                         )}
 
-                        <button
-                            onClick={() => handleComplete(false)}
-                            disabled={(!allVerified && !isSystemAdmin) || completing}
-                            className="px-5 py-2 text-[13px] font-[600] text-white bg-gray-900 rounded-[6px] hover:bg-gray-800 transition-colors disabled:opacity-40 flex items-center gap-2"
-                        >
-                            {completing && <PiClock className="animate-spin text-[12px]" />}
-                            Complete Reconciliation
-                        </button>
+                        {expenses.length > 0 && (
+                            <button
+                                onClick={() => handleComplete(false)}
+                                disabled={(!allVerified && !isSystemAdmin) || completing}
+                                className="px-5 py-2 text-[13px] font-[600] text-white rounded-[6px] transition-colors disabled:opacity-40 flex items-center gap-2"
+                                style={{ backgroundColor: '#6366F1' }}
+                            >
+                                {completing && <PiClock className="animate-spin text-[12px]" />}
+                                Complete Reconciliation
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

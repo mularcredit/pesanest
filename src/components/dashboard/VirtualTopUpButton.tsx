@@ -78,11 +78,10 @@ export function VirtualTopUpButton() {
                         <div className="px-6 py-5 space-y-4">
                             <div>
                                 <label className="block text-[11.5px] font-[500] text-gray-400 mb-1.5">Amount (KES)</label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 font-[500]">KES</span>
+                                <div>
                                     <input type="number" value={amount}
                                         onChange={e => setAmount(e.target.value)}
-                                        className="w-full rounded-[6px] pl-12 pr-3 py-[10px] text-[14px] font-mono text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                                        className="w-full rounded-[6px] pl-3 pr-3 py-[10px] text-[14px] font-mono text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
                                         style={{ border: '1px solid rgba(0,0,0,0.09)' }}
                                         placeholder="0" />
                                 </div>

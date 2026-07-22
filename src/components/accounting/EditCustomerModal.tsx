@@ -10,7 +10,6 @@ import {
     PiPhone,
     PiIdentificationCard,
     PiGlobe,
-    PiCaretDown,
     PiCheckCircle,
     PiSpinner,
     PiBuildings,
@@ -18,6 +17,7 @@ import {
     PiPencilSimple
 } from "react-icons/pi";
 import { useToast } from "@/components/ui/ToastProvider";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
 const INPUT_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
@@ -103,12 +103,11 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
                                 <label className={LABEL_CLS}>Company Name</label>
-                                <div className="relative">
-                                    <PiBuildings className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                <div>
                                     <input
                                         required
                                         type="text"
-                                        className={INPUT_CLS + " pl-8"}
+                                        className={INPUT_CLS + " pl-3"}
                                         style={INPUT_STYLE}
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -118,11 +117,10 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
 
                             <div>
                                 <label className={LABEL_CLS}>Email</label>
-                                <div className="relative">
-                                    <PiEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                <div>
                                     <input
                                         type="email"
-                                        className={INPUT_CLS + " pl-8"}
+                                        className={INPUT_CLS + " pl-3"}
                                         style={INPUT_STYLE}
                                         value={formData.email}
                                         onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -132,11 +130,10 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
 
                             <div>
                                 <label className={LABEL_CLS}>Phone</label>
-                                <div className="relative">
-                                    <PiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                <div>
                                     <input
                                         type="tel"
-                                        className={INPUT_CLS + " pl-8"}
+                                        className={INPUT_CLS + " pl-3"}
                                         style={INPUT_STYLE}
                                         placeholder="+211 ..."
                                         value={formData.phone}
@@ -171,11 +168,10 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
                                 </div>
                                 <div>
                                     <label className={LABEL_CLS}>Country</label>
-                                    <div className="relative">
-                                        <PiGlobe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                    <div>
                                         <input
                                             type="text"
-                                            className={INPUT_CLS + " pl-8"}
+                                            className={INPUT_CLS + " pl-3"}
                                             style={INPUT_STYLE}
                                             value={formData.country}
                                             onChange={e => setFormData({ ...formData, country: e.target.value })}
@@ -190,11 +186,10 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
                             style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
                             <div>
                                 <label className={LABEL_CLS}>Contact Person</label>
-                                <div className="relative">
-                                    <PiUserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                <div>
                                     <input
                                         type="text"
-                                        className={INPUT_CLS + " pl-8"}
+                                        className={INPUT_CLS + " pl-3"}
                                         style={INPUT_STYLE}
                                         value={formData.contactPerson}
                                         onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
@@ -204,11 +199,10 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
 
                             <div>
                                 <label className={LABEL_CLS}>Tax ID / TIN</label>
-                                <div className="relative">
-                                    <PiIdentificationCard className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]" />
+                                <div>
                                     <input
                                         type="text"
-                                        className={INPUT_CLS + " pl-8"}
+                                        className={INPUT_CLS + " pl-3"}
                                         style={INPUT_STYLE}
                                         value={formData.taxId}
                                         onChange={e => setFormData({ ...formData, taxId: e.target.value })}
@@ -218,19 +212,17 @@ export function EditCustomerModal({ customer }: EditCustomerModalProps) {
 
                             <div>
                                 <label className={LABEL_CLS}>Currency</label>
-                                <div className="relative">
-                                    <select
-                                        className={INPUT_CLS + " appearance-none pr-8 cursor-pointer"}
-                                        style={INPUT_STYLE}
-                                        value={formData.currency}
-                                        onChange={e => setFormData({ ...formData, currency: e.target.value })}
-                                    >
-                                        <option value="KES">KES - Kenyan Shilling</option>
-                                        <option value="USD">USD - US Dollar</option>
-                                        <option value="SSP">SSP - South Sudanese Pound</option>
-                                    </select>
-                                    <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[13px]" />
-                                </div>
+                                <CustomSelect
+                                    value={formData.currency}
+                                    onChange={val => setFormData({ ...formData, currency: val })}
+                                    options={[
+                                        { value: "KES", label: "KES - Kenyan Shilling" },
+                                        { value: "USD", label: "USD - US Dollar" },
+                                        { value: "SSP", label: "SSP - South Sudanese Pound" },
+                                    ]}
+                                    className={INPUT_CLS}
+                                    style={INPUT_STYLE}
+                                />
                             </div>
 
                             <div>

@@ -33,10 +33,13 @@ export async function POST(req: NextRequest) {
         // Actually, DEPOSIT doesn't have a status field in the schema right now. 
         // We will just verify if the description contains 'COMPLETED' or update it.
         if (transaction.description.includes('[COMPLETED]')) {
-            return NextResponse.json({ success: true, message: "Already verified" });
+            return NextResponse.json({ success: true, amount: transaction.amount, alreadyVerified: true });
         }
 
-        const wallet = await prisma.wallet.findUnique({ where: { id: transaction.walletId } });
+        const wallet = await prisma.wallet.findUnique({
+            where: { id: transaction.walletId },
+            include: { user: { select: { name: true, phoneNumber: true } } },
+        }) as any;
 
         // Critical: update wallet balance and mark transaction complete (atomic)
         await prisma.$transaction([
@@ -59,6 +62,19 @@ export async function POST(req: NextRequest) {
             });
         } catch (glErr) {
             console.error('[Wallet GL] GL posting failed (non-critical):', glErr);
+        }
+
+        // Non-critical: SMS confirmation to wallet owner
+        if (wallet?.user?.phoneNumber) {
+            const newBalance = (wallet.balance ?? 0) + transaction.amount;
+            import('@/lib/sms/sms-service')
+                .then(({ smsService }) => smsService.sendWalletTopup(
+                    wallet.user.phoneNumber,
+                    wallet.user.name ?? 'User',
+                    transaction.amount,
+                    newBalance,
+                ))
+                .catch(() => {});
         }
 
         return NextResponse.json({ success: true, amount: transaction.amount });

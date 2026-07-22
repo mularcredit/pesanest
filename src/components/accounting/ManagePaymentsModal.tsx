@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/Input";
 import { format } from "date-fns";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface Payment {
     id: string;
@@ -221,17 +222,18 @@ export function ManagePaymentsModal({
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-semibold text-gray-500 uppercase">Method</label>
-                                    <select
+                                    <CustomSelect
                                         value={editForm.method}
-                                        onChange={e => setEditForm({ ...editForm, method: e.target.value })}
+                                        onChange={val => setEditForm({ ...editForm, method: val })}
+                                        options={[
+                                            { value: "CASH", label: "Cash" },
+                                            { value: "BANK_TRANSFER", label: "Bank Transfer" },
+                                            { value: "CHEQUE", label: "Cheque" },
+                                            { value: "MOBILE_MONEY", label: "Mobile Money" },
+                                            { value: "CARD", label: "Card Payment" },
+                                        ]}
                                         className="w-full h-11 px-3 bg-gray-50/50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
-                                    >
-                                        <option value="CASH">Cash</option>
-                                        <option value="BANK_TRANSFER">Bank Transfer</option>
-                                        <option value="CHEQUE">Cheque</option>
-                                        <option value="MOBILE_MONEY">Mobile Money</option>
-                                        <option value="CARD">Card Payment</option>
-                                    </select>
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-semibold text-gray-500 uppercase">Reference</label>

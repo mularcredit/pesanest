@@ -9,6 +9,7 @@ import {
     PiSpinner, PiX, PiFunnel, PiCheckSquare, PiSquare
 } from "react-icons/pi";
 import { useToast } from "@/components/ui/ToastProvider";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface RequisitionExportButtonProps {
     requisitions: any[];
@@ -288,24 +289,30 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [], ico
                             <div className="grid grid-cols-3 gap-3">
                                 <div>
                                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Category</label>
-                                    <select value={selCategory} onChange={e => setSelCategory(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30">
-                                        {categories.map(c => <option key={c} value={c}>{c === "all" ? "All Categories" : c}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        value={selCategory}
+                                        onChange={val => setSelCategory(val)}
+                                        options={categories.map(c => ({ value: c, label: c === "all" ? "All Categories" : c }))}
+                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Department</label>
-                                    <select value={selDept} onChange={e => setSelDept(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30">
-                                        {departments.map(d => <option key={d} value={d}>{d === "all" ? "All Depts." : d}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        value={selDept}
+                                        onChange={val => setSelDept(val)}
+                                        options={departments.map(d => ({ value: d, label: d === "all" ? "All Depts." : d }))}
+                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Branch</label>
-                                    <select value={selBranch} onChange={e => setSelBranch(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30">
-                                        {branches.map(b => <option key={b} value={b}>{b === "all" ? "All Branches" : b}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        value={selBranch}
+                                        onChange={val => setSelBranch(val)}
+                                        options={branches.map(b => ({ value: b, label: b === "all" ? "All Branches" : b }))}
+                                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
+                                    />
                                 </div>
                             </div>
 

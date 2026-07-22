@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/ToastProvider";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { format, parseISO } from "date-fns";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface PayInvoiceModalProps {
     invoice: {
@@ -126,14 +127,11 @@ export function PayInvoiceModal({ invoice, onClose }: PayInvoiceModalProps) {
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className={LABEL_CLASS}>Payment amount</label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-[500] text-gray-400">
-                                        {invoice.currency}
-                                    </span>
+                                <div>
                                     <input type="number" step="0.01" required
                                         value={formData.amount}
                                         onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                                        className={cn(INPUT_CLASS, 'pl-12 font-mono tabular-nums')}
+                                        className={cn(INPUT_CLASS, 'pl-3 font-mono tabular-nums')}
                                         style={INPUT_STYLE} />
                                 </div>
                             </div>
@@ -149,18 +147,19 @@ export function PayInvoiceModal({ invoice, onClose }: PayInvoiceModalProps) {
 
                         <div>
                             <label className={LABEL_CLASS}>Payment method</label>
-                            <div className="relative">
-                                <PiBank className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
-                                <select value={formData.method}
-                                    onChange={e => setFormData({ ...formData, method: e.target.value })}
-                                    className={cn(INPUT_CLASS, 'pl-8 cursor-pointer')} style={INPUT_STYLE} required>
-                                    <option value="BANK_TRANSFER">Bank Transfer</option>
-                                    <option value="CHECK">Cheque</option>
-                                    <option value="CASH">Cash</option>
-                                    <option value="MOBILE_MONEY">Mobile Money</option>
-                                    <option value="WIRE">Wire Transfer</option>
-                                </select>
-                            </div>
+                            <CustomSelect
+                                value={formData.method}
+                                onChange={val => setFormData({ ...formData, method: val })}
+                                options={[
+                                    { value: "BANK_TRANSFER", label: "Bank Transfer" },
+                                    { value: "CHECK", label: "Cheque" },
+                                    { value: "CASH", label: "Cash" },
+                                    { value: "MOBILE_MONEY", label: "Mobile Money" },
+                                    { value: "WIRE", label: "Wire Transfer" },
+                                ]}
+                                className={INPUT_CLASS}
+                                style={INPUT_STYLE}
+                            />
                         </div>
 
                         <div>

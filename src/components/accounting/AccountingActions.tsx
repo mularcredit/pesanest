@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface AccountingActionsProps {
     type: "NEW_ACCOUNT" | "MANUAL_JOURNAL" | "DELETE_ENTRY";
@@ -257,17 +258,18 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Type</label>
-                                        <select
-                                            className="w-full px-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-sm font-medium"
+                                        <CustomSelect
                                             value={accountData.type}
-                                            onChange={(e) => setAccountData(prev => ({ ...prev, type: e.target.value }))}
-                                        >
-                                            <option value="ASSET">Asset</option>
-                                            <option value="LIABILITY">Liability</option>
-                                            <option value="EQUITY">Equity</option>
-                                            <option value="REVENUE">Revenue</option>
-                                            <option value="EXPENSE">Expense</option>
-                                        </select>
+                                            onChange={val => setAccountData(prev => ({ ...prev, type: val }))}
+                                            options={[
+                                                { value: "ASSET", label: "Asset" },
+                                                { value: "LIABILITY", label: "Liability" },
+                                                { value: "EQUITY", label: "Equity" },
+                                                { value: "REVENUE", label: "Revenue" },
+                                                { value: "EXPENSE", label: "Expense" },
+                                            ]}
+                                            className="w-full px-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-sm font-medium"
+                                        />
                                     </div>
                                 </div>
                             ) : type === "MANUAL_JOURNAL" ? (
@@ -281,10 +283,13 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                                         {journalData.lines.map(line => (
                                             <div key={line.id} className="p-4 grid grid-cols-12 gap-3 border-b border-gray-100 last:border-0">
                                                 <div className="col-span-6">
-                                                    <select className="w-full h-10 bg-white border border-gray-200 rounded-lg text-sm" value={line.accountId} onChange={e => updateLine(line.id, 'accountId', e.target.value)}>
-                                                        <option value="">Select account...</option>
-                                                        {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.code} - {acc.name}</option>)}
-                                                    </select>
+                                                    <CustomSelect
+                                                        value={line.accountId}
+                                                        onChange={val => updateLine(line.id, 'accountId', val)}
+                                                        options={accounts.map(acc => ({ value: acc.id, label: `${acc.code} - ${acc.name}` }))}
+                                                        placeholder="Select account..."
+                                                        className="w-full h-10 bg-white border border-gray-200 rounded-lg text-sm"
+                                                    />
                                                 </div>
                                                 <div className="col-span-2"><Input type="number" placeholder="Debit" value={line.debit || ''} onChange={e => updateLine(line.id, 'debit', parseFloat(e.target.value) || 0)} /></div>
                                                 <div className="col-span-2"><Input type="number" placeholder="Credit" value={line.credit || ''} onChange={e => updateLine(line.id, 'credit', parseFloat(e.target.value) || 0)} /></div>

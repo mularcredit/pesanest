@@ -163,11 +163,10 @@ export function Select({
                     className="bg-[var(--sidebar)] border border-[var(--p-line)] rounded-lg shadow-[var(--shadow-dropdown)] p-2 animate-in fade-in zoom-in-95 duration-100"
                 >
                     {searchable && (
-                        <div className="relative mb-2 px-1">
-                            <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--t-muted)] text-sm" />
+                        <div className="mb-2 px-1">
                             <input
                                 autoFocus
-                                className="w-full pl-8 pr-2 py-2 bg-[var(--glass)] border border-[var(--p-line)] rounded-md text-sm focus:ring-1 focus:ring-[var(--p)]/30 placeholder:text-[var(--t-muted)] text-[var(--t1)] focus:outline-none"
+                                className="w-full pl-3 pr-2 py-2 bg-[var(--glass)] border border-[var(--p-line)] rounded-md text-sm focus:ring-1 focus:ring-[var(--p)]/30 placeholder:text-[var(--t-muted)] text-[var(--t1)] focus:outline-none"
                                 placeholder="Search..."
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}

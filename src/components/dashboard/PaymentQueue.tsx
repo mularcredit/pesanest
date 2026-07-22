@@ -123,6 +123,17 @@ interface PaymentBatch {
         monthlyBudgets?: number;
     };
     expenses?: Expense[];
+    requisitions?: {
+        id: string;
+        title: string;
+        amount: number;
+        currency: string;
+        category: string;
+        receiptUrl: string | null;
+        etrNumber: string | null;
+        etrVerified: boolean;
+        user: { name: string | null; email: string | null };
+    }[];
 }
 
 interface PaymentQueueProps {
@@ -1138,7 +1149,7 @@ export function PaymentQueue({
                                                         <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatAmount(batch.amount, batch.currency)}</td>
                                                         <td className="px-4 py-3 text-right">
                                                             <button
-                                                                onClick={() => setReconcileBatch({ id: batch.id, amount: batch.amount, currency: batch.currency, expenses: batch.expenses as any })}
+                                                                onClick={() => setReconcileBatch({ id: batch.id, amount: batch.amount, currency: batch.currency, expenses: batch.expenses as any, requisitions: batch.requisitions as any })}
                                                                 disabled={isProcessing}
                                                                 className="px-3 py-2 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all flex items-center justify-center shadow-none disabled:opacity-50 w-full"
                                                             >

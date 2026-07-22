@@ -10,6 +10,7 @@ import {
 } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/ToastProvider";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface Region { id: string; name: string; code: string; branches: any[]; }
 interface Branch {
@@ -152,12 +153,14 @@ export default function BranchesClient() {
                     </div>
                     <div>
                         <label className={LABEL_CLS}>Region <span className="text-rose-400">*</span></label>
-                        <select value={form.regionId}
-                            onChange={e => setForm(p => ({ ...p, regionId: e.target.value }))}
-                            className={INPUT_CLS + " appearance-none cursor-pointer"} style={INPUT_STYLE}>
-                            <option value="">Select region...</option>
-                            {regions.map(r => <option key={r.id} value={r.id}>{r.name} ({r.code})</option>)}
-                        </select>
+                        <CustomSelect
+                            value={form.regionId}
+                            onChange={val => setForm(p => ({ ...p, regionId: val }))}
+                            options={regions.map(r => ({ value: r.id, label: `${r.name} (${r.code})` }))}
+                            placeholder="Select region..."
+                            className={INPUT_CLS}
+                            style={INPUT_STYLE}
+                        />
                     </div>
                     <div>
                         <label className={LABEL_CLS}>Physical Address</label>
@@ -168,14 +171,14 @@ export default function BranchesClient() {
                     </div>
                     <div>
                         <label className={LABEL_CLS}>Team Leader</label>
-                        <select value={form.teamLeaderId}
-                            onChange={e => setForm(p => ({ ...p, teamLeaderId: e.target.value }))}
-                            className={INPUT_CLS + " appearance-none cursor-pointer"} style={INPUT_STYLE}>
-                            <option value="">No leader assigned</option>
-                            {users.filter(u => !["SYSTEM_ADMIN", "FINANCE_APPROVER"].includes(u.role)).map(u => (
-                                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                            ))}
-                        </select>
+                        <CustomSelect
+                            value={form.teamLeaderId}
+                            onChange={val => setForm(p => ({ ...p, teamLeaderId: val }))}
+                            options={users.filter(u => !["SYSTEM_ADMIN", "FINANCE_APPROVER"].includes(u.role)).map(u => ({ value: u.id, label: `${u.name} (${u.email})` }))}
+                            placeholder="No leader assigned"
+                            className={INPUT_CLS}
+                            style={INPUT_STYLE}
+                        />
                     </div>
                 </div>
 

@@ -69,12 +69,11 @@ export function RequisitionListWithFilter({ requisitions, monthlyBudgets }: Requ
             <div className="flex-1 min-w-0 pl-6 space-y-4">
                 {/* Search & Filter bar */}
                 <div className="flex gap-4">
-                    <div className="relative flex-1">
-                        <PiMagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <div className="flex-1">
                         <input
                             type="text"
                             placeholder="Search by ID or title..."
-                            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-3 pr-4 py-2.5 text-sm text-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
                         />
                     </div>
                     <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-lg flex items-center gap-2 text-gray-500 hover:text-gray-900 hover:border-gray-900 transition-all">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import {
@@ -10,6 +10,7 @@ import {
 } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/ToastProvider";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface InvoiceFormProps {
     vendors: Array<{ id: string; name: string }>;
@@ -133,11 +134,21 @@ export function InvoiceForm({ vendors }: InvoiceFormProps) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className={LABEL_CLASS}>Vendor <span className="text-rose-400">*</span></label>
-                                    <select className={cn(INPUT_CLASS, 'cursor-pointer')} style={INPUT_STYLE}
-                                        {...register("vendorId", { required: "Vendor is required" })}>
-                                        <option value="">Select vendor…</option>
-                                        {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
-                                    </select>
+                                    <Controller
+                                        name="vendorId"
+                                        control={control}
+                                        rules={{ required: "Vendor is required" }}
+                                        render={({ field }) => (
+                                            <CustomSelect
+                                                value={field.value}
+                                                onChange={val => field.onChange(val)}
+                                                options={vendors.map(v => ({ value: v.id, label: v.name }))}
+                                                placeholder="Select vendor…"
+                                                className={INPUT_CLASS}
+                                                style={INPUT_STYLE}
+                                            />
+                                        )}
+                                    />
                                     {errors.vendorId && <p className="text-[11px] text-rose-500 mt-1">{errors.vendorId.message as string}</p>}
                                 </div>
                                 <div>
@@ -158,12 +169,24 @@ export function InvoiceForm({ vendors }: InvoiceFormProps) {
                                 </div>
                                 <div>
                                     <label className={LABEL_CLASS}>Currency</label>
-                                    <select className={cn(INPUT_CLASS, 'cursor-pointer')} style={INPUT_STYLE}
-                                        {...register("currency")}>
-                                        <option value="KES">KES (Kenya Shilling)</option>
-                                        <option value="USD">USD (US Dollar)</option>
-                                        <option value="SSP">SSP (South Sudan Pound)</option>
-                                    </select>
+                                    <Controller
+                                        name="currency"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <CustomSelect
+                                                value={field.value}
+                                                onChange={val => field.onChange(val)}
+                                                options={[
+                                                    { value: "KES", label: "KES (Kenya Shilling)" },
+                                                    { value: "USD", label: "USD (US Dollar)" },
+                                                    { value: "SSP", label: "SSP (South Sudan Pound)" },
+                                                ]}
+                                                placeholder="Select currency"
+                                                className={INPUT_CLASS}
+                                                style={INPUT_STYLE}
+                                            />
+                                        )}
+                                    />
                                 </div>
                             </div>
 
@@ -216,12 +239,9 @@ export function InvoiceForm({ vendors }: InvoiceFormProps) {
                                             className={cn(INPUT_CLASS, 'text-center')} style={INPUT_STYLE}
                                             {...register(`items.${index}.quantity` as const, { required: true })} />
                                     </div>
-                                    <div className="col-span-3 relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 font-[500]">
-                                            {currencyPrefix}
-                                        </span>
+                                    <div className="col-span-3">
                                         <input type="number" step="0.01"
-                                            className={cn(INPUT_CLASS, 'pl-10 tabular-nums')} style={INPUT_STYLE}
+                                            className={cn(INPUT_CLASS, 'pl-3 tabular-nums')} style={INPUT_STYLE}
                                             {...register(`items.${index}.unitPrice` as const, { required: true })} />
                                     </div>
                                     <div className="col-span-2 flex items-center justify-end gap-2">

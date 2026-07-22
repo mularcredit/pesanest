@@ -35,10 +35,15 @@ function LoginComponent() {
             });
 
             if (result?.error) {
-                // Heuristic: if we haven't shown TOTP yet, try to detect if it's needed
                 if (!totpRequired && !totp) {
-                    setTotpRequired(true);
-                    setError("Enter your 6-digit authenticator code below.");
+                    // Check server whether this account actually has TOTP before showing the field
+                    const check = await fetch(`/api/auth/check-totp?email=${encodeURIComponent(email)}`).then(r => r.json()).catch(() => ({ totpEnabled: false }));
+                    if (check.totpEnabled) {
+                        setTotpRequired(true);
+                        setError("Enter your 6-digit authenticator code below.");
+                    } else {
+                        setError("Invalid email or password. Please try again.");
+                    }
                 } else {
                     setError("Invalid credentials or authenticator code. Please try again.");
                 }
@@ -147,8 +152,7 @@ function LoginComponent() {
                         <form onSubmit={handleSubmit}>
                             {/* Email */}
                             <div className="mb-1.5 text-xs font-medium text-zinc-900">Work email</div>
-                            <div className="relative mb-5">
-                                <HiEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
+                            <div className="mb-5">
                                 <input
                                     type="email"
                                     value={email}
@@ -156,7 +160,7 @@ function LoginComponent() {
                                     placeholder="you@company.com"
                                     required
                                     className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
-                                    style={{ padding: "11px 16px 11px 44px" }}
+                                    style={{ padding: "11px 16px" }}
                                 />
                             </div>
 
@@ -168,7 +172,6 @@ function LoginComponent() {
                                 </Link>
                             </div>
                             <div className={`relative ${totpRequired ? 'mb-4' : 'mb-8'}`}>
-                                <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none text-[#6366F1]/40" />
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={password}
@@ -176,7 +179,7 @@ function LoginComponent() {
                                     placeholder="Enter your secure password"
                                     required
                                     className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
-                                    style={{ padding: "11px 44px 11px 44px" }}
+                                    style={{ padding: "11px 44px 11px 16px" }}
                                 />
                                 <button
                                     type="button"

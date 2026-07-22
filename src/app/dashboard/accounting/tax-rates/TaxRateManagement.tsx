@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 
 const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
 const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
@@ -52,7 +53,7 @@ export function TaxRateManagement({ taxRates }: { taxRates: any[] }) {
     const activeTaxRates = taxRates.filter((r: any) => r.isActive);
     const inactiveTaxRates = taxRates.filter((r: any) => !r.isActive);
 
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<TaxRateFormValues>({
+    const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<TaxRateFormValues>({
         resolver: zodResolver(TaxRateSchema),
         defaultValues: { type: 'VAT', rate: 0 }
     });
@@ -162,13 +163,18 @@ export function TaxRateManagement({ taxRates }: { taxRates: any[] }) {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className={LABEL_CLS}>Tax Type</label>
-                            <select {...register("type")}
-                                className={INPUT_CLS + " appearance-none cursor-pointer"} style={INPUT_STYLE}>
-                                <option value="VAT">Value Added Tax (VAT)</option>
-                                <option value="SALES_TAX">Sales Tax</option>
-                                <option value="WITHHOLDING">Withholding Tax</option>
-                                <option value="EXCISE">Excise Duty</option>
-                            </select>
+                            <CustomSelect
+                                value={watch("type") ?? "VAT"}
+                                onChange={val => setValue("type", val as TaxRateFormValues["type"])}
+                                options={[
+                                    { value: "VAT", label: "Value Added Tax (VAT)" },
+                                    { value: "SALES_TAX", label: "Sales Tax" },
+                                    { value: "WITHHOLDING", label: "Withholding Tax" },
+                                    { value: "EXCISE", label: "Excise Duty" },
+                                ]}
+                                className={INPUT_CLS}
+                                style={INPUT_STYLE}
+                            />
                         </div>
                         <div>
                             <label className={LABEL_CLS}>Rate (%)</label>

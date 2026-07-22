@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AccountingActions } from "@/components/accounting/AccountingActions";
 import { LedgerExportButton } from "@/components/accounting/LedgerExportButton";
+import { LedgerAccountSelect } from "./LedgerAccountSelect";
 import { PiBookOpenText, PiMagnifyingGlass, PiCaretLeft, PiCaretRight, PiPlus } from "react-icons/pi";
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
@@ -141,18 +142,7 @@ export default async function GeneralLedgerPage({
                 <div className="w-px h-8 shrink-0" style={{ background: 'rgba(0,0,0,0.07)' }} />
 
                 {/* Account filter */}
-                <select
-                    name="code"
-                    defaultValue={selectedCode}
-                    className="px-4 py-2.5 text-[12.5px] text-gray-600 bg-transparent outline-none cursor-pointer"
-                >
-                    <option value="">All Accounts</option>
-                    {allAccounts.map(acc => (
-                        <option key={acc.id} value={acc.code}>
-                            {acc.code} · {acc.name}
-                        </option>
-                    ))}
-                </select>
+                <LedgerAccountSelect accounts={allAccounts} defaultValue={selectedCode} />
 
                 {/* Divider */}
                 <div className="w-px h-8 shrink-0" style={{ background: 'rgba(0,0,0,0.07)' }} />

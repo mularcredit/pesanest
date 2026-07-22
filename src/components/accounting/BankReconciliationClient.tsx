@@ -104,7 +104,7 @@ export function BankReconciliationClient({ cashAccountId, glBalance, journalLine
     const difference = Math.abs(unmatchedBankTotal - unmatchedBookTotal)
     const isReconciled = difference < 0.01 && unmatchedBankCount === 0 && unmatchedBookCount === 0
 
-    const searchInputCls = "w-full pl-9 pr-3 py-[9px] rounded-[6px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white"
+    const searchInputCls = "w-full pl-3 pr-3 py-[9px] rounded-[6px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white"
 
     return (
         <div className="space-y-5">
@@ -241,8 +241,7 @@ export function BankReconciliationClient({ cashAccountId, glBalance, journalLine
                                     <h3 className="text-[13px] font-[600] text-gray-900">Bank Statement</h3>
                                     <span className="ml-auto text-[11px] text-gray-400">{filteredBankTx.length} tx</span>
                                 </div>
-                                <div className="relative">
-                                    <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                <div>
                                     <input type="text" placeholder="Search..." value={searchBank}
                                         onChange={e => setSearchBank(e.target.value)}
                                         className={searchInputCls} style={CARD_STYLE} />
@@ -338,8 +337,7 @@ export function BankReconciliationClient({ cashAccountId, glBalance, journalLine
                                     <h3 className="text-[13px] font-[600] text-gray-900">Your Books</h3>
                                     <span className="ml-auto text-[11px] text-gray-400">{filteredBookLines.length} entries</span>
                                 </div>
-                                <div className="relative">
-                                    <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                <div>
                                     <input type="text" placeholder="Search..." value={searchBooks}
                                         onChange={e => setSearchBooks(e.target.value)}
                                         className={searchInputCls} style={CARD_STYLE} />

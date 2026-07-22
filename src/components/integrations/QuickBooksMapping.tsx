@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { PiArrowsClockwise, PiCheck, PiTranslate, PiMagnifyingGlass, PiWarning } from "react-icons/pi";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastProvider";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 interface Account {
     id: string;
@@ -118,14 +119,13 @@ export default function QuickBooksMapping() {
     return (
         <div className="space-y-6 animate-fade-in">
             <div className="flex items-center justify-between">
-                <div className="relative flex-1 max-w-sm">
-                    <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input 
+                <div className="flex-1 max-w-sm">
+                    <input
                         type="text"
                         placeholder="Search accounts..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#5e48b8] transition-all"
+                        className="w-full pl-3 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#5e48b8] transition-all"
                     />
                 </div>
                 <div className="flex gap-3">
@@ -176,18 +176,13 @@ export default function QuickBooksMapping() {
                                     )}
                                 </td>
                                 <td className="px-6 py-4">
-                                    <select 
+                                    <CustomSelect
                                         value={mapping[acc.id] || ""}
-                                        onChange={e => handleMappingChange(acc.id, e.target.value)}
+                                        onChange={val => handleMappingChange(acc.id, val)}
+                                        options={qboAccounts.map(q => ({ value: q.Id, label: `${q.Name} (${q.AccountType})` }))}
+                                        placeholder="-- Select QBO Account --"
                                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-[#5e48b8] transition-all"
-                                    >
-                                        <option value="">-- Select QBO Account --</option>
-                                        {qboAccounts.map(q => (
-                                            <option key={q.Id} value={q.Id}>
-                                                {q.Name} ({q.AccountType})
-                                            </option>
-                                        ))}
-                                    </select>
+                                    />
                                 </td>
                             </tr>
                         ))}

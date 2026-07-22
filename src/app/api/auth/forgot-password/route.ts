@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
         const normalizedEmail = email.trim().toLowerCase();
         const user = await prisma.user.findUnique({
             where: { email: normalizedEmail },
+            select: { id: true, phoneNumber: true, resetToken: true, resetTokenExpiry: true },
         });
 
         // Always return success to prevent email enumeration
@@ -40,13 +41,16 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        // In production, send email here
-        // For now, just log the reset link
         const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
-        console.log('Password reset link:', resetUrl);
 
-        // TODO: Send email with reset link
-        // await sendPasswordResetEmail(email, resetUrl);
+        // Send reset link via SMS if user has a phone number
+        if (user.phoneNumber) {
+            import('@/lib/sms/sms-service')
+                .then(({ smsService }) => smsService.sendPasswordReset(user.phoneNumber!, resetUrl))
+                .catch(() => {});
+        } else {
+            console.log('[forgot-password] No phone on file — reset URL:', resetUrl);
+        }
 
         return NextResponse.json(
             { message: "If an account exists, reset instructions have been sent" },

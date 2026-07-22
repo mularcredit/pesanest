@@ -10,13 +10,13 @@ import {
     PiMapPin,
     PiIdentificationCard,
     PiGlobe,
-    PiCaretDown,
     PiCheckCircle,
     PiSpinner,
     PiBuildings,
     PiUserCircle,
     PiX,
 } from "react-icons/pi";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import Link from "next/link";
 
 const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
@@ -80,12 +80,11 @@ export default function NewCustomerPage() {
                         <div className="p-6 space-y-4">
                             <div>
                                 <label className={LABEL_CLS}>Customer / Company Name <span className="text-rose-400">*</span></label>
-                                <div className="relative">
-                                    <PiBuildings className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                <div>
                                     <input
                                         required
                                         type="text"
-                                        className={INPUT_CLS + " pl-9"}
+                                        className={INPUT_CLS + " pl-3"}
                                         style={INPUT_STYLE}
                                         placeholder="e.g. Acme Corp Ltd."
                                         value={formData.name}
@@ -97,11 +96,10 @@ export default function NewCustomerPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className={LABEL_CLS}>Email Address</label>
-                                    <div className="relative">
-                                        <PiEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <div>
                                         <input
                                             type="email"
-                                            className={INPUT_CLS + " pl-9"}
+                                            className={INPUT_CLS + " pl-3"}
                                             style={INPUT_STYLE}
                                             placeholder="billing@acme.com"
                                             value={formData.email}
@@ -111,11 +109,10 @@ export default function NewCustomerPage() {
                                 </div>
                                 <div>
                                     <label className={LABEL_CLS}>Phone Number</label>
-                                    <div className="relative">
-                                        <PiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <div>
                                         <input
                                             type="tel"
-                                            className={INPUT_CLS + " pl-9"}
+                                            className={INPUT_CLS + " pl-3"}
                                             style={INPUT_STYLE}
                                             placeholder="+211 ..."
                                             value={formData.phone}
@@ -127,11 +124,10 @@ export default function NewCustomerPage() {
 
                             <div>
                                 <label className={LABEL_CLS}>Primary Contact Person</label>
-                                <div className="relative">
-                                    <PiUserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                <div>
                                     <input
                                         type="text"
-                                        className={INPUT_CLS + " pl-9"}
+                                        className={INPUT_CLS + " pl-3"}
                                         style={INPUT_STYLE}
                                         placeholder="e.g. John Doe"
                                         value={formData.contactPerson}
@@ -151,10 +147,9 @@ export default function NewCustomerPage() {
                         <div className="p-6 space-y-4">
                             <div>
                                 <label className={LABEL_CLS}>Billing Address</label>
-                                <div className="relative">
-                                    <PiMapPin className="absolute left-3 top-3 text-gray-400 text-[14px] pointer-events-none" />
+                                <div>
                                     <textarea
-                                        className="w-full rounded-[6px] pl-9 pr-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white resize-none h-20"
+                                        className="w-full rounded-[6px] pl-3 pr-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white resize-none h-20"
                                         style={INPUT_STYLE}
                                         placeholder="Street address, PO Box..."
                                         value={formData.address}
@@ -175,11 +170,10 @@ export default function NewCustomerPage() {
                                 </div>
                                 <div>
                                     <label className={LABEL_CLS}>Country</label>
-                                    <div className="relative">
-                                        <PiGlobe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <div>
                                         <input
                                             type="text"
-                                            className={INPUT_CLS + " pl-9"}
+                                            className={INPUT_CLS + " pl-3"}
                                             style={INPUT_STYLE}
                                             value={formData.country}
                                             onChange={e => setFormData({ ...formData, country: e.target.value })}
@@ -200,11 +194,10 @@ export default function NewCustomerPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className={LABEL_CLS}>Tax ID / TIN</label>
-                                    <div className="relative">
-                                        <PiIdentificationCard className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <div>
                                         <input
                                             type="text"
-                                            className={INPUT_CLS + " pl-9"}
+                                            className={INPUT_CLS + " pl-3"}
                                             style={INPUT_STYLE}
                                             placeholder="Tax Identification Number"
                                             value={formData.taxId}
@@ -214,19 +207,18 @@ export default function NewCustomerPage() {
                                 </div>
                                 <div>
                                     <label className={LABEL_CLS}>Default Currency</label>
-                                    <div className="relative">
-                                        <select
-                                            className={INPUT_CLS + " appearance-none pr-8 cursor-pointer"}
-                                            style={INPUT_STYLE}
-                                            value={formData.currency}
-                                            onChange={e => setFormData({ ...formData, currency: e.target.value })}
-                                        >
-                                            <option value="KES">KES - Kenyan Shilling</option>
-                                            <option value="USD">USD - US Dollar</option>
-                                            <option value="SSP">SSP - South Sudanese Pound</option>
-                                        </select>
-                                        <PiCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[13px]" />
-                                    </div>
+                                    <CustomSelect
+                                        value={formData.currency}
+                                        onChange={val => setFormData({ ...formData, currency: val })}
+                                        options={[
+                                            { value: "KES", label: "KES - Kenyan Shilling" },
+                                            { value: "USD", label: "USD - US Dollar" },
+                                            { value: "SSP", label: "SSP - South Sudanese Pound" },
+                                        ]}
+                                        placeholder="Select currency"
+                                        className={INPUT_CLS}
+                                        style={INPUT_STYLE}
+                                    />
                                 </div>
                             </div>
                         </div>

@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
                     include: { vendor: { select: { paystackRecipientCode: true, name: true } } }
                 },
                 expenses: {
-                    include: { user: { select: { paystackRecipientCode: true, name: true } } }
+                    include: { user: { select: { paystackRecipientCode: true, name: true, phoneNumber: true } } }
                 },
-                requisitions: { include: { user: { select: { name: true, email: true, paystackRecipientCode: true } } } },
+                requisitions: { include: { user: { select: { name: true, email: true, paystackRecipientCode: true, phoneNumber: true } } } },
                 monthlyBudgets: true
             }
         });
@@ -54,15 +54,16 @@ export async function POST(req: NextRequest) {
         }
 
         if (action === 'AUTHORIZE') {
-            // Update Payment to AUTHORIZED
             await prisma.payment.update({
                 where: { id: paymentId },
-                data: {
-                    status: 'AUTHORIZED',
-                    checkerId: session.user.id,
-                    authorizedAt: new Date()
-                }
+                data: { status: 'AUTHORIZED', checkerId: session.user.id, authorizedAt: new Date() }
             });
+
+            // Non-critical: SMS to payment maker
+            import('@/lib/sms/sms-service').then(async ({ smsService }) => {
+                const maker = await prisma.user.findUnique({ where: { id: payment.makerId }, select: { name: true, phoneNumber: true } });
+                if (maker?.phoneNumber) await smsService.sendPaymentAuthorized(maker.phoneNumber, maker.name ?? 'User', payment.amount, paymentId);
+            }).catch(() => {});
         } else if (action === 'DISBURSE') {
             let p = payment as any;
             const { paystackService } = await import('@/lib/payments/paystack');
@@ -70,15 +71,15 @@ export async function POST(req: NextRequest) {
 
             // Robust fetch for items
             if (!p.requisitions || p.requisitions.length === 0) {
-                p.requisitions = await (prisma as any).requisition.findMany({ 
+                p.requisitions = await (prisma as any).requisition.findMany({
                     where: { paymentId },
-                    include: { user: { select: { name: true, email: true, paystackRecipientCode: true } } }
+                    include: { user: { select: { name: true, email: true, paystackRecipientCode: true, phoneNumber: true } } }
                 });
             }
             if (!p.expenses || p.expenses.length === 0) {
-                p.expenses = await prisma.expense.findMany({ 
+                p.expenses = await prisma.expense.findMany({
                     where: { paymentId },
-                    include: { user: { select: { name: true, email: true, paystackRecipientCode: true } } }
+                    include: { user: { select: { name: true, email: true, paystackRecipientCode: true, phoneNumber: true } } }
                 });
             }
             if (!p.invoices || p.invoices.length === 0) {
@@ -131,12 +132,13 @@ export async function POST(req: NextRequest) {
                 }, { status: 400 });
             }
 
-            const results = { 
-                success: 0, 
-                failed: 0, 
+            const results = {
+                success: 0,
+                failed: 0,
                 errors: [] as string[],
-                details: [] as { id: string, title: string, error: string, type: string }[] 
+                details: [] as { id: string, title: string, error: string, type: string }[]
             };
+            const smsQueue: Array<{ phone: string; name: string; amount: number; ref: string }> = [];
 
             // Process Requisitions
             for (const req of p.requisitions) {
@@ -257,6 +259,7 @@ export async function POST(req: NextRequest) {
                     if (cashAccount) {
                         await (AccountingEngine as any).postRequisitionPayment(req.id, cashAccount.id);
                     }
+                    if (req.user?.phoneNumber) smsQueue.push({ phone: req.user.phoneNumber, name: req.user.name ?? 'User', amount: req.amount, ref: txId });
                     results.success++;
                 } catch (err: any) {
                     console.error(`Disbursement failed for req ${req.id}:`, err);
@@ -326,6 +329,7 @@ export async function POST(req: NextRequest) {
                     if (cashAccount) {
                         await (AccountingEngine as any).postExpensePayment(exp.id, cashAccount.id);
                     }
+                    if (exp.user?.phoneNumber) smsQueue.push({ phone: exp.user.phoneNumber, name: exp.user.name ?? 'User', amount: exp.amount, ref: txId });
                     results.success++;
                 } catch (err: any) {
                     console.error(`Disbursement failed for exp ${exp.id}:`, err);
@@ -418,19 +422,30 @@ export async function POST(req: NextRequest) {
                 }
             });
 
-            return NextResponse.json({ 
-                success: true, 
-                summary: results 
+            // Non-critical: SMS to each successfully-disbursed recipient
+            if (smsQueue.length > 0) {
+                import('@/lib/sms/sms-service').then(({ smsService }) =>
+                    Promise.allSettled(smsQueue.map(s =>
+                        smsService.sendPaymentDisbursed(s.phone, s.name, s.amount, s.ref)
+                    ))
+                ).catch(() => {});
+            }
+
+            return NextResponse.json({
+                success: true,
+                summary: results
             });
         } else if (action === 'REJECT') {
-            // Update Payment
             await prisma.payment.update({
                 where: { id: paymentId },
-                data: {
-                    status: 'REJECTED',
-                    checkerId: session.user.id
-                }
+                data: { status: 'REJECTED', checkerId: session.user.id }
             });
+
+            // Non-critical: SMS to payment maker
+            import('@/lib/sms/sms-service').then(async ({ smsService }) => {
+                const maker = await prisma.user.findUnique({ where: { id: payment.makerId }, select: { name: true, phoneNumber: true } });
+                if (maker?.phoneNumber) await smsService.sendPaymentRejected(maker.phoneNumber, maker.name ?? 'User', payment.amount);
+            }).catch(() => {});
 
             // Disconnect items so they re-appear in the payables queue
             await prisma.expense.updateMany({

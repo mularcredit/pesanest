@@ -25,7 +25,8 @@ export function WalletVerifier() {
             .then(res => res.json().then(data => ({ ok: res.ok, data })))
             .then(({ ok, data }) => {
                 if (!ok) throw new Error(data.error);
-                if (data.success) {
+                // Show toast only for fresh verifications, not double-processed ones
+                if (data.success && !data.alreadyVerified) {
                     showToast(`Successfully deposited KSh ${Number(data.amount).toLocaleString()} into your wallet!`, 'success');
                 }
                 // Hard reload so the server component always re-fetches fresh balance

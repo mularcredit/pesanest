@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+const locations = require('kenya-locations')
 
 const prisma = new PrismaClient()
 
@@ -11,6 +12,9 @@ async function main() {
     await prisma.saleItem.deleteMany({})
 
     await prisma.expense.deleteMany({})
+    await prisma.budgetItem.deleteMany({})
+    await prisma.monthlyBudget.deleteMany({})
+    await prisma.requisitionItem.deleteMany({})
     await prisma.requisition.deleteMany({})
     await prisma.walletTransaction.deleteMany({})
 
@@ -20,6 +24,9 @@ async function main() {
     await prisma.customer.deleteMany({})
 
     // AP Cleanup
+    await prisma.itemApproval.deleteMany({})
+    await prisma.approval.deleteMany({})
+    await prisma.invoiceLineItem.deleteMany({})
     await prisma.invoice.deleteMany({}) // Vendor Invoices
     await prisma.payment.deleteMany({}) // Vendor Payments
     await prisma.vendor.deleteMany({})
@@ -27,6 +34,12 @@ async function main() {
     await prisma.wallet.deleteMany({})
     await prisma.wallet.deleteMany({})
     await prisma.user.deleteMany({})
+
+    // Regional Cleanup
+    await prisma.branchWalletTransaction.deleteMany({})
+    await prisma.branchWallet.deleteMany({})
+    await prisma.branch.deleteMany({})
+    await prisma.region.deleteMany({})
 
     // GL Cleanup
     await prisma.journalLine.deleteMany({})
@@ -97,11 +110,11 @@ async function main() {
     })
 
     // Create wallets (Clean slate)
-    await prisma.wallet.create({ data: { userId: admin.id, balance: 0.00, currency: 'USD' } })
-    await prisma.wallet.create({ data: { userId: finance.id, balance: 0.00, currency: 'USD' } })
-    await prisma.wallet.create({ data: { userId: manager.id, balance: 0.00, currency: 'USD' } })
+    await prisma.wallet.create({ data: { userId: admin.id, balance: 0.00, currency: 'KES' } })
+    await prisma.wallet.create({ data: { userId: finance.id, balance: 0.00, currency: 'KES' } })
+    await prisma.wallet.create({ data: { userId: manager.id, balance: 0.00, currency: 'KES' } })
     const employeeWallet = await prisma.wallet.create({
-        data: { userId: employee.id, balance: 0.00, currency: 'USD' }
+        data: { userId: employee.id, balance: 0.00, currency: 'KES' }
     })
 
     // Wallet Transactions
@@ -334,7 +347,7 @@ async function main() {
             title: 'Q1 South Sudan Market Activation',
             description: 'Roadshow materials and logistics for Juba/Nimule corridor',
             amount: 5000.00,
-            currency: 'USD',
+            currency: 'KES',
             category: 'Logistics',
             businessJustification: 'Expand market share in Equatoria region',
             status: 'PENDING',
@@ -352,6 +365,62 @@ async function main() {
 
     // 4. Internet
     // DELETED SEED DATA
+
+    // ============================================================================
+    // REGIONS AND BRANCHES (Exhaustive Kenyan Coverage)
+    // ============================================================================
+    console.log('Seeding Exhaustive Kenyan Company Structure (47 Counties, 300+ Sub-counties)...')
+
+    const counties = locations.getCounties()
+    const subCounties = locations.getSubCounties()
+
+    let nairobiHqId = '';
+
+    // 1. Create Regions (Counties)
+    const regionMap: Record<string, string> = {} // Name -> ID
+
+    for (const c of counties) {
+        const region = await prisma.region.create({
+            data: {
+                name: `${c.name} County`,
+                code: c.code,
+            }
+        })
+        regionMap[c.name] = region.id
+    }
+
+    // 2. Create Branches (Sub-Counties)
+    for (const sc of subCounties) {
+        const branch = await prisma.branch.create({
+            data: {
+                name: sc.name,
+                code: `${sc.code.padStart(3, '0')}-${sc.name.toUpperCase().replace(/\s+/g, '').substring(0, 5)}`,
+                regionId: regionMap[sc.county],
+            }
+        })
+        
+        // Pick first Nairobi sub-county as HQ for test accounts
+        if (sc.county === 'Nairobi' && !nairobiHqId) {
+            nairobiHqId = branch.id;
+        }
+    }
+
+    // Default Fallback
+    if (!nairobiHqId) {
+        const anyBranch = await prisma.branch.findFirst();
+        nairobiHqId = anyBranch?.id || '';
+    }
+
+    // Update main users with branches
+    await prisma.user.update({
+        where: { id: admin.id },
+        data: { branchId: nairobiHqId }
+    })
+
+    await prisma.user.update({
+        where: { id: manager.id },
+        data: { branchId: nairobiHqId }
+    })
 
     // Vendors
     await prisma.vendor.create({

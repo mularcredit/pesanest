@@ -18,6 +18,7 @@ import {
     PiCaretDown,
 } from 'react-icons/pi';
 import { useToast } from "@/components/ui/ToastProvider";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import { createUser, updateUser } from "./actions";
 import { useRouter } from "next/navigation";
 
@@ -93,6 +94,8 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
     }, [user]);
 
     const [password, setPassword] = useState("");
+    const [showResetPassword, setShowResetPassword] = useState(false);
+    const [newPassword, setNewPassword] = useState("");
     const [selectedBranchId, setSelectedBranchId] = useState<string>(user?.branchId || '');
     const [selectedRegionId, setSelectedRegionId] = useState<string>(user?.regionId || '');
     const [selectedDepartment, setSelectedDepartment] = useState<string>(user?.department || '');
@@ -118,11 +121,10 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
 
     const generatePassword = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-        let newPassword = "";
-        for (let i = 0; i < 12; i++) {
-            newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        setPassword(newPassword);
+        let pw = "";
+        for (let i = 0; i < 12; i++) pw += chars.charAt(Math.floor(Math.random() * chars.length));
+        if (user) setNewPassword(pw);
+        else setPassword(pw);
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -207,13 +209,12 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
 
                     <div>
                         <label className={LABEL_CLS}>Full Name *</label>
-                        <div className="relative">
-                            <PiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[14px]" />
+                        <div>
                             <input
                                 name="name"
                                 defaultValue={user?.name}
                                 required
-                                className={`${INPUT_CLS} pl-9`}
+                                className={`${INPUT_CLS} pl-3`}
                                 style={INPUT_STYLE}
                                 placeholder="e.g. Jane Doe"
                             />
@@ -222,14 +223,13 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
 
                     <div>
                         <label className={LABEL_CLS}>Email address *</label>
-                        <div className="relative">
-                            <PiEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[14px]" />
+                        <div>
                             <input
                                 name="email"
                                 type="email"
                                 defaultValue={user?.email}
                                 required
-                                className={`${INPUT_CLS} pl-9`}
+                                className={`${INPUT_CLS} pl-3`}
                                 style={INPUT_STYLE}
                                 placeholder="jane@company.com"
                             />
@@ -248,15 +248,14 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
                                     <PiArrowsClockwise /> Generate
                                 </button>
                             </label>
-                            <div className="relative">
-                                <PiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[14px]" />
+                            <div>
                                 <input
                                     name="password"
                                     type="text"
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className={`${INPUT_CLS} pl-9 font-mono`}
+                                    className={`${INPUT_CLS} pl-3 font-mono`}
                                     style={INPUT_STYLE}
                                     placeholder="Click generate or type a password..."
                                 />
@@ -267,31 +266,58 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
                         </div>
                     )}
 
+                    {user && (
+                        <div className="rounded-[10px] overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.08)' }}>
+                            <button
+                                type="button"
+                                onClick={() => { setShowResetPassword(v => !v); setNewPassword(""); }}
+                                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2 text-[13px] font-[500] text-gray-700">
+                                    <PiLock className="text-[#6366F1]" />
+                                    Reset Password
+                                </span>
+                                <span className="text-[11px] text-gray-400">{showResetPassword ? 'Cancel' : 'Click to set a new password'}</span>
+                            </button>
+                            {showResetPassword && (
+                                <div className="px-4 pb-4 space-y-2" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                                    <label className={`${LABEL_CLS} flex justify-between pt-3`}>
+                                        <span>New Password</span>
+                                        <button type="button" onClick={generatePassword}
+                                            className="text-[#6366F1] hover:underline flex items-center gap-1 normal-case text-[11px] font-[400]">
+                                            <PiArrowsClockwise /> Generate
+                                        </button>
+                                    </label>
+                                    <input
+                                        name="newPassword"
+                                        type="text"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className={`${INPUT_CLS} pl-3 font-mono`}
+                                        style={INPUT_STYLE}
+                                        placeholder="Type or generate a new password..."
+                                    />
+                                    <p className="text-[10.5px] text-gray-400">Min 8 characters. Share with the user securely after saving.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className={LABEL_CLS}>Role *</label>
-                            <select
-                                name="role"
+                            <input type="hidden" name="role" value={selectedRole} />
+                            <CustomSelect
                                 value={selectedRole}
-                                onChange={(e) => setSelectedRole(e.target.value)}
+                                onChange={val => setSelectedRole(val)}
+                                options={[
+                                    ...STANDARD_ROLES,
+                                    ...roles.map(role => ({ value: `custom:${role.id}`, label: role.name })),
+                                ]}
+                                placeholder="Select role"
                                 className={INPUT_CLS}
                                 style={INPUT_STYLE}
-                            >
-                                <optgroup label="Standard Roles">
-                                    {STANDARD_ROLES.map(r => (
-                                        <option key={r.value} value={r.value}>{r.label}</option>
-                                    ))}
-                                </optgroup>
-                                {roles.length > 0 && (
-                                    <optgroup label="Custom Roles">
-                                        {roles.map((role) => (
-                                            <option key={role.id} value={`custom:${role.id}`}>
-                                                {role.name}
-                                            </option>
-                                        ))}
-                                    </optgroup>
-                                )}
-                            </select>
+                            />
                         </div>
 
                         <div>
@@ -314,14 +340,13 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
                                 {isDepartmentDropdownOpen && (
                                     <div className="absolute z-20 w-full mt-1 bg-white rounded-[8px] overflow-hidden"
                                         style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}>
-                                        <div className="p-2 relative" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                                            <PiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                        <div className="p-2" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                                             <input
                                                 type="text"
                                                 placeholder="Search..."
                                                 value={departmentSearch}
                                                 onChange={(e) => setDepartmentSearch(e.target.value)}
-                                                className="w-full pl-8 pr-3 py-1.5 text-[12px] bg-gray-50 rounded-[5px] outline-none focus:ring-1 focus:ring-[#6366F1]"
+                                                className="w-full pl-3 pr-3 py-1.5 text-[12px] bg-gray-50 rounded-[5px] outline-none focus:ring-1 focus:ring-[#6366F1]"
                                                 style={{ border: '1px solid rgba(0,0,0,0.07)' }}
                                                 onClick={(e) => e.stopPropagation()}
                                             />
@@ -371,14 +396,13 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
                                 {isBranchDropdownOpen && (
                                     <div className="absolute z-20 w-full mt-1 bg-white rounded-[8px] overflow-hidden"
                                         style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}>
-                                        <div className="p-2 relative" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                                            <PiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                        <div className="p-2" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                                             <input
                                                 type="text"
                                                 placeholder="Search branches..."
                                                 value={branchSearch}
                                                 onChange={(e) => setBranchSearch(e.target.value)}
-                                                className="w-full pl-8 pr-3 py-1.5 text-[12px] bg-gray-50 rounded-[5px] outline-none focus:ring-1 focus:ring-[#6366F1]"
+                                                className="w-full pl-3 pr-3 py-1.5 text-[12px] bg-gray-50 rounded-[5px] outline-none focus:ring-1 focus:ring-[#6366F1]"
                                                 style={{ border: '1px solid rgba(0,0,0,0.07)' }}
                                                 onClick={(e) => e.stopPropagation()}
                                             />
@@ -431,14 +455,13 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
                                 {isRegionDropdownOpen && (
                                     <div className="absolute z-20 w-full mt-1 bg-white rounded-[8px] overflow-hidden"
                                         style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}>
-                                        <div className="p-2 relative" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                                            <PiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                                        <div className="p-2" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                                             <input
                                                 type="text"
                                                 placeholder="Search regions..."
                                                 value={regionSearch}
                                                 onChange={(e) => setRegionSearch(e.target.value)}
-                                                className="w-full pl-8 pr-3 py-1.5 text-[12px] bg-gray-50 rounded-[5px] outline-none focus:ring-1 focus:ring-[#6366F1]"
+                                                className="w-full pl-3 pr-3 py-1.5 text-[12px] bg-gray-50 rounded-[5px] outline-none focus:ring-1 focus:ring-[#6366F1]"
                                                 style={{ border: '1px solid rgba(0,0,0,0.07)' }}
                                                 onClick={(e) => e.stopPropagation()}
                                             />

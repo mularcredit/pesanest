@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import {
     PiCheckCircle, PiXCircle, PiClock, PiWarning,
-    PiUsers, PiSpinner, PiCaretDown,
+    PiUsers, PiSpinner,
 } from 'react-icons/pi';
 import { EscalationPanel } from '@/components/workflow/DelegationEscalation';
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 const CARD: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
-const SELECT = "appearance-none bg-white rounded-[6px] px-3 py-2 text-[12.5px] font-[500] text-gray-700 outline-none cursor-pointer pr-7";
+const SELECT = "bg-white rounded-[6px] px-3 py-2 text-[12.5px] font-[500] text-gray-700 outline-none";
 
 interface AnalyticsData {
     summary: {
@@ -108,15 +109,17 @@ export default function WorkflowAnalyticsPage() {
 
                 <div className="flex items-center gap-2">
                     {/* Days selector */}
-                    <div className="relative">
-                        <select value={days} onChange={e => setDays(parseInt(e.target.value))}
-                            className={SELECT} style={CARD}>
-                            <option value={7}>Last 7 days</option>
-                            <option value={30}>Last 30 days</option>
-                            <option value={90}>Last 90 days</option>
-                        </select>
-                        <PiCaretDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[12px]" />
-                    </div>
+                    <CustomSelect
+                        value={String(days)}
+                        onChange={val => setDays(parseInt(val))}
+                        options={[
+                            { value: "7", label: "Last 7 days" },
+                            { value: "30", label: "Last 30 days" },
+                            { value: "90", label: "Last 90 days" },
+                        ]}
+                        className={SELECT}
+                        style={CARD}
+                    />
 
                     {/* Scope toggle */}
                     <div className="flex items-center bg-white rounded-[6px] p-0.5" style={CARD}>

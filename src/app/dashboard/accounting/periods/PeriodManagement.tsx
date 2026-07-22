@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 
 const CARD_STYLE: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.09)' };
 const INPUT_CLS = "w-full rounded-[6px] px-3 py-[10px] text-[13px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] transition-colors bg-white";
@@ -40,7 +41,7 @@ export function PeriodManagement({ fiscalYears }: PeriodManagementProps) {
 
     useEffect(() => { setMounted(true); }, []);
 
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<FiscalYearFormValues>({
+    const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<FiscalYearFormValues>({
         resolver: zodResolver(FiscalYearFormSchema),
         defaultValues: {
             periodType: 'MONTHLY',
@@ -147,12 +148,17 @@ export function PeriodManagement({ fiscalYears }: PeriodManagementProps) {
                     </div>
                     <div>
                         <label className={LABEL_CLS}>Period Type</label>
-                        <select {...register("periodType")}
-                            className={INPUT_CLS + " appearance-none cursor-pointer"} style={INPUT_STYLE}>
-                            <option value="MONTHLY">Monthly (12 Periods)</option>
-                            <option value="QUARTERLY">Quarterly (4 Periods)</option>
-                            <option value="ANNUAL">Annual (1 Period)</option>
-                        </select>
+                        <CustomSelect
+                            value={watch("periodType") ?? "MONTHLY"}
+                            onChange={val => setValue("periodType", val as "MONTHLY" | "QUARTERLY" | "ANNUAL")}
+                            options={[
+                                { value: "MONTHLY", label: "Monthly (12 Periods)" },
+                                { value: "QUARTERLY", label: "Quarterly (4 Periods)" },
+                                { value: "ANNUAL", label: "Annual (1 Period)" },
+                            ]}
+                            className={INPUT_CLS}
+                            style={INPUT_STYLE}
+                        />
                     </div>
                 </form>
 

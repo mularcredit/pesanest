@@ -102,6 +102,13 @@ export async function createUser(formData: FormData) {
             });
         }
 
+        // Non-critical: welcome SMS with login credentials
+        if (phoneNumber) {
+            import('@/lib/sms/sms-service')
+                .then(({ smsService }) => smsService.sendWelcome(newUser.name ?? name, phoneNumber, email, password))
+                .catch(() => {});
+        }
+
         revalidatePath('/dashboard/team');
         return { success: true };
     } catch (error: any) {
@@ -128,6 +135,7 @@ export async function updateUser(userId: string, formData: FormData) {
     const phoneNumber = formData.get("phoneNumber") as string;
     const branchId = formData.get("branchId") as string | null;
     const regionId = formData.get("regionId") as string | null;
+    const newPassword = (formData.get("newPassword") as string)?.trim() || null;
 
     if (customRoleId) {
         role = 'CUSTOM';
@@ -158,7 +166,12 @@ export async function updateUser(userId: string, formData: FormData) {
         }
     }
 
+    if (newPassword && newPassword.length < 8) {
+        return { success: false, error: "Password must be at least 8 characters." };
+    }
+
     try {
+        const passwordData = newPassword ? { password: await hash(newPassword, 12) } : {};
         await prisma.user.update({
             where: { id: userId },
             data: {
@@ -171,6 +184,7 @@ export async function updateUser(userId: string, formData: FormData) {
                 phoneNumber,
                 branchId: (role === 'TEAM_LEADER' && branchId) ? branchId : null,
                 regionId: (role === 'REGIONAL_MANAGER' && regionId) ? regionId : null,
+                ...passwordData,
             }
         });
 

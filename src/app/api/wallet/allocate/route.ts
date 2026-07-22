@@ -84,6 +84,21 @@ export async function POST(req: NextRequest) {
 
         const updatedMainWallet = result[0];
 
+        // Non-critical: SMS to branch Team Leader
+        import('@/lib/sms/sms-service').then(async ({ smsService }) => {
+            const branch = await prisma.branch.findUnique({
+                where: { id: branchId },
+                include: { teamLeader: { select: { name: true, phoneNumber: true } } },
+            });
+            if (branch?.teamLeader?.phoneNumber) {
+                await smsService.sendBranchFunded(
+                    branch.teamLeader.phoneNumber,
+                    branch.teamLeader.name ?? 'Team Leader',
+                    allocationAmount,
+                );
+            }
+        }).catch(() => {});
+
         return NextResponse.json({
             success: true,
             balance: updatedMainWallet.balance,

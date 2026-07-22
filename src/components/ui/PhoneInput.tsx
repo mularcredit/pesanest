@@ -374,17 +374,14 @@ export function PhoneInput({ className, value = "", onChange, ...props }: PhoneI
                     >
                         {/* Search Bar */}
                         <div className="p-3 border-b border-gray-50 bg-gray-50/30 sticky top-0 backdrop-blur-sm">
-                            <div className="relative">
-                                <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    placeholder="Search country..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#5e48b8] transition-all placeholder:text-gray-400"
-                                />
-                            </div>
+                            <input
+                                autoFocus
+                                type="text"
+                                placeholder="Search country..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-white border border-gray-200 rounded-lg pl-3 pr-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#5e48b8] transition-all placeholder:text-gray-400"
+                            />
                         </div>
 
                         {/* Country List */}

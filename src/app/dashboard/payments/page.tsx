@@ -159,8 +159,21 @@ export default async function PaymentsPage() {
                     receiptVerification: true,
                 }
             },
+            requisitions: {
+                select: {
+                    id: true,
+                    title: true,
+                    amount: true,
+                    currency: true,
+                    category: true,
+                    receiptUrl: true,
+                    etrNumber: true,
+                    etrVerified: true,
+                    user: { select: { name: true, email: true } },
+                }
+            },
             _count: {
-                select: { invoices: true, expenses: true }
+                select: { invoices: true, expenses: true, requisitions: true }
             }
         },
         orderBy: { updatedAt: 'desc' }

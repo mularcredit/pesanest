@@ -316,15 +316,14 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
  className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#6366F1]/30 rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] z-50 overflow-hidden"
  >
  <div className="p-2 border-b border-[#6366F1]/25 bg-gray-50/50">
- <div className="relative">
- <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+ <div>
  <input
  type="text"
  autoFocus
  placeholder="Search GL codes or names..."
  value={accountSearch}
  onChange={(e) => setAccountSearch(e.target.value)}
- className="w-full bg-white border border-[#6366F1]/30 rounded-[10px] pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+ className="w-full bg-white border border-[#6366F1]/30 rounded-[10px] pl-3 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
  />
  </div>
  </div>
@@ -390,17 +389,14 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
   {/* Amount */}
   <div>
   <label className="block text-[13px] font-medium text-gray-800 mb-2">Amount <span className="text-rose-500">*</span></label>
-  <div className="relative">
-  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">
-  {selectedCurrency.symbol}
-  </span>
+  <div>
   <input
   type="number"
   required
   step="0.01"
   value={amount}
   onChange={(e) => setAmount(e.target.value)}
-  className="w-full bg-white border border-gray-200 rounded-[10px] pl-12 pr-4 py-3 text-[15px] text-gray-900 font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all placeholder:text-gray-300 hover:border-gray-300"
+  className="w-full bg-white border border-gray-200 rounded-[10px] pl-3 pr-4 py-3 text-[15px] text-gray-900 font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1] transition-all placeholder:text-gray-300 hover:border-gray-300"
   placeholder="0.00"
   />
   </div>
@@ -425,16 +421,15 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
   <>
   <div className="fixed inset-0 z-40" onClick={() => setIsCurrencyOpen(false)} />
   <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#6366F1]/30 rounded-[12px] shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100">
-  <div className="relative mb-3">
-  <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-  <input 
-  type="text" 
-  autoFocus 
-  placeholder="Search currency..." 
-  value={currencySearch} 
-  onChange={(e) => setCurrencySearch(e.target.value)} 
-  onClick={(e) => e.stopPropagation()} 
-  className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[10px] text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#6366F1] transition-all" 
+  <div className="mb-3">
+  <input
+  type="text"
+  autoFocus
+  placeholder="Search currency..."
+  value={currencySearch}
+  onChange={(e) => setCurrencySearch(e.target.value)}
+  onClick={(e) => e.stopPropagation()}
+  className="w-full pl-3 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[10px] text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#6366F1] transition-all"
   />
   </div>
   <div className="max-h-52 overflow-y-auto custom-scrollbar">
@@ -492,15 +487,14 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
  className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#6366F1]/30 rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] z-50 overflow-hidden"
  >
  <div className="p-2 border-b border-[#6366F1]/25 bg-gray-50/50">
- <div className="relative">
- <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+ <div>
  <input
  type="text"
  autoFocus
  placeholder="Search standard categories..."
  value={categorySearch}
  onChange={(e) => setCategorySearch(e.target.value)}
- className="w-full bg-white border border-[#6366F1]/30 rounded-[10px] pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+ className="w-full bg-white border border-[#6366F1]/30 rounded-[10px] pl-3 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
  />
  </div>
  </div>
@@ -602,15 +596,14 @@ export function ExpenseForm({ mode, expense, onSuccess, onCancel }: ExpenseFormP
   className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#6366F1]/30 rounded-[12px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] z-50 overflow-hidden"
   >
   <div className="p-2 border-b border-[#6366F1]/25 bg-gray-50/50">
-  <div className="relative">
-  <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+  <div>
   <input
   type="text"
   autoFocus
   placeholder="Find merchant..."
   value={vendorSearch}
   onChange={(e) => setVendorSearch(e.target.value)}
-  className="w-full bg-white border border-[#6366F1]/30 rounded-[10px] pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
+  className="w-full bg-white border border-[#6366F1]/30 rounded-[10px] pl-3 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-all"
   />
   </div>
   </div>

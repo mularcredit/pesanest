@@ -10,7 +10,7 @@ model Asset {
   // Financials
   purchaseDate    DateTime
   purchasePrice   Float
-  currency        String    @default("USD")
+  currency        String    @default("KES")
   currentValue    Float?
   usefulLife      Int?      // In months
   

@@ -27,6 +27,7 @@ import { EXPENSE_CATEGORIES } from"@/lib/constants";
 import { getExpenseAccountsAction, createExpenseAccountAction } from"@/app/dashboard/requisitions/new/multi-item-actions";
 import { Button } from"@/components/ui/Button";
 import { Input } from"@/components/ui/Input";
+import { CustomSelect } from"@/components/ui/CustomSelect";
 
 export default function MonthlyBudgetPage() {
  const { showToast } = useToast();
@@ -306,18 +307,13 @@ export default function MonthlyBudgetPage() {
  Custom Ledger <span className="text-gray-400 font-normal">(Optional)</span>
  </label>
  <div className="flex gap-2">
- <select
+ <CustomSelect
  value={customAccountId}
- onChange={(e) => setCustomAccountId(e.target.value)}
+ onChange={val => setCustomAccountId(val)}
+ options={expenseAccounts.map((acc: any) => ({ value: acc.id, label: `${acc.code} - ${acc.name}` }))}
+ placeholder="Default"
  className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#6366F1] focus:border-[#6366F1] transition-all shadow-none"
- >
- <option value="">Default</option>
- {expenseAccounts.map((acc: any) => (
- <option key={acc.id} value={acc.id}>
- {acc.code} - {acc.name}
- </option>
- ))}
- </select>
+ />
  <button
  type="button"
  onClick={() => setIsCreatingAccount(true)}
@@ -383,11 +379,10 @@ export default function MonthlyBudgetPage() {
  className="absolute top-full left-0 w-64 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-2 mt-1"
  onClick={e => e.stopPropagation()}
  >
- <div className="relative mb-2">
- <PiMagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"/>
+ <div className="mb-2">
  <input
  autoFocus
- className="w-full pl-8 pr-2 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#6366F1]"
+ className="w-full pl-3 pr-2 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#6366F1]"
  placeholder="Search..."
  value={categorySearch}
  onChange={e => setCategorySearch(e.target.value)}

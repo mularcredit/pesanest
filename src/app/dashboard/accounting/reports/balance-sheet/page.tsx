@@ -2,9 +2,11 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import {
-    PiDownloadSimple, PiPrinter, PiCheckCircle, PiWarningCircle,
+    PiCheckCircle, PiWarningCircle,
     PiBuildings, PiHandCoins, PiScales,
 } from 'react-icons/pi';
+import { ReportExportButton } from '@/components/accounting/ReportExportButton';
+import type { ReportExportData } from '@/components/accounting/ReportExportButton';
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
 
@@ -127,6 +129,39 @@ export default async function BalanceSheetPage() {
 
     const asOf = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
+    const exportData: ReportExportData = {
+        title: 'Balance Sheet',
+        subtitle: `Statement of Financial Position · As at ${asOf}`,
+        company: 'Company',
+        currency: 'KES',
+        sections: [
+            {
+                title: 'Assets',
+                lines: [
+                    ...assets.map(a => ({ code: a.code, name: a.name, current: a.balance, indent: true as const })),
+                    { name: 'Total Assets', current: totalAssets, isBold: true, isGrandTotal: true },
+                ],
+            },
+            {
+                title: 'Liabilities',
+                lines: [
+                    ...liabilities.map(a => ({ code: a.code, name: a.name, current: a.balance, indent: true as const })),
+                    { name: 'Total Liabilities', current: totalLiabilities, isBold: true, isSubtotal: true },
+                ],
+            },
+            {
+                title: 'Equity',
+                lines: [
+                    ...equityAccts.map(a => ({ code: a.code, name: a.name, current: a.balance, indent: true as const })),
+                    { name: 'Net Income', current: netIncome, indent: true },
+                    { name: 'Total Equity', current: totalEquityFull, isBold: true, isSubtotal: true },
+                    { spacer: true, name: '', current: 0 },
+                    { name: 'Total Liabilities & Equity', current: totalLiabEquity, isBold: true, isGrandTotal: true },
+                ],
+            },
+        ],
+    };
+
     return (
         <div className="pb-20 space-y-5">
 
@@ -141,16 +176,7 @@ export default async function BalanceSheetPage() {
                     </div>
                     <p className="text-[12px] text-gray-400 pl-[38px]">Statement of financial position as at {asOf}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-[12px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
-                        style={{ border: HAIRLINE }}>
-                        <PiPrinter className="text-[14px]" /> Print
-                    </button>
-                    <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-[12px] font-[500] text-gray-600 bg-white hover:bg-gray-50 transition-colors"
-                        style={{ border: HAIRLINE }}>
-                        <PiDownloadSimple className="text-[14px]" /> Export
-                    </button>
-                </div>
+                <ReportExportButton data={exportData} />
             </div>
 
             {/* ── KPI strip ── */}

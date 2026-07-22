@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
     PiUser, PiInvoice, PiPlus, PiTrash,
     PiSpinner, PiPaperPlaneRight, PiFloppyDisk,
@@ -188,33 +189,27 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
                             {/* Customer */}
                             <div>
                                 <label className={LABEL_CLS}>Customer <span className="text-rose-400">*</span></label>
-                                <div className="relative">
-                                    <PiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
-                                    <select
-                                        value={formData.customerId}
-                                        onChange={e => setFormData(p => ({ ...p, customerId: e.target.value }))}
-                                        className={INPUT_CLS + " pl-9 appearance-none cursor-pointer"}
-                                        style={INPUT_STYLE}>
-                                        <option value="">Select a customer…</option>
-                                        {customers.map(c => (
-                                            <option key={c.id} value={c.id}>{c.name} ({c.currency})</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <CustomSelect
+                                    value={formData.customerId}
+                                    onChange={val => setFormData(p => ({ ...p, customerId: val }))}
+                                    options={customers.map(c => ({ value: c.id, label: `${c.name} (${c.currency})` }))}
+                                    placeholder="Select a customer…"
+                                    className={INPUT_CLS}
+                                    style={INPUT_STYLE}
+                                />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Invoice # */}
                                 <div>
                                     <label className={LABEL_CLS}>Invoice Number</label>
-                                    <div className="relative">
-                                        <PiInvoice className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <div>
                                         <input
                                             type="text"
                                             placeholder="Auto-generated"
                                             value={formData.invoiceNumber}
                                             onChange={e => setFormData(p => ({ ...p, invoiceNumber: e.target.value }))}
-                                            className={INPUT_CLS + " pl-9 font-mono"}
+                                            className={INPUT_CLS + " pl-3 font-mono"}
                                             style={INPUT_STYLE}
                                         />
                                     </div>
@@ -223,13 +218,12 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
                                 {/* Issue Date */}
                                 <div>
                                     <label className={LABEL_CLS}>Issue Date</label>
-                                    <div className="relative">
-                                        <PiCalendarBlank className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <div>
                                         <input
                                             type="date"
                                             value={formData.issueDate}
                                             onChange={e => setFormData(p => ({ ...p, issueDate: e.target.value }))}
-                                            className={INPUT_CLS + " pl-9"}
+                                            className={INPUT_CLS + " pl-3"}
                                             style={INPUT_STYLE}
                                         />
                                     </div>
@@ -238,13 +232,12 @@ export function SalesForm({ customers, initialData }: SalesFormProps) {
                                 {/* Due Date */}
                                 <div>
                                     <label className={LABEL_CLS}>Due Date</label>
-                                    <div className="relative">
-                                        <PiCalendarBlank className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none" />
+                                    <div>
                                         <input
                                             type="date"
                                             value={formData.dueDate}
                                             onChange={e => setFormData(p => ({ ...p, dueDate: e.target.value }))}
-                                            className={INPUT_CLS + " pl-9"}
+                                            className={INPUT_CLS + " pl-3"}
                                             style={INPUT_STYLE}
                                         />
                                     </div>

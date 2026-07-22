@@ -129,11 +129,10 @@ export function InvoicesClient({ invoices }: InvoicesClientProps) {
                 </div>
 
                 {/* Search */}
-                <div className="relative flex-1 max-w-xs ml-auto">
-                    <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
+                <div className="flex-1 max-w-xs ml-auto">
                     <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="Search invoice # or vendor…"
-                        className="w-full rounded-[6px] pl-8 pr-3 py-[9px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                        className="w-full rounded-[6px] pl-3 pr-3 py-[9px] text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
                         style={{ border: '1px solid rgba(0,0,0,0.09)' }} />
                 </div>
             </div>
