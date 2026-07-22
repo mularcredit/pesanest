@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-    PiDeviceMobile, PiPaperPlaneTilt, PiMagnifyingGlass, PiPencilSimple,
+    PiDeviceMobile, PiPaperPlaneTilt, PiPencilSimple,
     PiX, PiCheckCircle, PiWarningCircle, PiFlask, PiArrowClockwise,
     PiWifiHigh, PiWifiSlash, PiDeviceMobileCamera, PiUserCircle,
     PiStorefront, PiBriefcase, PiAddressBook,
@@ -373,7 +373,6 @@ export function SmsPageClient({ initialLogs, stats, config }: Props) {
                     {/* Search messages */}
                     <div className="px-4 py-3 border-b border-gray-100">
                         <div className="flex items-center gap-2 px-3 py-2 rounded-[7px] bg-gray-50 border border-gray-200">
-                            <PiMagnifyingGlass className="text-gray-400 text-[13px]" />
                             <input
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
@@ -453,7 +452,6 @@ export function SmsPageClient({ initialLogs, stats, config }: Props) {
                     {/* Search + type filter */}
                     <div className="px-4 py-3 border-b border-gray-100 space-y-2">
                         <div className="flex items-center gap-2 px-3 py-2 rounded-[7px] bg-gray-50 border border-gray-200">
-                            <PiMagnifyingGlass className="text-gray-400 text-[13px]" />
                             <input
                                 value={contactSearch}
                                 onChange={e => setContactSearch(e.target.value)}
@@ -685,17 +683,14 @@ export function SmsPageClient({ initialLogs, stats, config }: Props) {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="relative">
+                                        <div>
                                             <input
                                                 value={contactQuery}
                                                 onChange={e => setContactQuery(e.target.value)}
                                                 placeholder="Search users, customers, vendors…"
-                                                className="w-full px-3 py-2.5 rounded-[7px] border border-gray-200 text-[13px] text-gray-800 placeholder:text-gray-400 outline-none focus:border-indigo-400 transition-colors pr-8"
+                                                className="w-full px-3 py-2.5 rounded-[7px] border border-gray-200 text-[13px] text-gray-800 placeholder:text-gray-400 outline-none focus:border-indigo-400 transition-colors"
                                                 autoComplete="off"
                                             />
-                                            {contactLoading && (
-                                                <PiArrowClockwise className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-gray-300 text-[13px]" />
-                                            )}
                                         </div>
                                     )}
                                     {/* Dropdown */}

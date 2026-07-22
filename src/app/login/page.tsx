@@ -6,14 +6,13 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { HiEnvelope, HiLockClosed, HiEye, HiEyeSlash, HiArrowRight } from "react-icons/hi2";
+import { HiArrowRight } from "react-icons/hi2";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 
 function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [totp, setTotp] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
     const [totpRequired, setTotpRequired] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -171,23 +170,16 @@ function LoginComponent() {
                                     Forgot password?
                                 </Link>
                             </div>
-                            <div className={`relative ${totpRequired ? 'mb-4' : 'mb-8'}`}>
+                            <div className={totpRequired ? 'mb-4' : 'mb-8'}>
                                 <input
-                                    type={showPassword ? "text" : "password"}
+                                    type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Enter your secure password"
                                     required
                                     className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
-                                    style={{ padding: "11px 44px 11px 16px" }}
+                                    style={{ padding: "11px 16px" }}
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6366F1]/40 hover:text-[#6366F1]/70 transition-colors"
-                                >
-                                    {showPassword ? <HiEyeSlash className="text-base" /> : <HiEye className="text-base" />}
-                                </button>
                             </div>
 
                             {totpRequired && (

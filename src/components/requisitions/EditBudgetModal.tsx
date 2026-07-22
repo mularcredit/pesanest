@@ -9,7 +9,6 @@ import {
     PiTrash,
     PiCheckCircle,
     PiCaretDown,
-    PiMagnifyingGlass,
     PiWarning,
     PiCalendarBlank,
     PiBuildings,
@@ -339,16 +338,13 @@ export function EditBudgetModal({ isOpen, onClose, budget }: EditBudgetModalProp
                                                                     onClick={e => e.stopPropagation()}
                                                                 >
                                                                     <div className="px-1 mb-1.5">
-                                                                        <div className="relative">
-                                                                            <PiMagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                                                            <input
-                                                                                autoFocus
-                                                                                className="w-full bg-gray-50 border border-gray-100 rounded-md pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#6366F1] placeholder:text-gray-400"
-                                                                                placeholder="Search..."
-                                                                                value={categorySearch}
-                                                                                onChange={e => setCategorySearch(e.target.value)}
-                                                                            />
-                                                                        </div>
+                                                                        <input
+                                                                            autoFocus
+                                                                            className="w-full bg-gray-50 border border-gray-100 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#6366F1] placeholder:text-gray-400"
+                                                                            placeholder="Search..."
+                                                                            value={categorySearch}
+                                                                            onChange={e => setCategorySearch(e.target.value)}
+                                                                        />
                                                                     </div>
                                                                     <div className="max-h-48 overflow-y-auto custom-scrollbar px-1 space-y-0.5">
                                                                         {filteredCategories.length > 0 ? (

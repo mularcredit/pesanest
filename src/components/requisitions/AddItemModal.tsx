@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PiPlus, PiX, PiCaretDown, PiMagnifyingGlass } from "react-icons/pi";
+import { PiPlus, PiX, PiCaretDown } from "react-icons/pi";
 import { addItemToRequisition, getCategoriesAction } from "@/app/dashboard/requisitions/new/multi-item-actions";
 
 interface AddItemModalProps {
@@ -162,8 +162,7 @@ export function AddItemModal({
 
                                 {isCategoryOpen && (
                                     <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 p-3 animate-in fade-in zoom-in-95 duration-100">
-                                        <div className="relative mb-3">
-                                            <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                                        <div className="mb-3">
                                             <input
                                                 type="text"
                                                 autoFocus
@@ -171,7 +170,7 @@ export function AddItemModal({
                                                 value={categorySearch}
                                                 onChange={(e) => setCategorySearch(e.target.value)}
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#6366F1] focus:bg-white transition-all"
+                                                className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#6366F1] focus:bg-white transition-all"
                                             />
                                         </div>
                                         <div className="max-h-48 overflow-y-auto">

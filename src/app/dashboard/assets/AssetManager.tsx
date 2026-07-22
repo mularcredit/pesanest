@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-    PiPlus, PiMagnifyingGlass, PiPackage, PiCheckCircle,
+    PiPlus, PiPackage, PiCheckCircle,
     PiWarning, PiTrash, PiTag, PiUser, PiX, PiCaretDown,
     PiArrowsClockwise, PiCurrencyDollar,
 } from "react-icons/pi";
@@ -180,9 +180,8 @@ export function AssetManager({ assets, stats }: { assets: any[]; stats: any }) {
                                     <div className="fixed inset-0 z-40" onClick={() => setIsCategoryOpen(false)} />
                                     <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-[8px] shadow-lg z-50 p-2"
                                         style={CARD_STYLE}>
-                                        <div className="relative mb-1.5">
-                                            <PiMagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[12px]" />
-                                            <input autoFocus className="w-full pl-7 pr-2 py-1.5 rounded-[5px] text-[12px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                                        <div className="mb-1.5">
+                                            <input autoFocus className="w-full px-2 py-1.5 rounded-[5px] text-[12px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
                                                 style={{ border: '1px solid rgba(0,0,0,0.09)' }}
                                                 placeholder="Search…" value={categorySearch}
                                                 onChange={e => setCategorySearch(e.target.value)}

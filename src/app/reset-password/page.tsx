@@ -4,14 +4,13 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { HiLockClosed, HiEye, HiEyeSlash, HiArrowLeft, HiArrowRight, HiCheckCircle } from "react-icons/hi2";
+import { HiArrowLeft, HiArrowRight, HiCheckCircle } from "react-icons/hi2";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { cn } from "@/lib/utils";
 
 function ResetPasswordForm() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
@@ -153,24 +152,17 @@ function ResetPasswordForm() {
                                 )}
 
                                 <div className="mb-1.5 text-xs font-medium text-zinc-900">New password</div>
-                                <div className="relative mb-2">
+                                <div className="mb-2">
                                     <input
-                                        type={showPassword ? "text" : "password"}
+                                        type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="Enter new password"
                                         required
                                         minLength={8}
                                         className="w-full outline-none transition-all rounded-lg text-[13px] text-zinc-900 bg-[#6366F1]/[0.02] border border-[#6366F1]/30 focus:border-[#6366F1] focus:bg-[#6366F1]/[0.04]"
-                                        style={{ padding: "11px 44px 11px 16px" }}
+                                        style={{ padding: "11px 16px" }}
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6366F1]/40 hover:text-[#6366F1]/70 transition-colors"
-                                    >
-                                        {showPassword ? <HiEyeSlash className="text-base" /> : <HiEye className="text-base" />}
-                                    </button>
                                 </div>
                                 {password && (
                                     <div className="mb-6 px-1 space-y-1.5 pt-2">

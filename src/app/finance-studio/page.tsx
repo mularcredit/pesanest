@@ -16,7 +16,7 @@ import { checkCreditNoteNumberUniqueness, getCustomersForStudio, getStatementDat
 import { format } from "date-fns";
 import {
     PiTrash, PiPlus, PiFloppyDisk, PiFileText, PiReceipt, PiListBullets,
-    PiArrowLeft, PiUpload, PiCaretDown, PiInfo, PiWarningCircle,
+    PiArrowLeft, PiUpload, PiInfo, PiWarningCircle,
     PiSortAscending, PiBuildings,
 } from 'react-icons/pi';
 
@@ -362,16 +362,13 @@ function FinanceStudioContent() {
 
         return (
             <div className="relative" ref={dropdownRef}>
-                <div className="relative">
+                <div>
                     <StudioInput
                         value={value}
                         onChange={(e: any) => { onChange(e.target.value); setShowCustomerDropdown(true); }}
                         onFocus={() => setShowCustomerDropdown(true)}
                         placeholder="Search customer..."
                     />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                        <PiCaretDown className="text-[12px]" />
-                    </div>
                 </div>
                 {showCustomerDropdown && hasSuggestions && (
                     <div className="absolute z-50 w-full mt-1 bg-white rounded-[8px] shadow-lg max-h-48 overflow-y-auto" style={{ border: HAIRLINE }}>
