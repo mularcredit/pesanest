@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { AccountingActions } from "@/components/accounting/AccountingActions";
 import { LedgerExportButton } from "@/components/accounting/LedgerExportButton";
 import { LedgerAccountSelect } from "./LedgerAccountSelect";
-import { PiBookOpenText, PiMagnifyingGlass, PiCaretLeft, PiCaretRight, PiPlus } from "react-icons/pi";
+import { PiBookOpenText, PiCaretLeft, PiCaretRight, PiPlus } from "react-icons/pi";
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
 
@@ -128,7 +128,6 @@ export default async function GeneralLedgerPage({
             <form className="bg-white rounded-[8px] flex items-center gap-0 overflow-hidden" style={{ border: HAIRLINE }}>
                 {/* Search */}
                 <div className="flex items-center gap-2 flex-1 px-4 py-2.5">
-                    <PiMagnifyingGlass className="text-gray-400 text-[14px] shrink-0" />
                     <input
                         name="q"
                         defaultValue={search}

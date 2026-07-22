@@ -3,7 +3,7 @@
 import { useState, useTransition, useRef, useEffect } from "react";
 import {
     PiX, PiSpinner, PiCheckCircle, PiWarningCircle,
-    PiBuildings, PiMagnifyingGlass, PiCurrencyDollar, PiTrash,
+    PiBuildings, PiCurrencyDollar, PiTrash,
 } from "react-icons/pi";
 
 interface Branch {
@@ -154,7 +154,6 @@ export function BulkAllocateModal({
                     <div className="w-[220px] shrink-0 flex flex-col" style={{ borderRight: HAIRLINE }}>
                         <div className="px-3 py-3 shrink-0" style={{ borderBottom: HAIRLINE }}>
                             <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-[6px] bg-gray-50" style={{ border: HAIRLINE }}>
-                                <PiMagnifyingGlass className="text-gray-400 text-[13px] shrink-0" />
                                 <input
                                     type="text"
                                     placeholder="Search branches…"

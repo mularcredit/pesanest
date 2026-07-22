@@ -115,7 +115,7 @@
 
 [data-theme='light'] {
   /* Light Mode Surfaces — cool vivid orange tint */
-  --page: #FFFFFF;
+  --page: #F2F1FF;
   --sidebar: #3730a3;
   --sidebar-grad: #3730a3;
   --card: #FFFFFF;

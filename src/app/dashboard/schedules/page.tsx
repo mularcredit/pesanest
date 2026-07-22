@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import {
     PiCalendarBlank, PiPlus, PiCheckCircle, PiXCircle,
     PiArrowClockwise, PiTrash, PiToggleLeft, PiToggleRight,
-    PiPlayCircle, PiClock, PiWarningCircle, PiX, PiMagnifyingGlass,
+    PiPlayCircle, PiClock, PiWarningCircle, PiX,
     PiCaretRight, PiFileText, PiCheck,
 } from 'react-icons/pi';
 import { useToast } from '@/components/ui/ToastProvider';
@@ -148,7 +148,6 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
                     <div>
                         <div className="px-5 pt-4 pb-2">
                             <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-[7px]" style={{ border: HAIRLINE }}>
-                                <PiMagnifyingGlass className="text-gray-400 text-[13px] shrink-0" />
                                 <input
                                     className="flex-1 bg-transparent text-[12.5px] text-gray-900 placeholder:text-gray-400 outline-none"
                                     placeholder="Search items by name or category..."

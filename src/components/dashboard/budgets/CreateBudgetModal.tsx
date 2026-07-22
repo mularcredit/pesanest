@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
-    PiX, PiCheckCircle, PiMagnifyingGlass, PiCaretUpDown,
+    PiX, PiCheckCircle, PiCaretUpDown,
     PiChartPieSlice, PiSpinner,
 } from "react-icons/pi";
 import { cn } from "@/lib/utils";
@@ -125,14 +125,11 @@ export function CreateBudgetModal({ isOpen, onClose, onSuccess }: CreateBudgetMo
                                     <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-[8px] z-50 overflow-hidden"
                                         style={{ border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
                                         <div className="p-2" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                                            <div className="relative">
-                                                <PiMagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]" />
-                                                <input autoFocus type="text" value={categorySearch}
-                                                    onChange={e => setCategorySearch(e.target.value)}
-                                                    placeholder="Search categories…"
-                                                    className="w-full rounded-[5px] pl-8 pr-3 py-1.5 text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
-                                                    style={{ border: '1px solid rgba(0,0,0,0.09)' }} />
-                                            </div>
+                                            <input autoFocus type="text" value={categorySearch}
+                                                onChange={e => setCategorySearch(e.target.value)}
+                                                placeholder="Search categories…"
+                                                className="w-full rounded-[5px] px-3 py-1.5 text-[12.5px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-1 focus:ring-[#6366F1] bg-white"
+                                                style={{ border: '1px solid rgba(0,0,0,0.09)' }} />
                                         </div>
                                         <div className="max-h-48 overflow-y-auto p-1.5 space-y-0.5">
                                             {filteredCategories.length === 0 ? (
