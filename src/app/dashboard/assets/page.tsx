@@ -2,6 +2,7 @@ import { getAssets, getAssetStats } from "./actions";
 import { AssetManager } from "./AssetManager";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { requirePermission } from "@/lib/access-control";
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,7 @@ export const metadata = {
 export default async function AssetsPage({ searchParams }: { searchParams: { q?: string } }) {
     const session = await auth();
     if (!session?.user) return redirect("/login");
+    requirePermission(session, ['ASSETS.VIEW']);
 
     const query = searchParams?.q || "";
     const { data: assets } = await getAssets(query);

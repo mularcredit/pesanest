@@ -6,8 +6,12 @@ import prisma from "@/lib/prisma";
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();
-        // Permission check: Should be Admin or have ROLES.VIEW
         if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const user = session.user as any;
+        const perms = user.permissions || [];
+        if (user.role !== 'SYSTEM_ADMIN' && !perms.includes('*') && !perms.includes('ROLES.VIEW') && !perms.includes('ROLES.MANAGE')) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
 
         const roles = await prisma.role.findMany({
             include: {
@@ -46,8 +50,12 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const session = await auth();
-        // Permission check: ROLES.MANAGE
         if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const user = session.user as any;
+        const perms = user.permissions || [];
+        if (user.role !== 'SYSTEM_ADMIN' && !perms.includes('*') && !perms.includes('ROLES.MANAGE')) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
 
         const body = await req.json();
         const { name, description, permissionIds, maxApprovalLimit } = body;
@@ -78,6 +86,11 @@ export async function PUT(req: NextRequest) {
     try {
         const session = await auth();
         if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const putUser = session.user as any;
+        const putPerms = putUser.permissions || [];
+        if (putUser.role !== 'SYSTEM_ADMIN' && !putPerms.includes('*') && !putPerms.includes('ROLES.MANAGE')) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
 
         const body = await req.json();
         const { id, name, description, permissionIds, maxApprovalLimit } = body;

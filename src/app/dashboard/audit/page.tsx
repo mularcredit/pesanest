@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { requirePermission } from "@/lib/access-control";
 import { AuditTrailClient } from "./AuditTrailClient";
 
 export const dynamic = 'force-dynamic';
@@ -8,11 +9,7 @@ export const dynamic = 'force-dynamic';
 export default async function AuditPage() {
     const session = await auth();
     if (!session?.user) return redirect("/login");
-
-    const role = (session.user as any).role;
-    const isAdmin = role === 'SYSTEM_ADMIN';
-    const isFinance = role === 'FINANCE_APPROVER' || role === 'FINANCE_TEAM';
-    if (!isAdmin && !isFinance) redirect("/dashboard");
+    requirePermission(session, ['AUDIT.VIEW']);
 
     const [logs, totalRows, entityGroups, actionGroups] = await Promise.all([
         prisma.$queryRaw<any[]>`SELECT * FROM "AuditLog" ORDER BY "createdAt" DESC LIMIT 50`.catch(() => []),
