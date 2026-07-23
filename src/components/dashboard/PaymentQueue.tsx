@@ -193,7 +193,7 @@ export function PaymentQueue({
     const [isProcessing, setIsProcessing] = useState(false);
     const [showBypassModal, setShowBypassModal] = useState(false);
     const [showHelp, setShowHelp] = useState(true);
-    const [paymentMethod, setPaymentMethod] = useState<'WALLET' | 'BRANCH_WALLET'>('WALLET');
+    const [paymentMethod, setPaymentMethod] = useState<'WALLET' | 'BRANCH_WALLET' | 'CASH'>('WALLET');
     const [mounted, setMounted] = useState(false);
     // Default to list view for compact readability
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
@@ -206,7 +206,7 @@ export function PaymentQueue({
         isOpen: boolean;
         paymentId: string;
         action: 'AUTHORIZE' | 'REJECT' | 'DISBURSE' | 'CLOSE';
-        paymentMethod?: 'WALLET' | 'BRANCH_WALLET';
+        paymentMethod?: 'WALLET' | 'BRANCH_WALLET' | 'CASH';
         amount?: number;
         currency?: string;
         itemCount?: number;
@@ -1312,26 +1312,7 @@ export function PaymentQueue({
                         <div className="px-6 py-5 space-y-4">
                             {confirmationModal.action === 'DISBURSE' ? (
                                 <>
-                                    {/* Fee breakdown */}
-                                    <div>
-                                        <label className="block text-[11px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-2">Estimated Breakdown</label>
-                                        <div className="rounded-[8px] overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
-                                            <div className="flex justify-between items-center px-4 py-2.5 text-[12px] text-gray-500" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                                                <span>Subtotal</span>
-                                                <span className="font-mono font-[500] text-gray-900">{formatAmount(confirmationModal.amount || 0, confirmationModal.currency)}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center px-4 py-2.5 text-[12px] text-gray-500" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                                                <span>Fees ({confirmationModal.itemCount} items)</span>
-                                                <span className="font-mono text-emerald-600 font-[500]">+{formatAmount((confirmationModal.itemCount || 1) * estimatePaystackPayoutFee(confirmationModal.amount || 0, confirmationModal.currency), confirmationModal.currency)}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center px-4 py-3 bg-gray-50/60">
-                                                <span className="text-[12px] font-[600] text-gray-700">Total</span>
-                                                <span className="font-mono text-[14px] font-[700] text-emerald-700">{formatAmount((confirmationModal.amount || 0) + ((confirmationModal.itemCount || 1) * estimatePaystackPayoutFee(confirmationModal.amount || 0, confirmationModal.currency)), confirmationModal.currency)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Payment method */}
+                                    {/* Payment method selector */}
                                     <div>
                                         <label className="block text-[11px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-2">Payment Route</label>
                                         <div className="flex p-0.5 rounded-[7px] bg-gray-100" style={{ border: '1px solid rgba(0,0,0,0.07)' }}>
@@ -1345,11 +1326,53 @@ export function PaymentQueue({
                                                     paymentMethod === 'BRANCH_WALLET' ? "bg-white text-emerald-600 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
                                                 Branch Internal
                                             </button>
+                                            <button onClick={() => setPaymentMethod('CASH')}
+                                                className={cn("flex-1 py-2 text-[11.5px] font-[600] rounded-[6px] transition-all",
+                                                    paymentMethod === 'CASH' ? "bg-white text-amber-600 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
+                                                Cash / Already Paid
+                                            </button>
                                         </div>
                                         <p className="text-[11px] text-gray-400 mt-1.5">
-                                            {paymentMethod === 'WALLET' ? "Sends funds directly to the recipient's personal account." : "Funds the branch's local digital wallet."}
+                                            {paymentMethod === 'WALLET'
+                                                ? "Sends funds directly to the recipient's personal account via Paystack."
+                                                : paymentMethod === 'BRANCH_WALLET'
+                                                ? "Funds the branch's local digital wallet. No external transfer."
+                                                : "Payment was already made in cash or offline. Items will be marked paid immediately with no gateway transfer."}
                                         </p>
                                     </div>
+
+                                    {/* Fee breakdown — hidden for cash */}
+                                    {paymentMethod !== 'CASH' && (
+                                        <div>
+                                            <label className="block text-[11px] font-[500] uppercase tracking-[0.07em] text-gray-400 mb-2">Estimated Breakdown</label>
+                                            <div className="rounded-[8px] overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                                <div className="flex justify-between items-center px-4 py-2.5 text-[12px] text-gray-500" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                                    <span>Subtotal</span>
+                                                    <span className="font-mono font-[500] text-gray-900">{formatAmount(confirmationModal.amount || 0, confirmationModal.currency)}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center px-4 py-2.5 text-[12px] text-gray-500" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                                    <span>Fees ({confirmationModal.itemCount} items)</span>
+                                                    <span className="font-mono text-emerald-600 font-[500]">+{formatAmount((confirmationModal.itemCount || 1) * estimatePaystackPayoutFee(confirmationModal.amount || 0, confirmationModal.currency), confirmationModal.currency)}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center px-4 py-3 bg-gray-50/60">
+                                                    <span className="text-[12px] font-[600] text-gray-700">Total</span>
+                                                    <span className="font-mono text-[14px] font-[700] text-emerald-700">{formatAmount((confirmationModal.amount || 0) + ((confirmationModal.itemCount || 1) * estimatePaystackPayoutFee(confirmationModal.amount || 0, confirmationModal.currency)), confirmationModal.currency)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Cash notice */}
+                                    {paymentMethod === 'CASH' && (
+                                        <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-[8px] bg-amber-50" style={{ border: '1px solid rgba(217,119,6,0.2)' }}>
+                                            <PiInfo className="text-amber-500 text-[14px] mt-0.5 shrink-0" />
+                                            <p className="text-[11.5px] text-amber-700 leading-relaxed">
+                                                All items in this batch will be marked as <strong>Paid</strong> immediately.
+                                                No funds will be moved from your wallet. Use this for cash payments or
+                                                settlements already completed outside the system.
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {/* Proof of payment */}
                                     <div>
@@ -1383,6 +1406,7 @@ export function PaymentQueue({
                                 className={cn(
                                     "px-5 py-2 text-[13px] font-[600] text-white rounded-[6px] transition-colors flex items-center gap-2 disabled:opacity-50",
                                     confirmationModal.action === 'REJECT' ? "bg-red-600 hover:bg-red-700" :
+                                    confirmationModal.action === 'DISBURSE' && paymentMethod === 'CASH' ? "bg-amber-500 hover:bg-amber-600" :
                                     confirmationModal.action === 'DISBURSE' ? "bg-emerald-600 hover:bg-emerald-700" :
                                     confirmationModal.action === 'AUTHORIZE' ? "bg-[#6366F1] hover:bg-indigo-700" :
                                     "bg-gray-900 hover:bg-gray-800"

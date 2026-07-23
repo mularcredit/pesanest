@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { paymentId, action, paymentMethod, proofUrl } = body; // action: 'AUTHORIZE' | 'REJECT' | 'DISBURSE' | 'CLOSE'
+        const { paymentId, action, paymentMethod, proofUrl } = body; // action: 'AUTHORIZE' | 'REJECT' | 'DISBURSE' | 'CLOSE', paymentMethod: 'WALLET' | 'BRANCH_WALLET' | 'CASH'
 
         if (!['AUTHORIZE', 'REJECT', 'DISBURSE', 'CLOSE'].includes(action)) {
             return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
@@ -101,8 +101,34 @@ export async function POST(req: NextRequest) {
             }
 
 
+            // CASH path: no gateway, no wallet movement — just mark everything paid
+            if (paymentMethod === 'CASH') {
+                const { AccountingEngine } = await import('@/lib/accounting/accounting-engine');
+                const cashAccount = await prisma.account.findFirst({ where: { code: '1000' } });
+
+                for (const req of p.requisitions) {
+                    await (prisma as any).requisition.update({ where: { id: req.id }, data: { status: 'PAID' } });
+                    if (cashAccount) await (AccountingEngine as any).postRequisitionPayment(req.id, cashAccount.id).catch(() => {});
+                }
+                for (const exp of p.expenses) {
+                    await prisma.expense.update({ where: { id: exp.id }, data: { status: 'PAID', paidAt: new Date() } });
+                    if (cashAccount) await (AccountingEngine as any).postExpensePayment(exp.id, cashAccount.id).catch(() => {});
+                }
+                for (const inv of p.invoices) {
+                    await prisma.invoice.update({ where: { id: inv.id }, data: { status: 'PAID', paymentStatus: 'PAID', paidAt: new Date() } });
+                    if (cashAccount) await (AccountingEngine as any).postInvoicePayment(inv.id, cashAccount.id).catch(() => {});
+                }
+
+                await prisma.payment.update({
+                    where: { id: paymentId },
+                    data: { status: 'PAID', processedAt: new Date(), method: 'CASH' }
+                });
+
+                return NextResponse.json({ success: true, summary: { success: allItems.length, failed: 0, errors: [], details: [] } });
+            }
+
             const wallet = await prisma.wallet.findUnique({ where: { userId: session.user.id } });
-            
+
             let liveBalance = wallet?.balance ?? 0;
             if (paymentMethod === 'WALLET') {
                 try {
