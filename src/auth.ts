@@ -178,12 +178,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ],
     secret: process.env.AUTH_SECRET,
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger }) {
             if (user) {
                 token.role = (user as any).role;
                 token.id = user.id;
                 token.permissions = (user as any).permissions || [];
                 token.customRoleId = (user as any).customRoleId;
+            }
+            // When the client calls update(), re-fetch permissions from DB so the
+            // JWT cookie is refreshed and useSession() sees the new permissions immediately.
+            if (trigger === 'update' && token.id) {
+                try {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { id: token.id as string },
+                        include: {
+                            customRole: {
+                                include: { permissions: { include: { permission: true } } }
+                            }
+                        }
+                    });
+                    if (dbUser?.customRole) {
+                        token.permissions = dbUser.customRole.permissions.map(
+                            (rp: any) => `${rp.permission.resource}.${rp.permission.action}`
+                        );
+                    } else {
+                        token.permissions = LEGACY_PERMISSIONS[(token.role as string)] || [];
+                    }
+                } catch {}
             }
             return token;
         },

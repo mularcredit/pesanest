@@ -188,9 +188,11 @@ export function Sidebar({ isOpen = false, onClose, isDesktopCollapsed, onToggleD
         // System Admin has full access
         if (role === 'SYSTEM_ADMIN' || permissions.includes('*')) return true;
 
+        // Roles management is SYSTEM_ADMIN only — no permission grant can open this
+        if (href.startsWith('/dashboard/roles')) return role === 'SYSTEM_ADMIN';
+
         const requiredPermissions: Record<string, string[]> = {
             // Admin / Management
-            "/dashboard/roles": ["ROLES.MANAGE", "ROLES.VIEW"],
             "/dashboard/team": ["USERS.VIEW", "USERS.MANAGE", "USERS.EDIT"],
             "/dashboard/users": ["USERS.VIEW", "USERS.MANAGE"],
             "/dashboard/settings": ["SETTINGS.MANAGE"],

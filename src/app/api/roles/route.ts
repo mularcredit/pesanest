@@ -8,8 +8,7 @@ export async function GET(req: NextRequest) {
         const session = await auth();
         if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         const user = session.user as any;
-        const perms = user.permissions || [];
-        if (user.role !== 'SYSTEM_ADMIN' && !perms.includes('*') && !perms.includes('ROLES.VIEW') && !perms.includes('ROLES.MANAGE')) {
+        if (user.role !== 'SYSTEM_ADMIN') {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
@@ -51,9 +50,7 @@ export async function POST(req: NextRequest) {
     try {
         const session = await auth();
         if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        const user = session.user as any;
-        const perms = user.permissions || [];
-        if (user.role !== 'SYSTEM_ADMIN' && !perms.includes('*') && !perms.includes('ROLES.MANAGE')) {
+        if ((session.user as any).role !== 'SYSTEM_ADMIN') {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
@@ -86,9 +83,7 @@ export async function PUT(req: NextRequest) {
     try {
         const session = await auth();
         if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        const putUser = session.user as any;
-        const putPerms = putUser.permissions || [];
-        if (putUser.role !== 'SYSTEM_ADMIN' && !putPerms.includes('*') && !putPerms.includes('ROLES.MANAGE')) {
+        if ((session.user as any).role !== 'SYSTEM_ADMIN') {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 

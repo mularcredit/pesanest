@@ -16,9 +16,8 @@ import { requirePermission } from "@/lib/access-control";
 export default async function RolesPage() {
     const session = await auth();
 
-    // Updated permission check using the new helper
-    // Allows SYSTEM_ADMIN or anyone with ROLES.VIEW permission
-    requirePermission(session, ['ROLES.VIEW', 'ROLES.MANAGE']);
+    // Roles management is restricted to SYSTEM_ADMIN only
+    if ((session?.user as any)?.role !== 'SYSTEM_ADMIN') redirect('/dashboard');
 
     const roles = await prisma.role.findMany({
         include: {
@@ -44,7 +43,7 @@ export default async function RolesPage() {
                     <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Roles</h1>
                     <p className="text-[12.5px] text-gray-400 mt-0.5">Manage user roles and access control</p>
                 </div>
-                {((session?.user as any).role === 'SYSTEM_ADMIN' || (session?.user as any).permissions?.includes('ROLES.MANAGE')) && (
+                {(session?.user as any).role === 'SYSTEM_ADMIN' && (
                     <Link
                         href="/dashboard/roles/new"
                         className="flex items-center gap-2 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] bg-[#6366F1] text-white hover:bg-indigo-600 transition-colors"

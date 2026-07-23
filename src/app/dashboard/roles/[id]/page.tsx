@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from"react";
 import { useRouter, useParams } from"next/navigation";
+import { useSession } from"next-auth/react";
 import { useToast } from"@/components/ui/ToastProvider";
 import {
  PiShieldCheck,
@@ -34,6 +35,7 @@ interface Role {
 export default function EditRolePage() {
  const router = useRouter();
  const params = useParams();
+ const { update: updateSession } = useSession();
  const { showToast } = useToast();
 
  const [role, setRole] = useState<Role | null>(null);
@@ -129,6 +131,7 @@ export default function EditRolePage() {
  if (!response.ok) throw new Error(data.error);
 
  showToast('Role updated successfully', 'success');
+ await updateSession(); // refresh JWT so sidebar picks up new permissions immediately
  router.push('/dashboard/roles');
  } catch (error: any) {
  showToast(error.message || 'Failed to update role', 'error');
