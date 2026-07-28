@@ -29,7 +29,7 @@ export function ExpenseFunnel({ stages }: { stages: FunnelStage[] }) {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-[13.5px] font-[600] text-gray-900">Expense Pipeline</h2>
-                    <p className="text-[11.5px] text-gray-400 mt-0.5">Requisition lifecycle status</p>
+                    <p className="text-[11.5px] text-gray-400 mt-0.5">Expense lifecycle status</p>
                 </div>
                 <span className="text-[10.5px] font-[600] text-gray-500 px-2.5 py-1 rounded-[5px]"
                     style={{ background: 'rgba(0,0,0,0.04)' }}>

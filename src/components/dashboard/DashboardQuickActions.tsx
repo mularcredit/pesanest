@@ -14,7 +14,7 @@ const ITEMS = [
     {
         href: '/dashboard/requisitions',
         icon: PiHandCoins,
-        label: 'Requisitions',
+        label: 'Expenses',
         sub: 'Expenses, advances & budgets',
         iconBg: 'bg-indigo-50 text-[#6366F1]',
         iconBorder: 'rgba(99,102,241,0.2)',

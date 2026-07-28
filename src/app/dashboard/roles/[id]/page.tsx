@@ -288,7 +288,7 @@ export default function EditRolePage() {
  style={INPUT_STYLE}
  />
  <p className="text-[10.5px] text-gray-400 mt-1">
- Requisitions above this amount require higher approval.
+ Expenses above this amount require higher approval.
  </p>
  </div>
 

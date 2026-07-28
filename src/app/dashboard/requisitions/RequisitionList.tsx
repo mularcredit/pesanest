@@ -132,7 +132,7 @@ export function RequisitionList({ requisitions, monthlyBudgets = [] }: Requisiti
         const result = await updateRequisition(fd);
         setEditSaving(false);
         if (result.success) {
-            showToast(result.message || "Requisition updated successfully", "success");
+            showToast(result.message || "Expense updated successfully", "success");
             setEditingReq(null);
             router.refresh();
         } else {
@@ -282,7 +282,7 @@ export function RequisitionList({ requisitions, monthlyBudgets = [] }: Requisiti
                                                 <button
                                                     onClick={() => openEdit(req)}
                                                     className="p-1.5 rounded-md hover:bg-amber-50 text-slate-400 hover:text-amber-600 transition-all"
-                                                    title="Edit Requisition"
+                                                    title="Edit Expense"
                                                 >
                                                     <PiPencil className="text-base" />
                                                 </button>
@@ -385,7 +385,7 @@ export function RequisitionList({ requisitions, monthlyBudgets = [] }: Requisiti
                     <div className="bg-white max-w-xl w-full rounded-xl shadow-2xl overflow-hidden animate-scale-in flex flex-col border border-gray-200">
                         <div className="h-[88px] px-6 flex justify-between items-center bg-white border-b border-gray-100 shrink-0">
                             <div>
-                                <h2 className="text-base font-semibold text-gray-900">Fulfill Requisition</h2>
+                                <h2 className="text-base font-semibold text-gray-900">Fulfill Expense</h2>
                                 <div className="flex items-center gap-2 mt-1">
                                     <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
                                         ID: {selectedReq.id.slice(0, 8)}
@@ -672,14 +672,14 @@ export function RequisitionList({ requisitions, monthlyBudgets = [] }: Requisiti
                 />
             )}
 
-            {/* Edit Requisition Modal */}
+            {/* Edit Expense Modal */}
             {editingReq && mounted && createPortal(
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in gpu-accel">
                     <div className="bg-white max-w-xl w-full rounded-xl shadow-2xl overflow-hidden animate-scale-in flex flex-col border border-gray-200">
                         {/* Header */}
                         <div className="h-[88px] shrink-0 flex items-center justify-between px-6 bg-white border-b border-gray-100">
                             <div>
-                                <h2 className="text-base font-semibold text-gray-900">Edit Requisition</h2>
+                                <h2 className="text-base font-semibold text-gray-900">Edit Expense</h2>
                                 <div className="flex items-center gap-2 mt-1">
                                     <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
                                         ID: {editingReq.id.slice(0, 8)}
@@ -725,7 +725,7 @@ export function RequisitionList({ requisitions, monthlyBudgets = [] }: Requisiti
                             {/* Title */}
                             <div>
                                 <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-                                    Requisition Title <span className="text-rose-500">*</span>
+                                    Expense Title <span className="text-rose-500">*</span>
                                 </label>
                                 <input
                                     type="text"

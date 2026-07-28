@@ -86,7 +86,7 @@ export function AccountsGridClient({ accountsData, totalRequisitions, totalAmoun
             {/* Page header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Requisitions</h1>
+                    <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Expenses</h1>
                     <p className="text-[12.5px] text-gray-400 mt-0.5">
                         {accountsData.length} {accountsData.length === 1 ? 'account' : 'accounts'} · {totalRequisitions} requests · {formatCurrency(totalAmount)}
                     </p>
@@ -100,7 +100,7 @@ export function AccountsGridClient({ accountsData, totalRequisitions, totalAmoun
                     <Link href="/dashboard/requisitions/new"
                         className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[#6366F1] text-white text-[12px] font-[500] hover:bg-indigo-600 transition-colors">
                         <Plus size={12} strokeWidth={2} />
-                        New Requisition
+                        New Expense
                     </Link>
                 </div>
             </div>
@@ -210,7 +210,7 @@ export function AccountsGridClient({ accountsData, totalRequisitions, totalAmoun
                                         </span>
                                     )}
                                     {acc.total === 0 && (
-                                        <span className="text-[10.5px] text-gray-300">No requisitions yet</span>
+                                        <span className="text-[10.5px] text-gray-300">No expenses yet</span>
                                     )}
                                 </div>
 

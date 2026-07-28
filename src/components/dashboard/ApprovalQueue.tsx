@@ -261,7 +261,7 @@ export function ApprovalQueue({ expenses, requisitions, budgets = [], invoices =
 
     const navItems = [
         { id: 'expenses' as const,     label: 'Expenses',      count: expenses.length,     icon: PiReceipt },
-        { id: 'requisitions' as const, label: 'Requisitions',  count: requisitions.length, icon: PiFileText },
+        { id: 'requisitions' as const, label: 'Expenses',  count: requisitions.length, icon: PiFileText },
         { id: 'budgets' as const,      label: 'Budgets',       count: budgets.length,      icon: PiMoney },
         { id: 'invoices' as const,     label: 'Invoices',      count: invoices.length,     icon: PiBuildings },
         { id: 'history' as const,      label: 'History',       count: history.length,      icon: PiListBullets },
@@ -412,7 +412,7 @@ export function ApprovalQueue({ expenses, requisitions, budgets = [], invoices =
 
                 {/* ── REQUISITIONS ── */}
                 {activeTab === 'requisitions' && (
-                    requisitions.length === 0 ? <EmptyState icon={PiFileText} label="requisition" /> :
+                    requisitions.length === 0 ? <EmptyState icon={PiFileText} label="expense" /> :
                     viewMode === 'grid' ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                             {requisitions.map(req => (

@@ -134,7 +134,7 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
                     <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-[600] text-gray-900">New Recurring Schedule</p>
                         <p className="text-[10.5px] text-gray-400">
-                            {step === 'item' ? 'Step 1 — Pick a requisition item to repeat' : 'Step 2 — Configure the schedule'}
+                            {step === 'item' ? 'Step 1 — Pick an expense item to repeat' : 'Step 2 — Configure the schedule'}
                         </p>
                     </div>
                     <button onClick={onClose}
@@ -166,7 +166,7 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
                                 <div className="py-12 text-center">
                                     <p className="text-[12px] text-gray-400">
                                         {items.length === 0
-                                            ? 'No schedulable items found. All items already have schedules, or no requisitions exist.'
+                                            ? 'No schedulable items found. All items already have schedules, or no expenses exist.'
                                             : 'No items match your search.'}
                                     </p>
                                 </div>
@@ -491,7 +491,7 @@ export default function SchedulesPage() {
                     <p className="text-[11.5px] text-gray-300 mb-5">
                         {filter !== 'all'
                             ? `No ${filter} schedules — switch to "All" to see everything`
-                            : 'Create a schedule to automate recurring requisitions'}
+                            : 'Create a schedule to automate recurring expenses'}
                     </p>
                     {filter === 'all' && (
                         <button onClick={() => setCreateOpen(true)}
@@ -586,7 +586,7 @@ export default function SchedulesPage() {
                                                 ))}
                                                 {schedule.executions.some(e => e.status === 'EXECUTED') && (
                                                     <span className="text-[10px] text-gray-300 flex items-center gap-1 ml-0.5">
-                                                        <PiFileText className="text-[9px]" /> → Requisitions
+                                                        <PiFileText className="text-[9px]" /> → Expenses
                                                     </span>
                                                 )}
                                             </div>
@@ -600,7 +600,7 @@ export default function SchedulesPage() {
                                                 disabled={running}
                                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[11px] font-[600] text-white transition-all disabled:opacity-40"
                                                 style={{ background: '#6366F1' }}
-                                                title="Run now — creates a new requisition immediately">
+                                                title="Run now — creates a new expense immediately">
                                                 {running
                                                     ? <PiArrowClockwise className="animate-spin text-[12px]" />
                                                     : <PiPlayCircle className="text-[12px]" />}

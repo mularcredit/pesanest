@@ -60,7 +60,7 @@ export default async function AccountCategoryPage({ params }: { params: Promise<
                         <PiCaretLeft /> Back to accounts
                     </Link>
                     <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{account.name}</h1>
-                    <p className="text-gray-500 text-sm mt-1">GL-{account.code} · {requisitions.length} {requisitions.length === 1 ? 'requisition' : 'requisitions'}</p>
+                    <p className="text-gray-500 text-sm mt-1">GL-{account.code} · {requisitions.length} {requisitions.length === 1 ? 'expense' : 'expenses'}</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -69,7 +69,7 @@ export default async function AccountCategoryPage({ params }: { params: Promise<
                         className="px-5 py-2.5 bg-[#6366F1] text-white rounded-md font-medium text-xs hover:bg-[#6366F1]/90 transition-all flex items-center gap-2"
                     >
                         <PiPlus />
-                        <span>New Requisition</span>
+                        <span>New Expense</span>
                     </Link>
                 </div>
             </div>

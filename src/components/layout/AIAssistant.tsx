@@ -27,13 +27,13 @@ const TOPICS = [
     {
         icon: PiFileText,
         color: '#7c3aed',
-        title: 'Requisitions',
+        title: "Expenses",
         summary: 'Submit and approve purchase requests.',
         content: [
-            'Navigate to **Requisitions** to create a new request.',
+            'Navigate to **Expenses** to create a new request.',
             'Add line items with category, quantity, and amount.',
             'Submit for approval — the workflow routes to your approver.',
-            'Approved requisitions can be linked to vouchers or invoices.',
+            'Approved expenses can be linked to vouchers or invoices.',
         ],
     },
     {
@@ -66,8 +66,8 @@ const TOPICS = [
         title: 'Schedules',
         summary: 'Automate recurring payment workflows.',
         content: [
-            'Go to **Schedules** to set up recurring requisitions.',
-            'Link a schedule to an existing requisition item.',
+            'Go to **Schedules** to set up recurring expenses.',
+            'Link a schedule to an existing expense item.',
             'Set frequency: Daily, Weekly, Monthly, Quarterly, or Yearly.',
             'Run overdue schedules manually from the schedule list.',
         ],
@@ -103,7 +103,7 @@ const TOPICS = [
         summary: 'Organise spending by category.',
         content: [
             'Categories are configured in **Settings → Categories**.',
-            'Each requisition and allocation is tagged to a category.',
+            'Each expense and allocation is tagged to a category.',
             'Dashboard charts break down spend by category.',
             'Use categories to set budgets and track utilisation.',
         ],
@@ -115,7 +115,7 @@ const TOPICS = [
         summary: 'Understand the approval workflow.',
         content: [
             'Roles: **Admin**, **Manager**, **Employee** — set in Settings.',
-            'Employees submit requisitions; Managers approve or reject.',
+            'Employees submit expenses; Managers approve or reject.',
             'Admins can override any stage in the workflow.',
             'All actions are logged in the Audit Trail.',
         ],

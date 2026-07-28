@@ -462,9 +462,9 @@ export function ExpensesClient({
                         window.location.href = '/dashboard/requisitions/new';
                     }}
                     title="Emergency Form Confirmation"
-                    description="Note: The Emergency form is specifically for urgent requests that require immediate action. For all non-urgent business expenditures, please use the standard Requisition form."
+                    description="Note: The Emergency form is specifically for urgent requests that require immediate action. For all non-urgent business expenditures, please use the standard Expense form."
                     confirmText="Yes, Proceed to Emergency"
-                    cancelText="Use Standard Requisition"
+                    cancelText="Use Standard Expense"
                     variant="info"
                 />
 

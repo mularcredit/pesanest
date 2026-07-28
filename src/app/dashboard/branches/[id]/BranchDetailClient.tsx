@@ -89,7 +89,7 @@ export function BranchDetailClient({ branch }: { branch: BranchData }) {
     const tabs: { id: Tab; label: string }[] = [
         { id: "overview", label: "Overview" },
         { id: "transactions", label: `Ledger${txns.length ? ` (${txns.length})` : ""}` },
-        { id: "requisitions", label: `Requisitions (${branch._count.requisitions})` },
+        { id: "requisitions", label: "Expenses"(${branch._count.requisitions})` },
         { id: "vendors", label: `Vendors (${branch._count.vendors})` },
     ];
 
@@ -313,7 +313,7 @@ function OverviewTab({ wallet, txns, branch }: {
                     { label: "Total In", value: formatCurrency(totalIn, currency), green: true },
                     { label: "Total Out", value: formatCurrency(totalOut, currency), red: true },
                     { label: "Transactions", value: txns.length.toString() },
-                    { label: "Requisitions", value: branch._count.requisitions.toString() },
+                    { label: "Expenses", value: branch._count.requisitions.toString() },
                 ].map((kpi, i, arr) => (
                     <div key={kpi.label}
                         className="flex-1 min-w-0 px-4 py-4 bg-white"
@@ -467,7 +467,7 @@ function RequisitionsTab({ count }: { count: number }) {
     return (
         <div className="bg-white rounded-[8px] overflow-hidden" style={{ border: HAIRLINE }}>
             <div className="px-5 py-3.5" style={{ borderBottom: HAIRLINE }}>
-                <p className="text-[12.5px] font-[600] text-gray-900">Requisitions</p>
+                <p className="text-[12.5px] font-[600] text-gray-900">Expenses</p>
             </div>
             <div className="px-5 py-8 flex flex-col items-center text-center gap-3">
                 <div className="w-10 h-10 rounded-[8px] bg-indigo-50 flex items-center justify-center"
@@ -483,7 +483,7 @@ function RequisitionsTab({ count }: { count: number }) {
                     className="mt-1 px-4 py-2 rounded-[6px] text-[12px] font-[500] text-[#6366F1] bg-indigo-50 hover:bg-indigo-100 transition-colors"
                     style={{ border: '1px solid rgba(99,102,241,0.15)' }}
                 >
-                    View Requisitions
+                    View Expenses
                 </Link>
             </div>
         </div>

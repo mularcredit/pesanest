@@ -63,7 +63,7 @@ export function RequisitionTypeModal({ isOpen, onClose, existingRequisitions = [
                                     <PiFolderPlus className="text-xl text-[#6366F1]" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-[#111827] tracking-tight leading-tight">Select Target Requisition</h2>
+                                    <h2 className="text-lg font-semibold text-[#111827] tracking-tight leading-tight">Select Target Expense</h2>
                                     <p className="text-sm text-gray-500 mt-0.5">Append items to an active workflow.</p>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@ export function RequisitionTypeModal({ isOpen, onClose, existingRequisitions = [
                                         <PiScroll className="text-2xl text-gray-400" />
                                     </div>
                                     <p className="text-sm font-semibold text-gray-900 mb-1">No Active Workflows</p>
-                                    <p className="text-sm text-gray-500 max-w-[250px] mx-auto">You can only append items to pending, approved, or paid requisitions.</p>
+                                    <p className="text-sm text-gray-500 max-w-[250px] mx-auto">You can only append items to pending, approved, or paid expenses.</p>
                                 </div>
                             ) : (
                                 <div className="grid gap-3">
@@ -140,7 +140,7 @@ export function RequisitionTypeModal({ isOpen, onClose, existingRequisitions = [
                             <div className="w-14 h-14 mx-auto bg-white shadow-[0_2px_8px_rgba(41,37,141,0.12)] border border-[#6366F1]/10 rounded-2xl flex items-center justify-center mb-4">
                                 <PiFileText className="text-2xl text-[#6366F1]" />
                             </div>
-                            <h2 className="text-xl font-semibold text-[#111827] tracking-tight mb-1">Create Requisition</h2>
+                            <h2 className="text-xl font-semibold text-[#111827] tracking-tight mb-1">Create Expense</h2>
                             <p className="text-sm text-gray-500">Initiate a new purchase request or append to an existing workflow.</p>
                         </div>
 
@@ -158,7 +158,7 @@ export function RequisitionTypeModal({ isOpen, onClose, existingRequisitions = [
                                 <div>
                                     <h3 className="font-semibold text-gray-900 text-[15px] tracking-tight group-hover:text-[#6366F1] transition-colors">Start Fresh Form</h3>
                                     <p className="text-[13px] text-gray-500 mt-1 leading-relaxed">
-                                        Open a blank purchase requisition template to document a completely new initiative.
+                                        Open a blank purchase expense template to document a completely new initiative.
                                     </p>
                                 </div>
                             </button>

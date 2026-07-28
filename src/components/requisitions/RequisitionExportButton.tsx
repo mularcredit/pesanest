@@ -122,7 +122,7 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [], ico
             const label = filterLabel();
 
             doc.setFontSize(18); doc.setTextColor(41, 37, 141);
-            doc.text("Requisitions Report", 14, 18);
+            doc.text("Expenses Report", 14, 18);
             doc.setFontSize(8); doc.setTextColor(120);
             doc.text(`Filters: ${label}`, 14, 25);
             doc.text(`Generated: ${new Date().toLocaleString()}   •   Records: ${filtered.length}`, 14, 30);
@@ -168,7 +168,7 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [], ico
                 },
             });
 
-            doc.save(`Requisitions_${new Date().toISOString().slice(0, 10)}.pdf`);
+            doc.save(`Expenses_${new Date().toISOString().slice(0, 10)}.pdf`);
             showToast(`PDF exported — ${filtered.length} records`, "success");
         } catch (err: any) {
             showToast(err.message || "Failed to export PDF", "error");
@@ -197,7 +197,7 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [], ico
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.href = url; a.download = `Requisitions_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.href = url; a.download = `Expenses_${new Date().toISOString().slice(0, 10)}.csv`;
             a.click(); URL.revokeObjectURL(url);
             showToast(`CSV exported — ${filtered.length} records`, "success");
         } catch (err: any) {
@@ -233,7 +233,7 @@ export function RequisitionExportButton({ requisitions, monthlyBudgets = [], ico
                         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
                             <div>
                                 <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                                    <PiFunnel className="text-[#6366F1]" /> Export Requisitions
+                                    <PiFunnel className="text-[#6366F1]" /> Export Expenses
                                 </h2>
                                 <p className="text-[11px] text-gray-400 mt-0.5">Apply filters then choose your format</p>
                             </div>

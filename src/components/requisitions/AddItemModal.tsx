@@ -97,7 +97,7 @@ export function AddItemModal({
                 <div className="h-[88px] px-6 flex items-center justify-between bg-gradient-to-r from-green-100 to-white border-b border-gray-200 rounded-t-xl">
                     <div className="flex items-center gap-3">
                         <div>
-                            <h2 className="text-base font-semibold text-gray-900">Add Item to Requisition</h2>
+                            <h2 className="text-base font-semibold text-gray-900">Add Item to Expense</h2>
                             <p className="text-xs text-gray-500 mt-1">Add another item to this purchase request</p>
                         </div>
                     </div>

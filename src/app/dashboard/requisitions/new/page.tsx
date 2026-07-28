@@ -223,7 +223,7 @@ function NewRequisitionForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title.trim()) { showToast("Requisition title is required.", "error", "Missing Title"); return; }
+        if (!title.trim()) { showToast("Expense title is required.", "error", "Missing Title"); return; }
         if (!description.trim() || description.length < 15) { showToast("Please provide a justification of at least 15 characters.", "error", "Justification Too Short"); return; }
         if (!category) { showToast("Please select a category.", "error", "Category Required"); return; }
         const amt = parseFloat(amount);
@@ -280,7 +280,7 @@ function NewRequisitionForm() {
                 {/* Back link inline — no redundant sub-header bar */}
                 <Link href="/dashboard/requisitions"
                     className="inline-flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-700 transition-colors mb-6">
-                    <PiCaretLeft className="text-[13px]" /> Back to Requisitions
+                    <PiCaretLeft className="text-[13px]" /> Back to Expenses
                 </Link>
 
                 <form onSubmit={handleSubmit}>
@@ -498,7 +498,7 @@ function NewRequisitionForm() {
                             </Link>
                             <button type="submit" disabled={isSubmitting}
                                 className="flex items-center gap-2 bg-[#6366F1] text-white px-5 py-2.5 rounded-[6px] text-[13px] font-[500] hover:bg-indigo-600 transition-colors disabled:opacity-50">
-                                {isSubmitting ? 'Submitting…' : <><PiPaperPlaneRight className="text-[14px]" /> Submit requisition</>}
+                                {isSubmitting ? 'Submitting…' : <><PiPaperPlaneRight className="text-[14px]" /> Submit expense</>}
                             </button>
                         </div>
                     </div>

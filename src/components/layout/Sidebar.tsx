@@ -74,10 +74,10 @@ const menuCategories: MenuCategory[] = [
         ]
     },
     {
-        title: "Requisitions",
+        title: "Expenses",
         icon: PiSiren,
         items: [
-            { name: "Requisitions", href: "/dashboard/requisitions", icon: PiReceipt },
+            { name: "Expenses", href: "/dashboard/requisitions", icon: PiReceipt },
             { name: "Approvals", href: "/dashboard/approvals", icon: PiCheckCircle },
             { name: "Payments", href: "/dashboard/payments", icon: PiCurrencyDollar },
         ]
@@ -149,7 +149,7 @@ export function Sidebar({ isOpen = false, onClose, isDesktopCollapsed, onToggleD
     const pathname = usePathname();
     const { data: session } = useSession();
     const user = session?.user;
-    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ "Requisitions": true });
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ "Expenses": true });
     const [counts, setCounts] = useState<{ expenses: number; approvals: number }>({ expenses: 0, approvals: 0 });
 
     useEffect(() => {
@@ -253,7 +253,7 @@ export function Sidebar({ isOpen = false, onClose, isDesktopCollapsed, onToggleD
         const activeGroup = menuCategories.find(cat =>
             cat.items.some(item => pathname === item.href)
         );
-        const next: Record<string, boolean> = { "Requisitions": true };
+        const next: Record<string, boolean> = { "Expenses": true };
         if (activeGroup) next[activeGroup.title] = true;
         setOpenGroups(next);
     }, [pathname]);

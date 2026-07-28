@@ -443,7 +443,7 @@ export default async function DashboardPage() {
                         <div className="bg-white rounded-[8px] overflow-hidden" style={CARD_STYLE}>
                             <div className="px-5 py-3.5 text-[10.5px] font-[500] uppercase tracking-[0.08em] text-gray-400"
                                 style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                                Active Requisitions
+                                Active Expenses
                             </div>
                             <div className="p-4 space-y-2">
                                 {requisitions.slice(0, 3).map((req: any) => (

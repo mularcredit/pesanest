@@ -15,7 +15,7 @@ export async function fulfillRequisition(formData: FormData) {
     const etrVerified = formData.get("etrVerified") === "true";
 
     if (!requisitionId || !receiptUrl) {
-        throw new Error("Requisition ID and Receipt URL are required");
+        throw new Error("Expense ID and Receipt URL are required");
     }
 
     try {
@@ -23,7 +23,7 @@ export async function fulfillRequisition(formData: FormData) {
             where: { id: requisitionId }
         });
 
-        if (!requisition) throw new Error("Requisition not found");
+        if (!requisition) throw new Error("Expense not found");
         if (requisition.status !== 'APPROVED') throw new Error("Only approved requisitions can be fulfilled");
 
         await prisma.expense.create({
@@ -68,7 +68,7 @@ export async function deleteRequisition(id: string) {
 
     try {
         const requisition = await prisma.requisition.findUnique({ where: { id } });
-        if (!requisition) return { success: false, message: "Requisition not found" };
+        if (!requisition) return { success: false, message: "Expense not found" };
 
         const user = await prisma.user.findUnique({
             where: { id: session.user.id },
@@ -83,7 +83,7 @@ export async function deleteRequisition(id: string) {
         await (prisma as any).requisition.delete({ where: { id } });
 
         revalidatePath("/dashboard/requisitions");
-        return { success: true, message: "Requisition deleted successfully" };
+        return { success: true, message: "Expense deleted successfully" };
     } catch (e: any) {
         console.error("Failed to delete requisition:", e);
         return { success: false, message: e.message || "Failed to delete" };
@@ -112,7 +112,7 @@ export async function updateRequisition(formData: FormData) {
 
     try {
         const requisition = await prisma.requisition.findUnique({ where: { id } });
-        if (!requisition) return { success: false, message: "Requisition not found" };
+        if (!requisition) return { success: false, message: "Expense not found" };
 
         const user = await prisma.user.findUnique({
             where: { id: session.user.id },
@@ -167,7 +167,7 @@ export async function updateRequisition(formData: FormData) {
 
         revalidatePath("/dashboard/requisitions");
         revalidatePath("/dashboard/approvals");
-        return { success: true, message: "Requisition updated and resubmitted for approval" };
+        return { success: true, message: "Expense updated and resubmitted for approval" };
     } catch (e: any) {
         console.error("Failed to update requisition:", e);
         return { success: false, message: e.message || "Failed to update" };

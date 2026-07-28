@@ -599,7 +599,7 @@ export function PaymentQueue({
  <div className="bg-white rounded-[8px] overflow-hidden mb-6" style={{border:'1px solid rgba(0,0,0,0.09)'}}>
                                                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                                                     <div className="flex items-center gap-3">
-                                                        <h3 className="text-[13px] font-semibold text-slate-800 tracking-wide">Purchase Requisitions</h3>
+                                                        <h3 className="text-[13px] font-semibold text-slate-800 tracking-wide">Expenses</h3>
                                                         <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-[10px] font-semibold border border-indigo-100">{requisitions.length} Items</span>
                                                     </div>
                                                     <button

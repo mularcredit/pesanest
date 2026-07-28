@@ -192,7 +192,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: { br
                         style={CARD}>
                         <div>
                             <p className="text-[13px] font-[600] text-gray-900 group-hover:text-[#6366f1] transition-colors">
-                                All Requisitions
+                                All Expenses
                             </p>
                             <p className="text-[11.5px] text-gray-400 mt-0.5">View full expense history</p>
                         </div>
