@@ -4,10 +4,19 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/ToastProvider';
 import { AccountRow } from './AccountRow';
-import { PiSpinner, PiCheckSquare, PiSquare, PiX, PiPencilSimple } from 'react-icons/pi';
+import { PiSpinner, PiCheckSquare, PiSquare, PiX, PiPencilSimple, PiFiles, PiTrendUp, PiTrendDown, PiWallet, PiCreditCard, PiBank } from 'react-icons/pi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
+
+const TYPE_META: Record<string, { label: string; description: string; accent: string; bg: string; icon: any }> = {
+    ASSET:     { label: 'Assets',      description: 'Resources owned or controlled',    accent: '#059669', bg: 'rgba(5,150,105,0.06)',   icon: PiWallet     },
+    LIABILITY: { label: 'Liabilities', description: 'Obligations owed to others',        accent: '#e11d48', bg: 'rgba(225,29,72,0.06)',   icon: PiCreditCard },
+    EQUITY:    { label: 'Equity',      description: "Owner's interest in the business",  accent: '#6366F1', bg: 'rgba(99,102,241,0.06)',  icon: PiBank       },
+    REVENUE:   { label: 'Revenue',     description: 'Income from business operations',   accent: '#0284c7', bg: 'rgba(2,132,199,0.06)',   icon: PiTrendUp    },
+    EXPENSE:   { label: 'Expenses',    description: 'Costs incurred in operations',      accent: '#d97706', bg: 'rgba(217,119,6,0.06)',   icon: PiTrendDown  },
+    DEFAULT:   { label: 'Other',       description: 'Miscellaneous accounts',            accent: '#6b7280', bg: 'rgba(107,114,128,0.06)', icon: PiFiles      },
+};
 
 export const SUBTYPE_SUGGESTIONS: Record<string, string[]> = {
     ASSET: [
@@ -48,11 +57,10 @@ interface Account {
 
 interface Props {
     grouped: Record<string, Account[]>;
-    typeMeta: Record<string, { label: string; description: string; accent: string; bg: string; icon: any }>;
     typeOrder: string[];
 }
 
-export function AccountsTableClient({ grouped, typeMeta, typeOrder }: Props) {
+export function AccountsTableClient({ grouped, typeOrder }: Props) {
     const router = useRouter();
     const { showToast } = useToast();
     const [selected, setSelected]     = useState<Set<string>>(new Set());
@@ -118,7 +126,7 @@ export function AccountsTableClient({ grouped, typeMeta, typeOrder }: Props) {
                 {typeOrder.map(type => {
                     const typeAccounts = grouped[type] || [];
                     if (typeAccounts.length === 0) return null;
-                    const meta = typeMeta[type];
+                    const meta = TYPE_META[type] ?? TYPE_META.DEFAULT;
                     const Icon = meta.icon;
                     const allGroupSelected = typeAccounts.every(a => selected.has(a.id));
                     const someGroupSelected = typeAccounts.some(a => selected.has(a.id));

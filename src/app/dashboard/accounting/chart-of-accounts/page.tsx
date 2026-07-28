@@ -3,22 +3,18 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AccountingActions } from "@/components/accounting/AccountingActions";
 import { AccountsTableClient } from "./AccountsTableClient";
-import {
-    PiFiles, PiTrendUp, PiTrendDown, PiWallet, PiCreditCard, PiBank,
-} from "react-icons/pi";
+import { PiFiles, PiTrendUp, PiTrendDown, PiWallet, PiCreditCard, PiBank } from "react-icons/pi";
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
 
-const TYPE_META: Record<string, {
-    label: string; description: string;
-    accent: string; bg: string; icon: any;
-}> = {
-    ASSET:     { label: 'Assets',      description: 'Resources owned or controlled',     accent: '#059669', bg: 'rgba(5,150,105,0.06)',   icon: PiWallet     },
-    LIABILITY: { label: 'Liabilities', description: 'Obligations owed to others',         accent: '#e11d48', bg: 'rgba(225,29,72,0.06)',   icon: PiCreditCard },
-    EQUITY:    { label: 'Equity',      description: "Owner's interest in the business",   accent: '#6366F1', bg: 'rgba(99,102,241,0.06)',  icon: PiBank       },
-    REVENUE:   { label: 'Revenue',     description: 'Income from business operations',    accent: '#0284c7', bg: 'rgba(2,132,199,0.06)',   icon: PiTrendUp    },
-    EXPENSE:   { label: 'Expenses',    description: 'Costs incurred in operations',       accent: '#d97706', bg: 'rgba(217,119,6,0.06)',   icon: PiTrendDown  },
-    DEFAULT:   { label: 'Other',       description: 'Miscellaneous accounts',             accent: '#6b7280', bg: 'rgba(107,114,128,0.06)', icon: PiFiles      },
+// Used only for the KPI strip — icon components stay server-side here
+const TYPE_META_SERVER: Record<string, { label: string; accent: string; bg: string; icon: any }> = {
+    ASSET:     { label: 'Assets',      accent: '#059669', bg: 'rgba(5,150,105,0.06)',   icon: PiWallet     },
+    LIABILITY: { label: 'Liabilities', accent: '#e11d48', bg: 'rgba(225,29,72,0.06)',   icon: PiCreditCard },
+    EQUITY:    { label: 'Equity',      accent: '#6366F1', bg: 'rgba(99,102,241,0.06)',  icon: PiBank       },
+    REVENUE:   { label: 'Revenue',     accent: '#0284c7', bg: 'rgba(2,132,199,0.06)',   icon: PiTrendUp    },
+    EXPENSE:   { label: 'Expenses',    accent: '#d97706', bg: 'rgba(217,119,6,0.06)',   icon: PiTrendDown  },
+    DEFAULT:   { label: 'Other',       accent: '#6b7280', bg: 'rgba(107,114,128,0.06)', icon: PiFiles      },
 };
 
 const TYPE_ORDER = ['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'];
@@ -63,7 +59,7 @@ export default async function ChartOfAccountsPage() {
             {/* ── KPI strip ── */}
             <div className="grid grid-cols-5 gap-3">
                 {TYPE_ORDER.map(type => {
-                    const meta  = TYPE_META[type];
+                    const meta  = TYPE_META_SERVER[type];
                     const count = (grouped[type] || []).length;
                     const Icon  = meta.icon;
                     return (
@@ -84,7 +80,6 @@ export default async function ChartOfAccountsPage() {
             {/* ── Account groups (client — handles selection + bulk edit) ── */}
             <AccountsTableClient
                 grouped={grouped}
-                typeMeta={TYPE_META}
                 typeOrder={TYPE_ORDER}
             />
         </div>
