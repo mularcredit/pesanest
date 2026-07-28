@@ -64,6 +64,47 @@ export function AccountingActions({ type, entryId, variant = 'primary' }: Accoun
         }
     };
 
+    // Subtype options per account type
+    const SUBTYPE_OPTIONS: Record<string, { value: string; label: string }[]> = {
+        ASSET: [
+            { value: 'CURRENT_ASSET',      label: 'Current Asset' },
+            { value: 'FIXED_ASSET',        label: 'Fixed Asset' },
+            { value: 'NON_CURRENT_ASSET',  label: 'Non-Current Asset' },
+            { value: 'CASH',               label: 'Cash & Cash Equivalents' },
+            { value: 'BANK',               label: 'Bank Account' },
+            { value: 'ACCOUNTS_RECEIVABLE',label: 'Accounts Receivable' },
+            { value: 'INVENTORY',          label: 'Inventory' },
+            { value: 'OTHER_ASSET',        label: 'Other Asset' },
+        ],
+        LIABILITY: [
+            { value: 'CURRENT_LIABILITY',  label: 'Current Liability' },
+            { value: 'LONG_TERM_LIABILITY',label: 'Long-term Liability' },
+            { value: 'ACCOUNTS_PAYABLE',   label: 'Accounts Payable' },
+            { value: 'CREDIT_CARD',        label: 'Credit Card' },
+            { value: 'OTHER_LIABILITY',    label: 'Other Liability' },
+        ],
+        EQUITY: [
+            { value: 'COMMON_STOCK',       label: 'Common Stock' },
+            { value: 'RETAINED_EARNINGS',  label: 'Retained Earnings' },
+            { value: 'OWNERS_EQUITY',      label: "Owner's Equity" },
+            { value: 'OTHER_EQUITY',       label: 'Other Equity' },
+        ],
+        REVENUE: [
+            { value: 'SALES',              label: 'Sales Income' },
+            { value: 'SERVICE_REVENUE',    label: 'Service Revenue' },
+            { value: 'OTHER_INCOME',       label: 'Other Income' },
+        ],
+        EXPENSE: [
+            { value: 'OPERATING_EXPENSE',  label: 'Operating Expense' },
+            { value: 'COST_OF_GOODS_SOLD', label: 'Cost of Goods Sold' },
+            { value: 'PAYROLL_EXPENSE',    label: 'Payroll Expense' },
+            { value: 'ADMINISTRATIVE',     label: 'Administrative Expense' },
+            { value: 'OTHER_EXPENSE',      label: 'Other Expense' },
+        ],
+    };
+
+    const defaultSubtype = (t: string) => SUBTYPE_OPTIONS[t]?.[0]?.value ?? '';
+
     // ACCOUNT FORM STATE
     const [accountData, setAccountData] = useState({
         code: "",
@@ -107,7 +148,7 @@ export function AccountingActions({ type, entryId, variant = 'primary' }: Accoun
     }, [isOpen, accountData.type, type]);
 
     const handleTypeChange = (val: string) => {
-        setAccountData(prev => ({ ...prev, type: val }));
+        setAccountData(prev => ({ ...prev, type: val, subtype: defaultSubtype(val) }));
         // auto code re-fetched via useEffect above
     };
 
@@ -187,7 +228,7 @@ export function AccountingActions({ type, entryId, variant = 'primary' }: Accoun
     };
 
     const resetAccountForm = () => {
-        setAccountData({ code: '', name: '', type: 'EXPENSE', subtype: 'OPERATING_EXPENSE', description: '' });
+        setAccountData({ code: '', name: '', type: 'EXPENSE', subtype: defaultSubtype('EXPENSE'), description: '' });
         setCodeMode('auto');
         setAutoCode('');
         setCodeSuggestions([]);
@@ -440,6 +481,17 @@ export function AccountingActions({ type, entryId, variant = 'primary' }: Accoun
                                             placeholder="e.g. Office Supplies"
                                             value={accountData.name}
                                             onChange={(e) => setAccountData(prev => ({ ...prev, name: e.target.value }))}
+                                        />
+                                    </div>
+
+                                    {/* Subtype */}
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Subtype</label>
+                                        <CustomSelect
+                                            value={accountData.subtype}
+                                            onChange={val => setAccountData(prev => ({ ...prev, subtype: val }))}
+                                            options={SUBTYPE_OPTIONS[accountData.type] ?? []}
+                                            className="w-full px-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-sm font-medium"
                                         />
                                     </div>
                                 </div>

@@ -7,21 +7,67 @@ import { PiPencil, PiArchive, PiArrowCounterClockwise, PiCheck, PiX, PiSpinner }
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
 
+const SUBTYPE_OPTIONS: Record<string, { value: string; label: string }[]> = {
+    ASSET: [
+        { value: 'CURRENT_ASSET',       label: 'Current Asset' },
+        { value: 'FIXED_ASSET',         label: 'Fixed Asset' },
+        { value: 'NON_CURRENT_ASSET',   label: 'Non-Current Asset' },
+        { value: 'CASH',                label: 'Cash & Cash Equivalents' },
+        { value: 'BANK',                label: 'Bank Account' },
+        { value: 'ACCOUNTS_RECEIVABLE', label: 'Accounts Receivable' },
+        { value: 'INVENTORY',           label: 'Inventory' },
+        { value: 'OTHER_ASSET',         label: 'Other Asset' },
+    ],
+    LIABILITY: [
+        { value: 'CURRENT_LIABILITY',   label: 'Current Liability' },
+        { value: 'LONG_TERM_LIABILITY', label: 'Long-term Liability' },
+        { value: 'ACCOUNTS_PAYABLE',    label: 'Accounts Payable' },
+        { value: 'CREDIT_CARD',         label: 'Credit Card' },
+        { value: 'OTHER_LIABILITY',     label: 'Other Liability' },
+    ],
+    EQUITY: [
+        { value: 'COMMON_STOCK',        label: 'Common Stock' },
+        { value: 'RETAINED_EARNINGS',   label: 'Retained Earnings' },
+        { value: 'OWNERS_EQUITY',       label: "Owner's Equity" },
+        { value: 'OTHER_EQUITY',        label: 'Other Equity' },
+    ],
+    REVENUE: [
+        { value: 'SALES',               label: 'Sales Income' },
+        { value: 'SERVICE_REVENUE',     label: 'Service Revenue' },
+        { value: 'OTHER_INCOME',        label: 'Other Income' },
+    ],
+    EXPENSE: [
+        { value: 'OPERATING_EXPENSE',   label: 'Operating Expense' },
+        { value: 'COST_OF_GOODS_SOLD',  label: 'Cost of Goods Sold' },
+        { value: 'PAYROLL_EXPENSE',     label: 'Payroll Expense' },
+        { value: 'ADMINISTRATIVE',      label: 'Administrative Expense' },
+        { value: 'OTHER_EXPENSE',       label: 'Other Expense' },
+    ],
+};
+
 export function AccountRow({ account, isLast }: { account: any; isLast?: boolean }) {
     const router = useRouter();
     const { showToast } = useToast();
-    const [editing, setEditing] = useState(false);
-    const [name, setName]       = useState(account.name);
-    const [loading, setLoading] = useState(false);
+    const [editing, setEditing]   = useState(false);
+    const [name, setName]         = useState(account.name);
+    const [subtype, setSubtype]   = useState(account.subtype || '');
+    const [loading, setLoading]   = useState(false);
+
+    const subtypeOptions = SUBTYPE_OPTIONS[account.type] ?? [];
 
     const save = async () => {
-        if (!name.trim() || name === account.name) { setEditing(false); return; }
+        const nameChanged    = name.trim() && name !== account.name;
+        const subtypeChanged = subtype !== (account.subtype || '');
+        if (!nameChanged && !subtypeChanged) { setEditing(false); return; }
         setLoading(true);
         try {
+            const body: Record<string, string> = {};
+            if (nameChanged)    body.name    = name;
+            if (subtypeChanged) body.subtype = subtype;
             const res = await fetch(`/api/accounting/accounts/${account.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify(body),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
@@ -33,7 +79,7 @@ export function AccountRow({ account, isLast }: { account: any; isLast?: boolean
         } finally { setLoading(false); }
     };
 
-    const cancel = () => { setEditing(false); setName(account.name); };
+    const cancel = () => { setEditing(false); setName(account.name); setSubtype(account.subtype || ''); };
 
     const handleKey = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') save();
@@ -111,9 +157,22 @@ export function AccountRow({ account, isLast }: { account: any; isLast?: boolean
             </div>
 
             {/* Subtype */}
-            <p className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] truncate">
-                {account.subtype?.replace(/_/g, ' ') || '—'}
-            </p>
+            {editing ? (
+                <select
+                    value={subtype}
+                    onChange={e => setSubtype(e.target.value)}
+                    className="w-full rounded-[6px] px-2 py-1.5 text-[11px] text-gray-700 outline-none focus:ring-2 focus:ring-[#6366F1]/20 bg-white"
+                    style={{ border: HAIRLINE }}>
+                    <option value="">— none —</option>
+                    {subtypeOptions.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                </select>
+            ) : (
+                <p className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] truncate">
+                    {account.subtype?.replace(/_/g, ' ') || '—'}
+                </p>
+            )}
 
             {/* Status */}
             <div className="flex justify-center">
