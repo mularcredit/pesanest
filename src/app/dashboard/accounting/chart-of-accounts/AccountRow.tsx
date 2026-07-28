@@ -3,49 +3,17 @@
 import { useState } from 'react';
 import { useToast } from '@/components/ui/ToastProvider';
 import { useRouter } from 'next/navigation';
-import { PiPencil, PiArchive, PiArrowCounterClockwise, PiCheck, PiX, PiSpinner } from 'react-icons/pi';
+import { PiPencil, PiArchive, PiArrowCounterClockwise, PiCheck, PiX, PiSpinner, PiCheckSquare, PiSquare } from 'react-icons/pi';
+import { SUBTYPE_SUGGESTIONS } from './AccountsTableClient';
 
 const HAIRLINE = '1px solid rgba(0,0,0,0.07)';
 
-const SUBTYPE_OPTIONS: Record<string, { value: string; label: string }[]> = {
-    ASSET: [
-        { value: 'CURRENT_ASSET',       label: 'Current Asset' },
-        { value: 'FIXED_ASSET',         label: 'Fixed Asset' },
-        { value: 'NON_CURRENT_ASSET',   label: 'Non-Current Asset' },
-        { value: 'CASH',                label: 'Cash & Cash Equivalents' },
-        { value: 'BANK',                label: 'Bank Account' },
-        { value: 'ACCOUNTS_RECEIVABLE', label: 'Accounts Receivable' },
-        { value: 'INVENTORY',           label: 'Inventory' },
-        { value: 'OTHER_ASSET',         label: 'Other Asset' },
-    ],
-    LIABILITY: [
-        { value: 'CURRENT_LIABILITY',   label: 'Current Liability' },
-        { value: 'LONG_TERM_LIABILITY', label: 'Long-term Liability' },
-        { value: 'ACCOUNTS_PAYABLE',    label: 'Accounts Payable' },
-        { value: 'CREDIT_CARD',         label: 'Credit Card' },
-        { value: 'OTHER_LIABILITY',     label: 'Other Liability' },
-    ],
-    EQUITY: [
-        { value: 'COMMON_STOCK',        label: 'Common Stock' },
-        { value: 'RETAINED_EARNINGS',   label: 'Retained Earnings' },
-        { value: 'OWNERS_EQUITY',       label: "Owner's Equity" },
-        { value: 'OTHER_EQUITY',        label: 'Other Equity' },
-    ],
-    REVENUE: [
-        { value: 'SALES',               label: 'Sales Income' },
-        { value: 'SERVICE_REVENUE',     label: 'Service Revenue' },
-        { value: 'OTHER_INCOME',        label: 'Other Income' },
-    ],
-    EXPENSE: [
-        { value: 'OPERATING_EXPENSE',   label: 'Operating Expense' },
-        { value: 'COST_OF_GOODS_SOLD',  label: 'Cost of Goods Sold' },
-        { value: 'PAYROLL_EXPENSE',     label: 'Payroll Expense' },
-        { value: 'ADMINISTRATIVE',      label: 'Administrative Expense' },
-        { value: 'OTHER_EXPENSE',       label: 'Other Expense' },
-    ],
-};
-
-export function AccountRow({ account, isLast }: { account: any; isLast?: boolean }) {
+export function AccountRow({ account, isLast, isSelected, onToggle }: {
+    account: any;
+    isLast?: boolean;
+    isSelected?: boolean;
+    onToggle?: () => void;
+}) {
     const router = useRouter();
     const { showToast } = useToast();
     const [editing, setEditing]   = useState(false);
@@ -53,7 +21,8 @@ export function AccountRow({ account, isLast }: { account: any; isLast?: boolean
     const [subtype, setSubtype]   = useState(account.subtype || '');
     const [loading, setLoading]   = useState(false);
 
-    const subtypeOptions = SUBTYPE_OPTIONS[account.type] ?? [];
+    const subtypeSuggestions = SUBTYPE_SUGGESTIONS[account.type] ?? [];
+    const listId = `subtype-list-${account.id}`;
 
     const save = async () => {
         const nameChanged    = name.trim() && name !== account.name;
@@ -129,11 +98,19 @@ export function AccountRow({ account, isLast }: { account: any; isLast?: boolean
 
     return (
         <div
-            className={`grid items-center px-5 py-3 hover:bg-gray-50/40 transition-colors group ${account.isArchived ? 'opacity-50' : ''}`}
+            className={`grid items-center px-5 py-3 hover:bg-gray-50/40 transition-colors group ${account.isArchived ? 'opacity-50' : ''} ${isSelected ? 'bg-indigo-50/40' : ''}`}
             style={{
-                gridTemplateColumns: '80px 1fr 140px 90px 72px',
+                gridTemplateColumns: '32px 80px 1fr 180px 90px 72px',
                 borderTop: isLast === false || !isLast ? HAIRLINE : undefined,
             }}>
+
+            {/* Checkbox */}
+            <button
+                onClick={onToggle}
+                className="text-[15px] transition-colors shrink-0"
+                style={{ color: isSelected ? '#6366F1' : 'rgba(0,0,0,0.15)' }}>
+                {isSelected ? <PiCheckSquare /> : <PiSquare />}
+            </button>
 
             {/* Code */}
             <p className="text-[12px] font-mono font-[600] text-gray-400 group-hover:text-[#6366F1] transition-colors">
@@ -156,21 +133,24 @@ export function AccountRow({ account, isLast }: { account: any; isLast?: boolean
                 )}
             </div>
 
-            {/* Subtype */}
+            {/* Subtype — combo input (free text + suggestions) */}
             {editing ? (
-                <select
-                    value={subtype}
-                    onChange={e => setSubtype(e.target.value)}
-                    className="w-full rounded-[6px] px-2 py-1.5 text-[11px] text-gray-700 outline-none focus:ring-2 focus:ring-[#6366F1]/20 bg-white"
-                    style={{ border: HAIRLINE }}>
-                    <option value="">— none —</option>
-                    {subtypeOptions.map(o => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                </select>
+                <>
+                    <input
+                        list={listId}
+                        value={subtype}
+                        onChange={e => setSubtype(e.target.value)}
+                        placeholder="e.g. Current Asset"
+                        className="w-full rounded-[6px] px-3 py-1.5 text-[11.5px] text-gray-700 outline-none focus:ring-2 focus:ring-[#6366F1]/20 bg-white"
+                        style={{ border: HAIRLINE }}
+                    />
+                    <datalist id={listId}>
+                        {subtypeSuggestions.map(s => <option key={s} value={s} />)}
+                    </datalist>
+                </>
             ) : (
-                <p className="text-[10.5px] font-[500] text-gray-400 uppercase tracking-[0.06em] truncate">
-                    {account.subtype?.replace(/_/g, ' ') || '—'}
+                <p className="text-[11px] font-[500] text-gray-400 truncate">
+                    {account.subtype ? account.subtype.replace(/_/g, ' ') : '—'}
                 </p>
             )}
 

@@ -484,15 +484,24 @@ export function AccountingActions({ type, entryId, variant = 'primary' }: Accoun
                                         />
                                     </div>
 
-                                    {/* Subtype */}
+                                    {/* Subtype — free text with suggestions */}
                                     <div>
-                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Subtype</label>
-                                        <CustomSelect
+                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">
+                                            Subtype <span className="font-normal normal-case text-gray-400">(type freely or pick a suggestion)</span>
+                                        </label>
+                                        <input
+                                            list="new-account-subtypes"
                                             value={accountData.subtype}
-                                            onChange={val => setAccountData(prev => ({ ...prev, subtype: val }))}
-                                            options={SUBTYPE_OPTIONS[accountData.type] ?? []}
-                                            className="w-full px-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-sm font-medium"
+                                            onChange={e => setAccountData(prev => ({ ...prev, subtype: e.target.value }))}
+                                            placeholder={`e.g. ${SUBTYPE_OPTIONS[accountData.type]?.[0]?.label ?? 'Operating Expense'}`}
+                                            className="w-full h-11 rounded-xl px-4 bg-white text-[13.5px] text-gray-900 outline-none focus:ring-2 focus:ring-[#6366F1]/20"
+                                            style={{ border: '1px solid rgba(0,0,0,0.12)' }}
                                         />
+                                        <datalist id="new-account-subtypes">
+                                            {(SUBTYPE_OPTIONS[accountData.type] ?? []).map(o => (
+                                                <option key={o.value} value={o.label} />
+                                            ))}
+                                        </datalist>
                                     </div>
                                 </div>
                             ) : type === "MANUAL_JOURNAL" ? (

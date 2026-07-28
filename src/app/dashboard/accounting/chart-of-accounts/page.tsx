@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AccountingActions } from "@/components/accounting/AccountingActions";
-import { AccountRow } from "./AccountRow";
+import { AccountsTableClient } from "./AccountsTableClient";
 import {
     PiFiles, PiTrendUp, PiTrendDown, PiWallet, PiCreditCard, PiBank,
 } from "react-icons/pi";
@@ -81,60 +81,12 @@ export default async function ChartOfAccountsPage() {
                 })}
             </div>
 
-            {/* ── Account groups ── */}
-            <div className="space-y-4">
-                {TYPE_ORDER.map(type => {
-                    const typeAccounts = grouped[type] || [];
-                    if (typeAccounts.length === 0) return null;
-                    const meta = TYPE_META[type];
-                    const Icon = meta.icon;
-
-                    return (
-                        <div key={type} className="bg-white rounded-[8px] overflow-hidden" style={{ border: HAIRLINE }}>
-
-                            {/* Section header */}
-                            <div className="flex items-center gap-3 px-5 py-3"
-                                style={{ background: meta.bg, borderBottom: HAIRLINE }}>
-                                <div className="w-[26px] h-[26px] rounded-[6px] flex items-center justify-center shrink-0"
-                                    style={{ background: meta.accent }}>
-                                    <Icon className="text-white text-[13px]" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-[12.5px] font-[600]" style={{ color: meta.accent }}>{meta.label}</p>
-                                    <p className="text-[10.5px] text-gray-400">{meta.description}</p>
-                                </div>
-                                <span className="text-[10px] font-[700] tabular-nums px-2.5 py-0.5 rounded-full"
-                                    style={{ background: meta.accent, color: 'white' }}>
-                                    {typeAccounts.length}
-                                </span>
-                            </div>
-
-                            {/* Column headers */}
-                            <div className="grid px-5 py-2.5"
-                                style={{
-                                    gridTemplateColumns: '80px 1fr 140px 90px 72px',
-                                    borderBottom: HAIRLINE,
-                                    background: 'rgba(0,0,0,0.01)',
-                                }}>
-                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Code</p>
-                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Account Name</p>
-                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400">Subtype</p>
-                                <p className="text-[10px] font-[600] uppercase tracking-[0.08em] text-gray-400 text-center">Status</p>
-                                <p />
-                            </div>
-
-                            {/* Rows */}
-                            {typeAccounts.map((account: any, idx: number) => (
-                                <AccountRow
-                                    key={account.id}
-                                    account={account}
-                                    isLast={idx === typeAccounts.length - 1}
-                                />
-                            ))}
-                        </div>
-                    );
-                })}
-            </div>
+            {/* ── Account groups (client — handles selection + bulk edit) ── */}
+            <AccountsTableClient
+                grouped={grouped}
+                typeMeta={TYPE_META}
+                typeOrder={TYPE_ORDER}
+            />
         </div>
     );
 }
