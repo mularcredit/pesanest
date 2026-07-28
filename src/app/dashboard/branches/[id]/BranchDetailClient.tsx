@@ -89,7 +89,7 @@ export function BranchDetailClient({ branch }: { branch: BranchData }) {
     const tabs: { id: Tab; label: string }[] = [
         { id: "overview", label: "Overview" },
         { id: "transactions", label: `Ledger${txns.length ? ` (${txns.length})` : ""}` },
-        { id: "requisitions", label: "Expenses"(${branch._count.requisitions})` },
+        { id: "requisitions", label: `Expenses (${branch._count.requisitions})` },
         { id: "vendors", label: `Vendors (${branch._count.vendors})` },
     ];
 
