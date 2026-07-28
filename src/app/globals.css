@@ -759,6 +759,15 @@ textarea:focus {
   background-color: var(--page) !important;
 }
 
+/* ── Suppress browser-native password reveal / credentials buttons ── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-strong-password-auto-fill-button {
+  display: none !important;
+}
+
 /* ── Custom select — remove native OS dropdown arrow, add custom caret ── */
 select {
   appearance: none;
