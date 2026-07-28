@@ -9,6 +9,7 @@ import {
     PiClock, PiCheckCircle, PiXCircle, PiArchive, PiArrowRight,
 } from "react-icons/pi";
 import { cn } from "@/lib/utils";
+import { AccountingActions } from "@/components/accounting/AccountingActions";
 
 interface AccountData {
     id: string;
@@ -97,6 +98,7 @@ export function AccountsGridClient({ accountsData, totalRequisitions, totalAmoun
                         <Download size={12} strokeWidth={1.75} />
                         Export
                     </button>
+                    <AccountingActions type="NEW_ACCOUNT" variant="secondary" />
                     <Link href="/dashboard/requisitions/new"
                         className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[#6366F1] text-white text-[12px] font-[500] hover:bg-indigo-600 transition-colors">
                         <Plus size={12} strokeWidth={2} />

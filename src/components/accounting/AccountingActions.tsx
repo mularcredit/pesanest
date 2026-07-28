@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { PiPlus, PiX, PiBookOpenText, PiSpinner, PiBank, PiNotebook, PiTrash, PiArrowsClockwise } from "react-icons/pi";
+import { PiPlus, PiX, PiBookOpenText, PiSpinner, PiBank, PiNotebook, PiTrash, PiArrowsClockwise, PiMagicWand, PiPencil, PiCheck } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -15,6 +15,8 @@ import { CustomSelect } from "@/components/ui/CustomSelect";
 interface AccountingActionsProps {
     type: "NEW_ACCOUNT" | "MANUAL_JOURNAL" | "DELETE_ENTRY";
     entryId?: string;
+    /** 'primary' = indigo filled (default for CoA page), 'secondary' = subtle outlined (for inline use) */
+    variant?: 'primary' | 'secondary';
 }
 
 interface Account {
@@ -31,7 +33,7 @@ interface JournalLine {
     credit: number;
 }
 
-export function AccountingActions({ type, entryId }: AccountingActionsProps) {
+export function AccountingActions({ type, entryId, variant = 'primary' }: AccountingActionsProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -70,6 +72,73 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
         subtype: "OPERATING_EXPENSE",
         description: ""
     });
+
+    // Account code: auto vs custom
+    const [codeMode, setCodeMode] = useState<'auto' | 'custom'>('auto');
+    const [autoCode, setAutoCode] = useState<string>('');
+    const [codeSuggestions, setCodeSuggestions] = useState<{ code: string; name: string; available: boolean }[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [loadingCode, setLoadingCode] = useState(false);
+    const codeInputRef = useRef<HTMLInputElement>(null);
+
+    const fetchSuggestedCode = async (type: string, query = '') => {
+        setLoadingCode(true);
+        try {
+            const res = await fetch(`/api/accounting/accounts/suggest-code?type=${type}&query=${encodeURIComponent(query)}`);
+            if (res.ok) {
+                const data = await res.json();
+                setAutoCode(data.nextCode);
+                setCodeSuggestions(data.suggestions);
+                if (codeMode === 'auto') {
+                    setAccountData(prev => ({ ...prev, code: data.nextCode }));
+                }
+            }
+        } finally {
+            setLoadingCode(false);
+        }
+    };
+
+    // Fetch auto code whenever modal opens or type changes
+    useEffect(() => {
+        if (isOpen && type === 'NEW_ACCOUNT') {
+            fetchSuggestedCode(accountData.type);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, accountData.type, type]);
+
+    const handleTypeChange = (val: string) => {
+        setAccountData(prev => ({ ...prev, type: val }));
+        // auto code re-fetched via useEffect above
+    };
+
+    const handleCodeInput = (val: string) => {
+        setAccountData(prev => ({ ...prev, code: val }));
+        if (val.trim().length > 0) {
+            fetchSuggestedCode(accountData.type, val);
+            setShowSuggestions(true);
+        } else {
+            setShowSuggestions(false);
+        }
+    };
+
+    const switchToCustom = () => {
+        setCodeMode('custom');
+        setAccountData(prev => ({ ...prev, code: '' }));
+        fetchSuggestedCode(accountData.type, '');
+        setShowSuggestions(true);
+        setTimeout(() => codeInputRef.current?.focus(), 50);
+    };
+
+    const switchToAuto = () => {
+        setCodeMode('auto');
+        setAccountData(prev => ({ ...prev, code: autoCode }));
+        setShowSuggestions(false);
+    };
+
+    const pickSuggestion = (code: string) => {
+        setAccountData(prev => ({ ...prev, code }));
+        setShowSuggestions(false);
+    };
 
     // JOURNAL FORM STATE
     const [journalData, setJournalData] = useState({
@@ -117,7 +186,23 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
         return { totalDebit, totalCredit, difference, isBalanced: Math.abs(difference) < 0.01 };
     };
 
+    const resetAccountForm = () => {
+        setAccountData({ code: '', name: '', type: 'EXPENSE', subtype: 'OPERATING_EXPENSE', description: '' });
+        setCodeMode('auto');
+        setAutoCode('');
+        setCodeSuggestions([]);
+        setShowSuggestions(false);
+    };
+
     const handleCreateAccount = async () => {
+        if (!accountData.name.trim()) {
+            showToast("Account name is required", "error");
+            return;
+        }
+        if (!accountData.code.trim()) {
+            showToast("Account code is required", "error");
+            return;
+        }
         setIsSubmitting(true);
         try {
             const res = await fetch("/api/accounting/accounts", {
@@ -125,12 +210,16 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(accountData)
             });
-            if (!res.ok) throw new Error("Failed to create account");
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || "Failed to create account");
+            }
             showToast("Account created successfully", "success");
+            resetAccountForm();
             setIsOpen(false);
             router.refresh();
-        } catch (error) {
-            showToast("Error creating account", "error");
+        } catch (error: any) {
+            showToast(error.message || "Error creating account", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -237,38 +326,120 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
                             type === "DELETE_ENTRY" ? "p-6" : "p-8"
                         )}>
                             {type === "NEW_ACCOUNT" ? (
-                                <div className="space-y-6">
+                                <div className="space-y-5">
+                                    {/* Account Type — pick first so code range is known */}
                                     <div>
-                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Account Code</label>
-                                        <Input
-                                            type="text"
-                                            className="bg-white border-gray-200 h-11 font-mono"
-                                            value={accountData.code}
-                                            onChange={(e) => setAccountData(prev => ({ ...prev, code: e.target.value }))}
+                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Type</label>
+                                        <CustomSelect
+                                            value={accountData.type}
+                                            onChange={handleTypeChange}
+                                            options={[
+                                                { value: "ASSET", label: "Asset (1000–1999)" },
+                                                { value: "LIABILITY", label: "Liability (2000–2999)" },
+                                                { value: "EQUITY", label: "Equity (3000–3999)" },
+                                                { value: "REVENUE", label: "Revenue (4000–4999)" },
+                                                { value: "EXPENSE", label: "Expense (5000–5999)" },
+                                            ]}
+                                            className="w-full px-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-sm font-medium"
                                         />
                                     </div>
+
+                                    {/* Account Code */}
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <label className="block text-xs font-semibold text-gray-700 uppercase">Account Code</label>
+                                            <div className="flex items-center rounded-[6px] overflow-hidden text-[11px]"
+                                                style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                                                <button
+                                                    type="button"
+                                                    onClick={switchToAuto}
+                                                    className={cn(
+                                                        "flex items-center gap-1 px-2.5 py-1 transition-colors",
+                                                        codeMode === 'auto'
+                                                            ? "bg-[#6366F1] text-white"
+                                                            : "bg-white text-gray-500 hover:bg-gray-50"
+                                                    )}>
+                                                    <PiMagicWand className="text-[10px]" /> Auto
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={switchToCustom}
+                                                    className={cn(
+                                                        "flex items-center gap-1 px-2.5 py-1 transition-colors",
+                                                        codeMode === 'custom'
+                                                            ? "bg-[#6366F1] text-white"
+                                                            : "bg-white text-gray-500 hover:bg-gray-50"
+                                                    )}
+                                                    style={{ borderLeft: '1px solid rgba(0,0,0,0.09)' }}>
+                                                    <PiPencil className="text-[10px]" /> Custom
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {codeMode === 'auto' ? (
+                                            <div className="flex items-center gap-3 h-11 px-4 bg-indigo-50 rounded-xl font-mono text-[15px] font-[600] text-[#6366F1]"
+                                                style={{ border: '1px solid rgba(99,102,241,0.2)' }}>
+                                                {loadingCode
+                                                    ? <PiSpinner className="animate-spin text-[#6366F1]" />
+                                                    : <><PiCheck className="text-[13px] shrink-0" />{autoCode}</>}
+                                                <span className="ml-auto text-[11px] font-[400] text-indigo-400">auto-assigned</span>
+                                            </div>
+                                        ) : (
+                                            <div className="relative">
+                                                <Input
+                                                    ref={codeInputRef}
+                                                    type="text"
+                                                    className="bg-white border-gray-200 h-11 font-mono"
+                                                    placeholder={`e.g. ${autoCode || '5100'}`}
+                                                    value={accountData.code}
+                                                    onChange={(e) => handleCodeInput(e.target.value)}
+                                                    onFocus={() => { fetchSuggestedCode(accountData.type, accountData.code); setShowSuggestions(true); }}
+                                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                                                    autoComplete="off"
+                                                />
+                                                <AnimatePresence>
+                                                    {showSuggestions && codeSuggestions.length > 0 && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -4 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: -4 }}
+                                                            className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg z-50 overflow-hidden"
+                                                            style={{ border: '1px solid rgba(0,0,0,0.1)' }}>
+                                                            <div className="px-3 py-1.5 text-[10px] font-[500] text-gray-400 uppercase tracking-wider"
+                                                                style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                                                                Suggestions
+                                                            </div>
+                                                            {codeSuggestions.map(s => (
+                                                                <button
+                                                                    key={s.code}
+                                                                    type="button"
+                                                                    onMouseDown={() => pickSuggestion(s.code)}
+                                                                    className={cn(
+                                                                        "w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-indigo-50 transition-colors",
+                                                                        !s.available && "opacity-40 pointer-events-none"
+                                                                    )}>
+                                                                    <span className="font-mono text-[13px] font-[600] text-gray-900">{s.code}</span>
+                                                                    {s.name
+                                                                        ? <span className="text-[11px] text-gray-400 truncate ml-3">{s.name} · taken</span>
+                                                                        : <span className="text-[11px] text-emerald-500">available</span>}
+                                                                </button>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Account Name */}
                                     <div>
                                         <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Account Name</label>
                                         <Input
                                             type="text"
                                             className="bg-white border-gray-200 h-11"
+                                            placeholder="e.g. Office Supplies"
                                             value={accountData.name}
                                             onChange={(e) => setAccountData(prev => ({ ...prev, name: e.target.value }))}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Type</label>
-                                        <CustomSelect
-                                            value={accountData.type}
-                                            onChange={val => setAccountData(prev => ({ ...prev, type: val }))}
-                                            options={[
-                                                { value: "ASSET", label: "Asset" },
-                                                { value: "LIABILITY", label: "Liability" },
-                                                { value: "EQUITY", label: "Equity" },
-                                                { value: "REVENUE", label: "Revenue" },
-                                                { value: "EXPENSE", label: "Expense" },
-                                            ]}
-                                            className="w-full px-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-sm font-medium"
                                         />
                                     </div>
                                 </div>
@@ -334,9 +505,17 @@ export function AccountingActions({ type, entryId }: AccountingActionsProps) {
     return (
         <>
             {type === "NEW_ACCOUNT" ? (
-                <Button onClick={() => setIsOpen(true)} className="bg-[#6366F1] text-white">
-                    <PiPlus className="mr-2" /> New Account
-                </Button>
+                variant === 'primary' ? (
+                    <Button onClick={() => setIsOpen(true)} className="bg-[#6366F1] text-white">
+                        <PiPlus className="mr-2" /> New Account
+                    </Button>
+                ) : (
+                    <button onClick={() => setIsOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-white text-gray-600 text-[12px] font-[500] hover:bg-gray-50 transition-colors"
+                        style={{ border: '1px solid rgba(0,0,0,0.09)' }}>
+                        <PiPlus className="text-[12px]" /> New Account
+                    </button>
+                )
             ) : type === "MANUAL_JOURNAL" ? (
                 <Button onClick={() => setIsOpen(true)} className="bg-[#6366F1] text-white">
                     <PiBookOpenText className="mr-2" /> Manual Journal
