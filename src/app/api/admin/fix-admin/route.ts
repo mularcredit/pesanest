@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 export async function GET() {
     try {
         const email = 'admin@payridge.co.ke';
-        const password = 'admin123';
+        const password = 'Admin@123';
         const hash = await bcrypt.hash(password, 12);
 
         const user = await prisma.user.upsert({
