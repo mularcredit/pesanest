@@ -12,6 +12,7 @@ import {
     PiWarningCircle
 } from "react-icons/pi";
 import { requirePermission } from "@/lib/access-control";
+import { SyncPermissionsButton } from "./SyncPermissionsButton";
 
 export default async function RolesPage() {
     const session = await auth();
@@ -43,15 +44,18 @@ export default async function RolesPage() {
                     <h1 className="text-[20px] font-[600] text-gray-900 tracking-tight">Roles</h1>
                     <p className="text-[12.5px] text-gray-400 mt-0.5">Manage user roles and access control</p>
                 </div>
-                {(session?.user as any).role === 'SYSTEM_ADMIN' && (
-                    <Link
-                        href="/dashboard/roles/new"
-                        className="flex items-center gap-2 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] bg-[#6366F1] text-white hover:bg-indigo-600 transition-colors"
-                    >
-                        <PiPlus className="text-[14px]" />
-                        Create Role
-                    </Link>
-                )}
+                <div className="flex items-center gap-2">
+                    <SyncPermissionsButton />
+                    {(session?.user as any).role === 'SYSTEM_ADMIN' && (
+                        <Link
+                            href="/dashboard/roles/new"
+                            className="flex items-center gap-2 px-4 py-2 rounded-[6px] text-[12.5px] font-[500] bg-[#6366F1] text-white hover:bg-indigo-600 transition-colors"
+                        >
+                            <PiPlus className="text-[14px]" />
+                            Create Role
+                        </Link>
+                    )}
+                </div>
             </div>
 
             {/* Roles Grid */}

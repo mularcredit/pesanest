@@ -132,30 +132,65 @@ async function main() {
         { resource: 'USERS', action: 'CREATE', description: 'Create new users' },
         { resource: 'USERS', action: 'EDIT', description: 'Edit user details' },
         { resource: 'USERS', action: 'DELETE', description: 'Deactivate users' },
+        { resource: 'USERS', action: 'MANAGE', description: 'Full user management (create, edit, deactivate)' },
 
         // Roles
         { resource: 'ROLES', action: 'MANAGE', description: 'Manage roles and permissions' },
 
-        // Finance & Accounting
+        // Accounting Module (broad access)
+        { resource: 'ACCOUNTING', action: 'VIEW', description: 'Access the accounting module' },
+
+        // Finance & Ledger
         { resource: 'GL', action: 'VIEW', description: 'View General Ledger' },
         { resource: 'GL', action: 'MANAGE', description: 'Manage Chart of Accounts and Journal Entries' },
-        { resource: 'INVOICES', action: 'VIEW', description: 'View Vendor Invoices' },
-        { resource: 'INVOICES', action: 'CREATE', description: 'Create/Upload Vendor Invoices' },
-        { resource: 'INVOICES', action: 'APPROVE', description: 'Approve Vendor Invoices' },
-        { resource: 'PAYMENTS', action: 'create', description: 'Initiate Payments' },
-        { resource: 'PAYMENTS', action: 'approve', description: 'Approve Payments' },
+        { resource: 'LEDGER', action: 'VIEW', description: 'View ledger entries and journal history' },
+        { resource: 'REPORTS', action: 'VIEW', description: 'View financial reports (trial balance, P&L, etc.)' },
+        { resource: 'PAYABLES', action: 'VIEW', description: 'View accounts payable' },
 
-        // Sales
-        { resource: 'CUSTOMERS', action: 'MANAGE', description: 'Manage Customers' },
-        { resource: 'SALES', action: 'MANAGE', description: 'Create and Send Invoices to Customers' },
+        // Invoices & Payments
+        { resource: 'INVOICES', action: 'VIEW', description: 'View vendor invoices' },
+        { resource: 'INVOICES', action: 'CREATE', description: 'Create/upload vendor invoices' },
+        { resource: 'INVOICES', action: 'MANAGE', description: 'Full invoice management (create, edit, void)' },
+        { resource: 'INVOICES', action: 'APPROVE', description: 'Approve vendor invoices' },
+        { resource: 'PAYMENTS', action: 'CREATE', description: 'Initiate payments' },
+        { resource: 'PAYMENTS', action: 'APPROVE', description: 'Approve payments' },
 
-        // Expenses
+        // Sales & Customers
+        { resource: 'CUSTOMERS', action: 'VIEW', description: 'View customer list' },
+        { resource: 'CUSTOMERS', action: 'MANAGE', description: 'Create and manage customers' },
+        { resource: 'SALES', action: 'MANAGE', description: 'Create and send customer invoices' },
+
+        // Expenses & Approvals
         { resource: 'EXPENSES', action: 'VIEW_ALL', description: 'View all company expenses' },
-        { resource: 'EXPENSES', action: 'APPROVE', description: 'Approve team expenses' },
+        { resource: 'EXPENSES', action: 'VIEW_TEAM', description: 'View team expenses' },
+        { resource: 'EXPENSES', action: 'APPROVE', description: 'Approve expense requests' },
         { resource: 'REQUISITIONS', action: 'APPROVE', description: 'Approve requisition requests' },
+        { resource: 'REQUISITIONS', action: 'VIEW_BRANCH', description: 'View branch-level requisitions' },
+        { resource: 'APPROVALS', action: 'VIEW', description: 'View approval queue' },
+
+        // Finance Dashboards
+        { resource: 'WALLET', action: 'VIEW', description: 'View treasury/wallet balances' },
+        { resource: 'FINANCE', action: 'VIEW', description: 'View financial dashboards and summaries' },
+        { resource: 'BUDGETS', action: 'VIEW', description: 'View budget plans' },
+        { resource: 'FORECASTING', action: 'VIEW', description: 'View financial forecasts' },
+        { resource: 'STUDIO', action: 'VIEW', description: 'Access finance studio' },
+        { resource: 'ANALYTICS', action: 'VIEW', description: 'View analytics and workflow reports' },
+
+        // Vendors & Procurement
+        { resource: 'VENDORS', action: 'VIEW', description: 'View vendor list' },
+        { resource: 'CONTRACTS', action: 'VIEW', description: 'View contracts' },
+        { resource: 'ASSETS', action: 'VIEW', description: 'View company assets register' },
+
+        // Branches & Regions
+        { resource: 'BRANCHES', action: 'VIEW', description: 'View branches' },
+        { resource: 'BRANCHES', action: 'MANAGE', description: 'Create and manage branches' },
+        { resource: 'REGIONS', action: 'VIEW', description: 'View regions' },
 
         // System
         { resource: 'SETTINGS', action: 'MANAGE', description: 'Manage system settings' },
+        { resource: 'IMPORT', action: 'MANAGE', description: 'Manage data imports' },
+        { resource: 'POLICIES', action: 'VIEW', description: 'View company policies' },
+        { resource: 'POLICIES', action: 'MANAGE', description: 'Create and manage policies' },
         { resource: 'AUDIT', action: 'VIEW', description: 'View audit logs' },
     ]
 
@@ -188,12 +223,18 @@ async function main() {
             description: 'Oversees all financial operations, approvals, and reporting',
             isSystem: true,
             permissions: [
+                'ACCOUNTING_VIEW',
                 'GL_VIEW', 'GL_MANAGE',
-                'INVOICES_VIEW', 'INVOICES_CREATE', 'INVOICES_APPROVE',
-                'PAYMENTS_create', 'PAYMENTS_approve',
-                'CUSTOMERS_MANAGE', 'SALES_MANAGE',
-                'EXPENSES_VIEW_ALL', 'EXPENSES_APPROVE', 'REQUISITIONS_APPROVE',
-                'USERS_VIEW', 'AUDIT_VIEW'
+                'LEDGER_VIEW', 'REPORTS_VIEW', 'PAYABLES_VIEW',
+                'INVOICES_VIEW', 'INVOICES_MANAGE', 'INVOICES_CREATE', 'INVOICES_APPROVE',
+                'PAYMENTS_CREATE', 'PAYMENTS_APPROVE',
+                'CUSTOMERS_VIEW', 'CUSTOMERS_MANAGE', 'SALES_MANAGE',
+                'EXPENSES_VIEW_ALL', 'EXPENSES_APPROVE',
+                'REQUISITIONS_APPROVE', 'REQUISITIONS_VIEW_BRANCH', 'APPROVALS_VIEW',
+                'WALLET_VIEW', 'FINANCE_VIEW', 'BUDGETS_VIEW', 'FORECASTING_VIEW',
+                'VENDORS_VIEW', 'CONTRACTS_VIEW', 'ASSETS_VIEW',
+                'BRANCHES_VIEW', 'REGIONS_VIEW',
+                'USERS_VIEW', 'AUDIT_VIEW', 'ANALYTICS_VIEW',
             ]
         },
         {
@@ -201,10 +242,15 @@ async function main() {
             description: 'Day-to-day accounting, bookkeeping, and invoice processing',
             isSystem: false,
             permissions: [
-                'GL_VIEW',
-                'INVOICES_VIEW', 'INVOICES_CREATE',
-                'CUSTOMERS_MANAGE', 'SALES_MANAGE',
-                'EXPENSES_VIEW_ALL'
+                'ACCOUNTING_VIEW',
+                'GL_VIEW', 'GL_MANAGE',
+                'LEDGER_VIEW', 'REPORTS_VIEW', 'PAYABLES_VIEW',
+                'INVOICES_VIEW', 'INVOICES_CREATE', 'INVOICES_MANAGE',
+                'PAYMENTS_CREATE',
+                'CUSTOMERS_VIEW', 'CUSTOMERS_MANAGE', 'SALES_MANAGE',
+                'EXPENSES_VIEW_ALL', 'APPROVALS_VIEW',
+                'VENDORS_VIEW', 'ASSETS_VIEW',
+                'AUDIT_VIEW',
             ]
         },
         {

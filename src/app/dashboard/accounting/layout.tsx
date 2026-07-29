@@ -4,14 +4,15 @@ import { requirePermission } from "@/lib/access-control";
 export default async function AccountingLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
 
-    // Check if user has ANY accounting-related permission
+    // Allow if user has any accounting-related permission (GL.VIEW covers legacy seeded users)
     requirePermission(session, [
         'ACCOUNTING.VIEW',
+        'GL.VIEW',
         'REPORTS.VIEW',
         'CUSTOMERS.VIEW',
         'PAYABLES.VIEW',
         'SALES.MANAGE',
-        'LEDGER.VIEW'
+        'LEDGER.VIEW',
     ]);
 
     return <>{children}</>;
